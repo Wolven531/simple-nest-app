@@ -22,14 +22,11 @@ run_unit_tests:
     # - node ./specs/start.js ./specs/async.spec.js
     - npm test
 
-build_app:
+build_and_run_app:
   script:
     - npm install
     - npm run prebuild
     - npm run build
-
-run_app:
-  script:
     - npm run start:prod
 
 # test_db:
