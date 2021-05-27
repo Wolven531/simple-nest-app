@@ -16,17 +16,28 @@ cache:
   paths:
     - node_modules/
 
+stages:
+  - build
+  - test
+  - run
+
+build_app:
+  stage: build
+  script:
+    - npm install
+    - npm run prebuild
+    - npm run build
+
 run_unit_tests:
+  stage: test
   script:
     - npm install
     # - node ./specs/start.js ./specs/async.spec.js
     - npm test
 
-build_and_run_app:
+run_app:
+  stage: run
   script:
-    - npm install
-    - npm run prebuild
-    - npm run build
     - npm run start:prod
 
 # test_db:
