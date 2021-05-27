@@ -20,7 +20,7 @@ test_async:
   script:
     - npm install
     # - node ./specs/start.js ./specs/async.spec.js
-    # - npm test
+    - npm test
 
 # test_db:
 #   script:
