@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import compression from 'compression'
+// import compression from 'compression'
 import 'reflect-metadata'
 import { AppModule } from './app/app.module'
 import {
@@ -11,6 +11,7 @@ import {
 	ENV_API_PORT,
 	ENV_API_PORT_DEFAULT,
 } from './constants'
+import { AppService } from './services/app.service'
 
 async function bootstrap() {
 	const ctx = ' bootstrap | main '
@@ -21,7 +22,7 @@ async function bootstrap() {
 		logger: ['debug', 'error', 'log', 'verbose', 'warn'],
 	})
 
-	// const appService = app.get(AppService)
+	const appService = app.get(AppService)
 	const configService = app.get(ConfigService)
 	// const jsonLoaderService = app.get(JsonLoaderService)
 	const logger = app.get(Logger)
@@ -55,8 +56,14 @@ async function bootstrap() {
 
 	logger.debug(`Loaded apiKey from env=${envApiKey}`, ctx)
 
+	const isValid = await appService.isRiotTokenValid()
+
+	if (!isValid) {
+		logger.warn('Riot API token is invalid...', ctx)
+	}
+
+	// TODO - potentially update users on app start
 	// const isFresh = jsonLoaderService.isUsersFileFresh()
-	// const isValid = await appService.isRiotTokenValid()
 
 	// if (isFresh) {
 	// 	logger.log('Skipping user refresh since users were all fresh', ctx)
@@ -71,19 +78,18 @@ async function bootstrap() {
 	// 	)
 
 	// 	logger.log(`Updated ${updatedUsers.length} users`, ctx)
-	// } else {
-	// 	logger.log('Skipping user refresh since Riot API token is invalid...', ctx)
 	// }
 
-	logger.log('Enabling API response compression...', ctx)
+	// TODO - enable compression
+	// logger.log('Enabling API response compression...', ctx)
 
-	app.use(
-		compression({
-			level: 9,
-			memLevel: 9,
-			threshold: 256,
-		}),
-	)
+	// app.use(
+	// 	compression({
+	// 		level: 9,
+	// 		memLevel: 9,
+	// 		threshold: 256,
+	// 	}),
+	// )
 
 	logger.log(`Listening for NestJS app on port ${port}...`, ctx)
 
