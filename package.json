@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "prebuild": "rimraf dist && npm i",
+    "prebuild": "rimraf dist && npm i && npm run test:cov",
     "start": "node dist/main",
     "start:debug": "nest start --debug --watch",
     "start:dev": "nest start",
