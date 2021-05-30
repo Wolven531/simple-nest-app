@@ -8,7 +8,8 @@ import {
 	HttpStatus,
 	Inject,
 	Logger,
-	Param,
+	// Param,
+	Query,
 } from '@nestjs/common'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
@@ -37,9 +38,10 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async searchUsers(
-		@Param('searchKey') searchKey: string,
+		// @Param('searchKey') searchKey: string,
+		@Query('searchKey') searchKey: string,
 	): Promise<Summoner | null> {
-		this.logger.debug('', ' User-Ctrl | searchUsers ')
+		this.logger.debug(`searchKey="${searchKey}"`, ' User-Ctrl | searchUsers ')
 
 		return this.summonerService.searchByName(searchKey)
 	}
