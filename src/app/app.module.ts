@@ -11,7 +11,7 @@ import { AppService } from '../services/app.service'
 // import { MatchlistService } from '../services/matchlist.service'
 // import { StatsService } from '../services/stats.service'
 // import { StatsModule } from '../stats/stats.module'
-// import { UserModule } from '../user/user.module'
+import { UserModule } from '../user/user.module'
 // local
 import { AppController } from './app.controller'
 
@@ -42,7 +42,7 @@ import { AppController } from './app.controller'
 		// MasteryModule,
 		// MatchlistModule,
 		// StatsModule,
-		// UserModule,
+		UserModule,
 	],
 	providers: [
 		AppService,
