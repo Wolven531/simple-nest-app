@@ -9,8 +9,11 @@ describe('ConfigController', () => {
 	// const fakeApiKey = 'some-api-key'
 	let controller: ConfigController
 	let testModule: TestingModule
+	let mockIsRiotTokenValid: jest.Mock
 
 	beforeEach(async () => {
+		mockIsRiotTokenValid = jest.fn().mockResolvedValue(true)
+
 		testModule = await Test.createTestingModule({
 			controllers: [ConfigController],
 			imports: [HttpModule],
@@ -18,7 +21,7 @@ describe('ConfigController', () => {
 				{
 					provide: AppService,
 					useFactory: () => ({
-						isRiotTokenValid: jest.fn(() => Promise.resolve(true)),
+						isRiotTokenValid: mockIsRiotTokenValid,
 					}),
 				},
 				// {
@@ -49,16 +52,34 @@ describe('ConfigController', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
-		describe('invoke getConfig()', () => {
+		describe('invoke getConfig() w/ mocked return from AppSvc set to true', () => {
 			let resp: Record<string, unknown>
 
 			beforeEach(async () => {
+				mockIsRiotTokenValid.mockResolvedValue(true)
+
 				resp = await controller.getConfig()
 			})
 
 			it('returns object w/ riotTokenIsValid set according to mocked return from AppSvc', () => {
 				expect(resp).toEqual({
 					riotTokenIsValid: true,
+				})
+			})
+		})
+
+		describe('invoke getConfig() w/ mocked return from AppSvc set to false', () => {
+			let resp: Record<string, unknown>
+
+			beforeEach(async () => {
+				mockIsRiotTokenValid.mockResolvedValue(false)
+
+				resp = await controller.getConfig()
+			})
+
+			it('returns object w/ riotTokenIsValid set according to mocked return from AppSvc', () => {
+				expect(resp).toEqual({
+					riotTokenIsValid: false,
 				})
 			})
 		})
