@@ -62,18 +62,19 @@ describe('ConfigController', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
-		describe('invoke getConfig() w/ mocked return from AppSvc set to true', () => {
+		describe('invoke getConfig() w/ mocked return from AppSvc set to true, secret provided matches config value', () => {
 			const fakeValidity = true
 			let resp: Record<string, unknown>
 
 			beforeEach(async () => {
 				mockIsRiotTokenValid.mockResolvedValue(fakeValidity)
 
-				resp = await controller.getConfig(undefined)
+				resp = await controller.getConfig(fakeServerSecret)
 			})
 
-			it('returns object w/ riotTokenIsValid set according to mocked return from AppSvc', () => {
+			it('returns object w/ riotTokenIsValid and riotSecret set according to mocked return from AppSvc and config', () => {
 				expect(resp).toEqual({
+					riotSecret: fakeApiKey,
 					riotTokenIsValid: fakeValidity,
 				})
 			})
