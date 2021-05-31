@@ -4,5 +4,6 @@ export interface APIConfig {
 	// NODE_ENV?: string
 	// SLC_API_DOCKER_TAG?: string
 	// required below
-	RIOT_SECRET: string;
+	RIOT_SECRET: string
+	SERVER_SECRET: string
 }
