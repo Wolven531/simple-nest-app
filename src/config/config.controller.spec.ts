@@ -1,11 +1,12 @@
 import { HttpModule, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+// import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { AppService } from '../services/app.service'
 import { ConfigController } from './config.controller'
 
 describe('ConfigController', () => {
-	const fakeApiKey = 'some-api-key'
+	// const fakeApiKey = 'some-api-key'
 	let controller: ConfigController
 	let testModule: TestingModule
 
@@ -15,13 +16,19 @@ describe('ConfigController', () => {
 			imports: [HttpModule],
 			providers: [
 				{
-					provide: ConfigService,
+					provide: AppService,
 					useFactory: () => ({
-						// NOTE: may need to udpate this mock logic when more config values are used
-						// get: jest.fn((path, defaultVal) => fakeApiKey),
-						get: jest.fn(() => fakeApiKey),
+						isRiotTokenValid: jest.fn(() => Promise.resolve(true)),
 					}),
 				},
+				// {
+				// 	provide: ConfigService,
+				// 	useFactory: () => ({
+				// 		// NOTE: may need to udpate this mock logic when more config values are used
+				// 		// get: jest.fn((path, defaultVal) => fakeApiKey),
+				// 		get: jest.fn(() => fakeApiKey),
+				// 	}),
+				// },
 				Logger,
 			],
 		}).compile()
@@ -43,15 +50,15 @@ describe('ConfigController', () => {
 		})
 
 		describe('invoke getConfig()', () => {
-			let resp: Record<string, string>
+			let resp: Record<string, unknown>
 
 			beforeEach(async () => {
 				resp = await controller.getConfig()
 			})
 
-			it('returns object w/ riotSecret property', () => {
+			it('returns object w/ riotTokenIsValid set according to mocked return from AppSvc', () => {
 				expect(resp).toEqual({
-					riotSecret: fakeApiKey,
+					riotTokenIsValid: true,
 				})
 			})
 		})
