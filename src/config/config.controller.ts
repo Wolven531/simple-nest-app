@@ -9,17 +9,22 @@ import {
 	Query,
 } from '@nestjs/common'
 // import { ApiParam } from '@nestjs/swagger'
-// import { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { AppService } from '../services/app.service'
-// import { ENV_API_KEY, ENV_API_KEY_DEFAULT } from '../constants'
+import {
+	ENV_API_KEY,
+	ENV_API_KEY_DEFAULT,
+	ENV_API_SECRET_KEY,
+	ENV_API_SECRET_KEY_DEFAULT,
+} from '../constants'
 
 @Controller('config')
 export class ConfigController {
 	constructor(
 		@Inject(AppService)
 		private readonly appService: AppService,
-		// @Inject(ConfigService)
-		// private readonly configService: ConfigService,
+		@Inject(ConfigService)
+		private readonly configService: ConfigService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -49,16 +54,23 @@ export class ConfigController {
 
 		const riotTokenIsValid = await this.appService.isRiotTokenValid()
 
-		// const riotSecret = this.configService.get<string>(
-		// 	ENV_API_KEY,
-		// 	ENV_API_KEY_DEFAULT,
-		// )
-		// return {
-		// 	riotSecret,
-		// }
+		const riotSecret = this.configService.get<string>(
+			ENV_API_KEY,
+			ENV_API_KEY_DEFAULT,
+		)
+		const serverSecret = this.configService.get<string>(
+			ENV_API_SECRET_KEY,
+			ENV_API_SECRET_KEY_DEFAULT,
+		)
 
-		return {
+		const privateConfig = {
+			riotSecret,
 			riotTokenIsValid,
 		}
+		const publicConfig = {
+			riotTokenIsValid,
+		}
+
+		return secret === serverSecret ? privateConfig : publicConfig
 	}
 }
