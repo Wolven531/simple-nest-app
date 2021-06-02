@@ -5,7 +5,6 @@ import {
 	Injectable,
 	Logger,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from 'axios'
 import { REGION } from '../constants'
 import { Summoner } from '../models/summoner.model'
@@ -18,7 +17,7 @@ export class SummonerService {
 		'lol/summoner/v4/summoners/by-name'
 
 	constructor(
-		@Inject(ConfigService)
+		@Inject(AppService)
 		private readonly appService: AppService,
 		@Inject(HttpService)
 		private readonly httpService: HttpService,
