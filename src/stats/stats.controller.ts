@@ -1,5 +1,3 @@
-import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
 import {
 	BadRequestException,
 	Controller,
@@ -11,8 +9,9 @@ import {
 	Logger,
 	Query,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { ENV_API_KEY, ENV_API_KEY_DEFAULT } from '../constants'
+import { CalculatedStats } from '../models/calculated-stats.model'
+import { Game } from '../models/game.model'
+import { AppService } from '../services/app.service'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
@@ -20,7 +19,7 @@ import { StatsService } from '../services/stats.service'
 export class StatsController {
 	constructor(
 		private readonly matchlistService: MatchlistService,
-		private readonly configService: ConfigService,
+		private readonly appService: AppService,
 		private readonly statsService: StatsService,
 		@Inject(Logger)
 		private readonly logger: Logger,
@@ -52,7 +51,7 @@ export class StatsController {
 			' getSummary | StatsCtrl ',
 		)
 
-		const apiKey = this.configService.get(ENV_API_KEY, ENV_API_KEY_DEFAULT)
+		const apiKey = this.appService.getRiotToken()
 
 		const matches = await this.matchlistService.getMatchlist(
 			apiKey,

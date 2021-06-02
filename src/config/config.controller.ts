@@ -58,6 +58,8 @@ export class ConfigController {
 			ENV_API_KEY,
 			ENV_API_KEY_DEFAULT,
 		)
+		const riotSecretOverride = this.appService.getRiotToken()
+		const riotSecretOverridden = riotSecretOverride !== riotSecret
 		const serverSecret = this.configService.get<string>(
 			ENV_API_SECRET_KEY,
 			ENV_API_SECRET_KEY_DEFAULT,
@@ -65,6 +67,8 @@ export class ConfigController {
 
 		const privateConfig = {
 			riotSecret,
+			riotSecretOverridden,
+			riotSecretOverride: riotSecretOverridden ? riotSecretOverride : undefined,
 			riotTokenIsValid,
 		}
 		const publicConfig = {

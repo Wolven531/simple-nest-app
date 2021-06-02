@@ -5,12 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 // import compression from 'compression'
 import 'reflect-metadata'
 import { AppModule } from './app/app.module'
-import {
-	ENV_API_KEY,
-	ENV_API_KEY_DEFAULT,
-	ENV_API_PORT,
-	ENV_API_PORT_DEFAULT,
-} from './constants'
+import { ENV_API_PORT, ENV_API_PORT_DEFAULT } from './constants'
 import { AppService } from './services/app.service'
 
 async function bootstrap() {
@@ -40,7 +35,7 @@ async function bootstrap() {
 			'https://developer.riotgames.com/apis',
 		)
 		.setVersion('1.0')
-		.addTag('compare')
+		// .addTag('compare')
 		.build()
 	const document = SwaggerModule.createDocument(app, swaggerOptions)
 
@@ -49,7 +44,7 @@ async function bootstrap() {
 	SwaggerModule.setup(swaggerEndpoint, app, document)
 
 	// NOTE: get values from ConfigService, which uses env files and vars
-	const envApiKey = configService.get<string>(ENV_API_KEY, ENV_API_KEY_DEFAULT)
+	const envApiKey = appService.getRiotToken()
 	const port =
 		process.env.PORT ||
 		configService.get<number>(ENV_API_PORT, ENV_API_PORT_DEFAULT)

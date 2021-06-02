@@ -1,4 +1,3 @@
-import { Summoner } from '../models/summoner.model'
 import {
 	HttpService,
 	HttpStatus,
@@ -8,7 +7,9 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from 'axios'
-import { ENV_API_KEY, ENV_API_KEY_DEFAULT, REGION } from '../constants'
+import { REGION } from '../constants'
+import { Summoner } from '../models/summoner.model'
+import { AppService } from './app.service'
 
 @Injectable()
 export class SummonerService {
@@ -18,7 +19,7 @@ export class SummonerService {
 
 	constructor(
 		@Inject(ConfigService)
-		private readonly configService: ConfigService,
+		private readonly appService: AppService,
 		@Inject(HttpService)
 		private readonly httpService: HttpService,
 		@Inject(Logger)
@@ -36,10 +37,7 @@ export class SummonerService {
 		try {
 			this.logger.verbose('Grabbing riotToken...', ctx)
 
-			const riotToken = this.configService.get<string>(
-				ENV_API_KEY,
-				ENV_API_KEY_DEFAULT,
-			)
+			const riotToken = this.appService.getRiotToken()
 
 			this.logger.verbose(`riotToken="${riotToken}"`, ctx)
 			this.logger.debug('About to contact Riot API...', ctx)

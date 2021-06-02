@@ -1,5 +1,3 @@
-import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
 import {
 	Controller,
 	Get,
@@ -11,9 +9,10 @@ import {
 	Param,
 	Query,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { ApiExtraModels, ApiOperation } from '@nestjs/swagger'
-import { ENV_API_KEY, ENV_API_KEY_DEFAULT } from '../constants'
+import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
+import { AppService } from '../services/app.service'
 import { MatchlistService } from '../services/matchlist.service'
 
 @Controller('matchlist')
@@ -21,7 +20,7 @@ import { MatchlistService } from '../services/matchlist.service'
 export class MatchlistController {
 	constructor(
 		private readonly matchlistService: MatchlistService,
-		private readonly configService: ConfigService,
+		private readonly appService: AppService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -47,7 +46,7 @@ export class MatchlistController {
 			`accountId=${accountId} getLastX=${getLastX} includeGameData=${includeGameData}`,
 			' getMatchlist | MatchlistCtrl ',
 		)
-		const apiKey = this.configService.get(ENV_API_KEY, ENV_API_KEY_DEFAULT)
+		const apiKey = this.appService.getRiotToken()
 
 		return this.matchlistService.getMatchlist(
 			apiKey,
@@ -83,7 +82,7 @@ export class MatchlistController {
 	@Header('Cache-Control', 'none')
 	async getGame(@Param('gameId') gameId: number): Promise<Game> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
-		const apiKey = this.configService.get(ENV_API_KEY, ENV_API_KEY_DEFAULT)
+		const apiKey = this.appService.getRiotToken()
 
 		return this.matchlistService.getGame(apiKey, gameId) as Promise<Game>
 	}

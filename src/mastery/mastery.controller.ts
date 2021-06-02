@@ -8,9 +8,8 @@ import {
 	Logger,
 	Param,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { ApiExtraModels, ApiOperation } from '@nestjs/swagger'
-import { ENV_API_KEY, ENV_API_KEY_DEFAULT } from '../constants'
+import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
 
 @Controller('mastery')
@@ -18,7 +17,7 @@ import { MasteryService } from '../services/mastery.service'
 export class MasteryController {
 	constructor(
 		private readonly masteryService: MasteryService,
-		private readonly configService: ConfigService,
+		private readonly appService: AppService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -43,7 +42,7 @@ export class MasteryController {
 			`summonerId=${summonerId}`,
 			' getMasteryTotal | MatchlistCtrl ',
 		)
-		const apiKey = this.configService.get(ENV_API_KEY, ENV_API_KEY_DEFAULT)
+		const apiKey = this.appService.getRiotToken()
 
 		return this.masteryService.getMasteryTotal(apiKey, summonerId)
 	}
