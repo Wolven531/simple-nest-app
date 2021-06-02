@@ -67,6 +67,29 @@ describe('App Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
+		describe('getRiotToken() w/o setting it', () => {
+			let actual: string
+
+			beforeEach(() => {
+				actual = service.getRiotToken()
+			})
+
+			it('returns value from ConfigService', () => {
+				expect(actual).toEqual('some-api-key')
+			})
+
+			describe('setRiotToken()', () => {
+				beforeEach(() => {
+					service.setRiotToken('overridden-value')
+				})
+
+				it('sets private override value, and return value from getRiotToken() is updated', () => {
+					expect(service['overrideToken']).toEqual('overridden-value')
+					expect(service.getRiotToken()).toEqual('overridden-value')
+				})
+			})
+		})
+
 		testCases.forEach(
 			({
 				descriptionMockedBehavior,
