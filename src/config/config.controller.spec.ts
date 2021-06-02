@@ -24,6 +24,7 @@ describe('ConfigController', () => {
 					provide: AppService,
 					useFactory: () => ({
 						isRiotTokenValid: mockIsRiotTokenValid,
+						getRiotToken: jest.fn().mockReturnValue(fakeApiKey),
 					}),
 				},
 				{
@@ -75,6 +76,8 @@ describe('ConfigController', () => {
 			it('returns object w/ riotTokenIsValid and riotSecret set according to mocked return from AppSvc and config', () => {
 				expect(resp).toEqual({
 					riotSecret: fakeApiKey,
+					riotSecretOverridden: false,
+					riotSecretOverride: undefined,
 					riotTokenIsValid: fakeValidity,
 				})
 			})

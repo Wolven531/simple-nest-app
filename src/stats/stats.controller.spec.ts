@@ -1,9 +1,10 @@
-import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
 import { BadRequestException, HttpModule, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { CalculatedStats } from '../models/calculated-stats.model'
+import { Game } from '../models/game.model'
+import { AppService } from '../services/app.service'
 import { JsonLoaderService } from '../services/json-loader.service'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
@@ -19,6 +20,7 @@ describe('StatsController', () => {
 			imports: [HttpModule],
 			providers: [
 				MatchlistService,
+				AppService,
 				ConfigService,
 				StatsService,
 				Logger,

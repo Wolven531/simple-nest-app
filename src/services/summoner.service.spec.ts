@@ -1,10 +1,10 @@
-import { Summoner } from '../models/summoner.model'
 import { HttpModule, HttpService, HttpStatus, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AxiosResponse } from 'axios'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
+import { Summoner } from '../models/summoner.model'
+import { AppService } from './app.service'
 import { SummonerService } from './summoner.service'
 
 type TestCase_SearchByName = {
@@ -64,9 +64,9 @@ describe('Summoner Service', () => {
 			imports: [HttpModule],
 			providers: [
 				{
-					provide: ConfigService,
+					provide: AppService,
 					useFactory: () => ({
-						get: jest.fn().mockReturnValue(fakeAPIKey),
+						getRiotToken: jest.fn().mockReturnValue(fakeAPIKey),
 					}),
 				},
 				SummonerService,

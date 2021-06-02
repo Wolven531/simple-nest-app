@@ -2,6 +2,7 @@ import { HttpModule, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { AppService } from '../services/app.service'
 import { JsonLoaderService } from '../services/json-loader.service'
 import { MasteryService } from '../services/mastery.service'
 import { MasteryController } from './mastery.controller'
@@ -14,7 +15,13 @@ describe('MasteryController', () => {
 		testModule = await Test.createTestingModule({
 			controllers: [MasteryController],
 			imports: [HttpModule],
-			providers: [ConfigService, JsonLoaderService, Logger, MasteryService],
+			providers: [
+				AppService,
+				ConfigService,
+				JsonLoaderService,
+				Logger,
+				MasteryService,
+			],
 		}).compile()
 
 		controller = testModule.get(MasteryController)

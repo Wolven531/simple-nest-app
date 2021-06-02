@@ -1,12 +1,12 @@
-import { Summoner } from '../models/summoner.model'
 // import { User } from '../models/user.model'
 // import { HttpModule, HttpService, HttpStatus, Logger } from '@nestjs/common'
 import { HttpModule, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 // import { AxiosResponse } from 'axios'
 // import childProcess from 'child_process'
 import { toggleMockedLogger } from '../../test/utils'
+import { Summoner } from '../models/summoner.model'
+import { AppService } from '../services/app.service'
 import { JsonLoaderService } from '../services/json-loader.service'
 import { SummonerService } from '../services/summoner.service'
 import { UserController } from './user.controller'
@@ -14,15 +14,25 @@ import { UserController } from './user.controller'
 describe('UserController', () => {
 	let controller: UserController
 	let testModule: TestingModule
+	let summonerService: SummonerService
 
 	beforeEach(async () => {
 		testModule = await Test.createTestingModule({
 			controllers: [UserController],
 			imports: [HttpModule],
-			providers: [ConfigService, JsonLoaderService, SummonerService, Logger],
+			providers: [
+				{
+					provide: SummonerService,
+					useFactory: () => ({
+						searchByName: jest.fn(() => Promise.resolve()),
+					}),
+				},
+				Logger,
+			],
 		}).compile()
 
 		controller = testModule.get(UserController)
+		summonerService = testModule.get(SummonerService)
 	})
 
 	afterEach(async () => {
@@ -120,7 +130,7 @@ describe('UserController', () => {
 					// jest.spyOn(testModule.get(HttpService), 'get')
 					// 	.mockImplementation(mockHttpServiceGet)
 					jest
-						.spyOn(testModule.get(SummonerService), 'searchByName')
+						.spyOn(summonerService, 'searchByName')
 						.mockImplementation(mockSearchByName)
 
 					resp = await controller.searchUsers('nameForWhichToSearch')
@@ -132,9 +142,7 @@ describe('UserController', () => {
 			afterEach(() => {
 				// jest.spyOn(testModule.get(HttpService), 'get')
 				// 	.mockRestore()
-				jest
-					.spyOn(testModule.get(SummonerService), 'searchByName')
-					.mockRestore()
+				jest.spyOn(summonerService, 'searchByName').mockRestore()
 			})
 
 			it('invokes SummonerService.searchByName(), does NOT throw error', () => {
