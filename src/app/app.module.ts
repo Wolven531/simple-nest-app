@@ -1,5 +1,5 @@
 import { object, string } from '@hapi/joi'
-import { HttpModule, Module } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APIConfig, ConfigurationModule } from '../config'
 import { SharedModule } from '../shared/shared.module'
@@ -37,7 +37,6 @@ import { AppController } from './app.controller'
 				allowUnknown: true,
 			},
 		}),
-		HttpModule,
 		ConfigurationModule,
 		// MasteryModule,
 		// MatchlistModule,
