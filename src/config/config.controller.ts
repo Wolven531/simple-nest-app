@@ -1,22 +1,23 @@
 import {
+	Body,
 	Controller,
 	Get,
 	HttpCode,
 	HttpStatus,
 	Inject,
 	Logger,
-	// Param,
+	Patch,
 	Query,
 } from '@nestjs/common'
-// import { ApiParam } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
-import { AppService } from '../services/app.service'
 import {
 	ENV_API_KEY,
 	ENV_API_KEY_DEFAULT,
 	ENV_API_SECRET_KEY,
 	ENV_API_SECRET_KEY_DEFAULT,
 } from '../constants'
+import { AppService } from '../services/app.service'
+import { UpdateConfigDto } from './update-config.dto'
 
 @Controller('config')
 export class ConfigController {
@@ -37,15 +38,7 @@ export class ConfigController {
 	@Get()
 	@HttpCode(HttpStatus.OK)
 	async getConfig(
-		// @Param('secret') secret: string,
-		// @Query('secret') secret: string,
-		// @Query('secret') secret: string | undefined = undefined,
-		// @Query() secret: string = undefined,
-		// @Query() secret: string,
 		@Query('secret') secret: string,
-		// @Query() query: Record<string, unknown>,
-		// secret: string = undefined,
-		// secret: string,
 	): Promise<Record<string, unknown>> {
 		this.logger.verbose(
 			`GET request received (w/ secret = ${!!secret}, secret="${secret}")`,
@@ -76,5 +69,32 @@ export class ConfigController {
 		}
 
 		return secret === serverSecret ? privateConfig : publicConfig
+	}
+
+	@Get('check-token')
+	@HttpCode(HttpStatus.OK)
+	isTokenValid(): Promise<boolean> {
+		this.logger.verbose('GET request received', ' isTokenValid | Config-Ctrl ')
+
+		return this.appService.isRiotTokenValid()
+	}
+
+	@Patch('set-token')
+	@HttpCode(HttpStatus.OK)
+	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
+		this.logger.verbose(
+			`PATCH request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
+			' updateConfig | Config-Ctrl ',
+		)
+
+		const serverSecret = this.configService.get<string>(ENV_API_SECRET_KEY)
+
+		if (updateConfigDto.secret !== serverSecret) {
+			return Promise.resolve(false)
+		}
+
+		this.appService.setRiotToken(updateConfigDto.token)
+
+		return Promise.resolve(true)
 	}
 }
