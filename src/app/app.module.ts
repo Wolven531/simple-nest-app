@@ -1,17 +1,16 @@
 import { object, string } from '@hapi/joi'
-import { HttpModule, Logger, Module } from '@nestjs/common'
+import { HttpModule, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-// in "aunt / uncle" dirs
 import { APIConfig, ConfigurationModule } from '../config'
+import { SharedModule } from '../shared/shared.module'
+import { UserModule } from '../user/user.module'
 // import { MasteryModule } from '../mastery/mastery.module'
 // import { MatchlistModule } from '../matchlist/matchlist.module'
 // services
-import { AppService } from '../services/app.service'
 // import { JsonLoaderService } from '../services/json-loader.service'
 // import { MatchlistService } from '../services/matchlist.service'
 // import { StatsService } from '../services/stats.service'
 // import { StatsModule } from '../stats/stats.module'
-import { UserModule } from '../user/user.module'
 // local
 import { AppController } from './app.controller'
 
@@ -31,6 +30,7 @@ import { AppController } from './app.controller'
 				// SLC_API_DOCKER_TAG: string().default('v0.1'),
 				// required below
 				RIOT_SECRET: string().required(),
+				SERVER_SECRET: string().required(),
 			}),
 			validationOptions: {
 				abortEarly: false,
@@ -42,14 +42,13 @@ import { AppController } from './app.controller'
 		// MasteryModule,
 		// MatchlistModule,
 		// StatsModule,
+		SharedModule,
 		UserModule,
 	],
 	providers: [
-		AppService,
 		// JsonLoaderService,
 		// MatchlistService,
 		// StatsService,
-		Logger,
 	],
 })
 export class AppModule {}
