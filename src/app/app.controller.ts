@@ -1,17 +1,19 @@
 import {
+	Body,
 	Controller,
 	Get,
 	HttpCode,
 	HttpStatus,
 	Inject,
 	Logger,
-	// Param,
+	Patch,
 	Put,
 	Query,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ENV_API_SECRET_KEY } from '../constants'
 import { AppService } from '../services/app.service'
+import { UpdateConfigDto } from './update-config.dto'
 
 @Controller('app')
 export class AppController {
@@ -42,7 +44,7 @@ export class AppController {
 	// 	allowEmptyValue: false,
 	// 	required: true,
 	// })
-	@Put('set-token')
+	@Put('set-token1')
 	@HttpCode(HttpStatus.OK)
 	setToken(
 		// @Body('secret', new ValidationPipe({ expectedType: String }))
@@ -68,6 +70,29 @@ export class AppController {
 		}
 
 		this.appService.setRiotToken(token)
+		return Promise.resolve(true)
+	}
+
+	// @Patch(':id')
+	@Patch('set-token')
+	@HttpCode(HttpStatus.OK)
+	updateConfig(
+		// @Param('id') id: string,
+		@Body() updateConfigDto: UpdateConfigDto,
+	) {
+		this.logger.verbose(
+			`PATCH request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
+			' updateConfig | App-Ctrl ',
+		)
+
+		const serverSecret = this.configService.get<string>(ENV_API_SECRET_KEY)
+
+		if (updateConfigDto.secret !== serverSecret) {
+			return Promise.resolve(false)
+		}
+
+		this.appService.setRiotToken(updateConfigDto.token)
+
 		return Promise.resolve(true)
 	}
 }
