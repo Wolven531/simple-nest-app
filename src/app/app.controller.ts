@@ -18,7 +18,9 @@ import { UpdateConfigDto } from './update-config.dto'
 @Controller('app')
 export class AppController {
 	constructor(
+		@Inject(AppService)
 		private readonly appService: AppService,
+		@Inject(ConfigService)
 		private readonly configService: ConfigService,
 		@Inject(Logger)
 		private readonly logger: Logger,

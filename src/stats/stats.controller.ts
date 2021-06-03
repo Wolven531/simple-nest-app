@@ -18,8 +18,11 @@ import { StatsService } from '../services/stats.service'
 @Controller('stats')
 export class StatsController {
 	constructor(
+		@Inject(MatchlistService)
 		private readonly matchlistService: MatchlistService,
+		@Inject(AppService)
 		private readonly appService: AppService,
+		@Inject(StatsService)
 		private readonly statsService: StatsService,
 		@Inject(Logger)
 		private readonly logger: Logger,

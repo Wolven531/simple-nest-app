@@ -19,7 +19,9 @@ import { MatchlistService } from '../services/matchlist.service'
 @ApiExtraModels(Game, Match)
 export class MatchlistController {
 	constructor(
+		@Inject(MatchlistService)
 		private readonly matchlistService: MatchlistService,
+		@Inject(AppService)
 		private readonly appService: AppService,
 		@Inject(Logger)
 		private readonly logger: Logger,

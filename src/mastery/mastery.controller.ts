@@ -16,7 +16,9 @@ import { MasteryService } from '../services/mastery.service'
 @ApiExtraModels()
 export class MasteryController {
 	constructor(
+		@Inject(MasteryService)
 		private readonly masteryService: MasteryService,
+		@Inject(AppService)
 		private readonly appService: AppService,
 		@Inject(Logger)
 		private readonly logger: Logger,
