@@ -11,6 +11,10 @@ import { AppService } from '../services/app.service'
 		ConfigModule.forRoot({
 			envFilePath: ['.env.production', '.env.development', '.env'],
 			isGlobal: true,
+			validationOptions: {
+				abortEarly: false,
+				allowUnknown: true,
+			},
 			validationSchema: object<APIConfig>({
 				// vals w/ defaults below
 				// API_PORT: number().default(3050),
@@ -22,13 +26,7 @@ import { AppService } from '../services/app.service'
 				RIOT_SECRET: string().required(),
 				SERVER_SECRET: string().required(),
 			}),
-			validationOptions: {
-				abortEarly: false,
-				allowUnknown: true,
-			},
 		}),
-		// TODO - does ConfigurationModule need to be imported ???
-		// ConfigurationModule,
 		HttpModule,
 	],
 	providers: [AppService, Logger],
