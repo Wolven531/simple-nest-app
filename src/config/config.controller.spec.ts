@@ -6,9 +6,27 @@ import { ENV_API_KEY, ENV_API_SECRET_KEY } from '../constants'
 import { AppService } from '../services/app.service'
 import { ConfigController } from './config.controller'
 
+type TestCase_IsTokenValid = {
+	descriptionMockedBehavior: string
+	expectedResult: boolean
+	mockIsRiotTokenValid: jest.Mock
+}
+
 describe('ConfigController', () => {
 	const fakeApiKey = 'some-api-key'
 	const fakeServerSecret = 'some-other-secret'
+	const testCases: TestCase_IsTokenValid[] = [
+		{
+			descriptionMockedBehavior: 'service method returns true (mocked)',
+			expectedResult: true,
+			mockIsRiotTokenValid: jest.fn(() => Promise.resolve(true)),
+		},
+		{
+			descriptionMockedBehavior: 'service method returns false (mocked)',
+			expectedResult: false,
+			mockIsRiotTokenValid: jest.fn(() => Promise.resolve(false)),
+		},
+	]
 	let controller: ConfigController
 	let testModule: TestingModule
 	let mockIsRiotTokenValid: jest.Mock
@@ -99,5 +117,32 @@ describe('ConfigController', () => {
 				})
 			})
 		})
+
+		testCases.forEach(
+			({ descriptionMockedBehavior, expectedResult, mockIsRiotTokenValid }) => {
+				describe(`invoke isTokenValid() when ${descriptionMockedBehavior}`, () => {
+					let actualResult: boolean
+
+					beforeEach(async () => {
+						jest
+							.spyOn(testModule.get(AppService), 'isRiotTokenValid')
+							.mockImplementation(mockIsRiotTokenValid)
+
+						actualResult = await controller.isTokenValid()
+					})
+
+					afterEach(() => {
+						jest
+							.spyOn(testModule.get(AppService), 'isRiotTokenValid')
+							.mockRestore()
+					})
+
+					it('invokes isRiotTokenValid() and returns expected value', () => {
+						expect(mockIsRiotTokenValid).toHaveBeenCalledTimes(1)
+						expect(actualResult).toBe(expectedResult)
+					})
+				})
+			},
+		)
 	})
 })
