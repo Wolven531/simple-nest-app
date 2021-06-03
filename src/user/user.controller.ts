@@ -1,5 +1,3 @@
-import { Summoner } from '../models/summoner.model'
-// import { User } from '../models/user.model'
 import {
 	Controller,
 	Get,
@@ -8,14 +6,17 @@ import {
 	HttpStatus,
 	Inject,
 	Logger,
-	// Param,
 	Query,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
-import { SummonerService } from '../services/summoner.service'
+import { Summoner } from '../models/summoner.model'
+// import { User } from '../models/user.model'
 // import { JsonLoaderService } from '../services/json-loader.service'
+import { SummonerService } from '../services/summoner.service'
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
 	constructor(
@@ -34,6 +35,7 @@ export class UserController {
 	// 	return this.jsonService.loadUsersFromFile()
 	// }
 
+	@ApiTags('user', 'search')
 	@Get('search')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')

@@ -10,6 +10,7 @@ import {
 	Query,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { ApiTags } from '@nestjs/swagger'
 import {
 	ENV_API_KEY,
 	ENV_API_KEY_DEFAULT,
@@ -19,6 +20,7 @@ import {
 import { AppService } from '../services/app.service'
 import { UpdateConfigDto } from './update-config.dto'
 
+@ApiTags('config')
 @Controller('config')
 export class ConfigController {
 	constructor(
@@ -30,11 +32,7 @@ export class ConfigController {
 		private readonly logger: Logger,
 	) {}
 
-	// @ApiParam({
-	// 	description: 'Optional administrative value',
-	// 	name: 'secret',
-	// 	required: false,
-	// })
+	@ApiTags('config')
 	@Get()
 	@HttpCode(HttpStatus.OK)
 	async getConfig(
@@ -71,6 +69,7 @@ export class ConfigController {
 		return secret === serverSecret ? privateConfig : publicConfig
 	}
 
+	@ApiTags('config')
 	@Get('check-token')
 	@HttpCode(HttpStatus.OK)
 	isTokenValid(): Promise<boolean> {
@@ -79,6 +78,7 @@ export class ConfigController {
 		return this.appService.isRiotTokenValid()
 	}
 
+	@ApiTags('config')
 	@Patch('set-token')
 	@HttpCode(HttpStatus.OK)
 	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
