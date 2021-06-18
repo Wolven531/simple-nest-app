@@ -13,7 +13,10 @@ async function bootstrap() {
 	const swaggerEndpoint = 'api'
 
 	const app = await NestFactory.create(AppModule, {
-		cors: true,
+		cors: {
+			methods: ['get', 'patch'],
+			origin: '*',
+		},
 		logger: ['debug', 'error', 'log', 'verbose', 'warn'],
 	})
 
