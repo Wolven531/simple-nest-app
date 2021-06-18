@@ -14,7 +14,7 @@ async function bootstrap() {
 
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			methods: ['get', 'patch'],
+			methods: ['get', 'patch', 'post'],
 			origin: '*',
 		},
 		logger: ['debug', 'error', 'log', 'verbose', 'warn'],

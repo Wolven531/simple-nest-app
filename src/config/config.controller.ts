@@ -6,7 +6,7 @@ import {
 	HttpStatus,
 	Inject,
 	Logger,
-	Patch,
+	Post,
 	Query,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -79,11 +79,11 @@ export class ConfigController {
 	}
 
 	@ApiTags('config')
-	@Patch('set-token')
+	@Post('set-token')
 	@HttpCode(HttpStatus.OK)
 	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
 		this.logger.verbose(
-			`PATCH request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
+			`POST request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
 			' updateConfig | Config-Ctrl ',
 		)
 
