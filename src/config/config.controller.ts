@@ -8,11 +8,9 @@ import {
 	Logger,
 	Post,
 	Query,
-	Req,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ApiTags } from '@nestjs/swagger'
-import { Request } from 'express'
 import {
 	ENV_API_KEY,
 	ENV_API_KEY_DEFAULT,
