@@ -83,22 +83,9 @@ export class ConfigController {
 	@ApiTags('config')
 	@Post('set-token')
 	@HttpCode(HttpStatus.OK)
-	updateConfig(
-		@Body() updateConfigDto: UpdateConfigDto,
-		@Req() req: Request,
-	): Promise<boolean> {
+	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
 		this.logger.verbose(
-			`updateConfigDto = ${JSON.stringify(updateConfigDto)}`,
-			' updateConfig | Config-Ctrl ',
-		)
-		// this.logger.verbose(
-		// 	`POST request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
-		// 	' updateConfig | Config-Ctrl ',
-		// )
-		this.logger.verbose(
-			`req.body = ${JSON.stringify(req.body)}\n\nreq.params = ${JSON.stringify(
-				req.params,
-			)}`,
+			`POST request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
 			' updateConfig | Config-Ctrl ',
 		)
 
