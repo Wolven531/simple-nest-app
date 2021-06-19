@@ -8,6 +8,7 @@ import {
 	Logger,
 	Post,
 	Query,
+	Req,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ApiTags } from '@nestjs/swagger'
@@ -81,11 +82,19 @@ export class ConfigController {
 	@ApiTags('config')
 	@Post('set-token')
 	@HttpCode(HttpStatus.OK)
-	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
+	updateConfig(
+		@Body() updateConfigDto: UpdateConfigDto,
+		@Req() req,
+	): Promise<boolean> {
+		this.logger.verbose(
+			`updateConfigDto = ${JSON.stringify(updateConfigDto)}`,
+			' updateConfig | Config-Ctrl ',
+		)
 		this.logger.verbose(
 			`POST request received; secret="${updateConfigDto.secret}" token="${updateConfigDto.token}"`,
 			' updateConfig | Config-Ctrl ',
 		)
+		this.logger.verbose(`req = ${req}`, ' updateConfig | Config-Ctrl ')
 
 		const serverSecret = this.configService.get<string>(ENV_API_SECRET_KEY)
 
