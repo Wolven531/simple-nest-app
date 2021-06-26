@@ -10,7 +10,7 @@ import { AppService } from './services/app.service'
 
 async function bootstrap() {
 	const ctx = ' bootstrap | main '
-	const swaggerEndpoint = 'api'
+	const swaggerEndpoint = ''
 
 	const app = await NestFactory.create(AppModule, {
 		bodyParser: true,
@@ -30,9 +30,9 @@ async function bootstrap() {
 	logger.log('Creating OpenAPI Document...', ctx)
 
 	const swaggerOptions = new DocumentBuilder()
-		.setTitle('Simple League Compare API')
+		.setTitle('NextGen League Compare API')
 		.setDescription(
-			'This API feeds a web UI for the Simple League Compare application',
+			'This API feeds a web UI for the NextGen League Compare application',
 		)
 		.setExternalDoc(
 			'Riot Official API Documentation',
