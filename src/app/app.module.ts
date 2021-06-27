@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigurationModule } from '../config'
 import { HealthModule } from '../health/health.module'
+import { MasteryModule } from '../mastery/mastery.module'
 import { SharedModule } from '../shared/shared.module'
 import { UserModule } from '../user/user.module'
 // local
@@ -13,6 +14,7 @@ import { AppController } from './app.controller'
 		ConfigurationModule, // contains config endpoints
 		HealthModule, // contains health endpoints
 		UserModule, // contains user endpoints
+		MasteryModule, // contains user endpoints
 	],
 	providers: [],
 })
