@@ -8,10 +8,11 @@ import {
 	Logger,
 	Param,
 } from '@nestjs/common'
-import { ApiExtraModels, ApiOperation } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
 
+@ApiTags('mastery')
 @Controller('mastery')
 @ApiExtraModels()
 export class MasteryController {
@@ -35,6 +36,7 @@ export class MasteryController {
 		summary: 'Get total mastery score for a given summonerId',
 		tags: ['mastery', 'summoner', 'summonerId', 'total'],
 	})
+	@ApiTags('mastery', 'total')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getMasteryTotal(
