@@ -12,28 +12,31 @@ import { ApiTags } from '@nestjs/swagger'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
-// import { User } from '../models/user.model'
-// import { JsonLoaderService } from '../services/json-loader.service'
+import { User } from '../models/user.model'
+import { JsonLoaderService } from '../services/json-loader.service'
 import { SummonerService } from '../services/summoner.service'
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
 	constructor(
-		// private readonly jsonService: JsonLoaderService,
+		@Inject(JsonLoaderService)
+		private readonly jsonService: JsonLoaderService,
+		@Inject(SummonerService)
 		private readonly summonerService: SummonerService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
 
-	// @Get()
-	// @HttpCode(HttpStatus.OK)
-	// @Header('Cache-Control', 'none')
-	// async getUsers(): Promise<User[]> {
-	// 	this.logger.debug('', ' User-Ctrl | getUsers ')
+	@ApiTags('users')
+	@Get()
+	@HttpCode(HttpStatus.OK)
+	@Header('Cache-Control', 'none')
+	async getUsers(): Promise<User[]> {
+		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-	// 	return this.jsonService.loadUsersFromFile()
-	// }
+		return this.jsonService.loadUsersFromFile()
+	}
 
 	@ApiTags('user', 'search')
 	@Get('search')
