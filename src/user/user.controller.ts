@@ -8,7 +8,7 @@ import {
 	Logger,
 	Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
@@ -28,8 +28,13 @@ export class UserController {
 		private readonly logger: Logger,
 	) {}
 
-	@ApiTags('users')
 	@Get()
+	@ApiOperation({
+		description: 'Get the current list of users from the server',
+		summary: 'Get the current list of users from the server',
+		tags: ['server', 'user', 'users'],
+	})
+	@ApiTags('users')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getUsers(): Promise<User[]> {
@@ -38,8 +43,19 @@ export class UserController {
 		return this.jsonService.loadUsersFromFile()
 	}
 
-	@ApiTags('user', 'search')
 	@Get('search')
+	@ApiOperation({
+		description:
+			'Search the Riot API for a given searchKey to confirm the existence of a user',
+		externalDocs: {
+			description: 'Riot API User Search Endpoint Docs',
+			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getBySummonerName',
+		},
+		summary:
+			'Confirm a user exists by searching for them using their summoner name',
+		tags: ['name', 'searchKey', 'summoner', 'user', 'username'],
+	})
+	@ApiTags('user', 'search')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async searchUsers(
