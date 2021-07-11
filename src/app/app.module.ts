@@ -13,8 +13,8 @@ import { AppController } from './app.controller'
 		SharedModule, // contains 'boilerplate' stuff (e.g. Http, Logger, etc.)
 		ConfigurationModule, // contains config endpoints
 		HealthModule, // contains health endpoints
-		UserModule, // contains user endpoints
 		MasteryModule, // contains user endpoints
+		UserModule, // contains user endpoints
 	],
 	providers: [],
 })
