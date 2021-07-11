@@ -6,7 +6,7 @@ import {
 	Inject,
 	Logger,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 
 @Controller('health')
 export class HealthController {
@@ -24,8 +24,13 @@ export class HealthController {
 		private readonly logger: Logger,
 	) {}
 
-	@ApiTags('health')
 	@Get()
+	@ApiOperation({
+		description: 'Basic endpoint to test server health',
+		summary: 'Basic endpoint to test server health',
+		tags: ['check', 'health', 'healthcheck', 'server'],
+	})
+	@ApiTags('health')
 	@HttpCode(HttpStatus.OK)
 	getHealth(): string {
 		this.logger.verbose('GET request received', ' getHealth | Health-Ctrl ')
