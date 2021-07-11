@@ -8,13 +8,20 @@ import { User } from '../models/user.model'
 
 @Injectable()
 export class JsonLoaderService {
-	private readonly DIRECTORY_DATA = 'data'
-	private readonly FILENAME_USERS = 'users.json'
+	// private readonly DIRECTORY_DATA = 'data'
+	// private readonly FILENAME_USERS = 'users.json'
+	private _users: User[]
 
 	constructor(
 		@Inject(Logger)
 		private readonly logger: Logger,
-	) {}
+	) {
+		this._users = this.loadUsersFromFile()
+	}
+
+	get users(): User[] {
+		return this._users
+	}
 
 	/**
 	 * This method uses loadUsersFromFile and a friendlyName parameter to search for a user in the users file
@@ -24,14 +31,13 @@ export class JsonLoaderService {
 	 */
 	getUserByFriendlyName(friendlyName: string): User | undefined {
 		const searchKey = friendlyName.toLowerCase()
-		const users = this.loadUsersFromFile()
 
 		this.logger.log(
 			`Searching for friendlyName = "${searchKey}"`,
 			' getUserByFriendlyName | json-loader-svc ',
 		)
 
-		return users.find((u) => u.name.toLowerCase() === searchKey)
+		return this.users.find((u) => u.name.toLowerCase() === searchKey)
 	}
 
 	/**
@@ -55,7 +61,7 @@ export class JsonLoaderService {
 	 *
 	 * @returns Array of User objects loaded from file, if load works; empty array otherwise
 	 */
-	loadUsersFromFile(): User[] {
+	private loadUsersFromFile(): User[] {
 		try {
 			// can use this rather than direct import
 			// const fileContents = readFileSync(

@@ -16,12 +16,12 @@ type TestCase_GetUserByFriendlyName = {
 // 	mockLoadUsersFromFile: jest.Mock
 // 	name: string
 // }
-type TestCase_LoadFromFile = {
-	expectedCountError: number
-	expectedResult: User[]
-	// mockReadFileSync: jest.Mock
-	name: string
-}
+// type TestCase_LoadFromFile = {
+// 	expectedCountError: number
+// 	expectedResult: User[]
+// 	// mockReadFileSync: jest.Mock
+// 	name: string
+// }
 // type TestCase_UpdateUsersFile = {
 // 	expectedCountError: number
 // 	mockWriteFileSync: jest.Mock
@@ -163,39 +163,39 @@ describe('JSON Loader Service', () => {
 	// 		name: 'when multiple users, one is stale',
 	// 	},
 	// ]
-	const testCases_LoadFromFile: TestCase_LoadFromFile[] = [
-		{
-			expectedCountError: 0,
-			expectedResult: [],
-			// mockReadFileSync: jest.fn(() =>
-			// 	Buffer.from(JSON.stringify([]), ENCODING_UTF8),
-			// ),
-			name: 'empty array',
-		},
-		// {
-		// 	expectedCountError: 0,
-		// 	expectedResult: [
-		// 		new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
-		// 	],
-		// 	// mockReadFileSync: jest.fn(() =>
-		// 	// 	Buffer.from(
-		// 	// 		JSON.stringify([
-		// 	// 			new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
-		// 	// 		]),
-		// 	// 		ENCODING_UTF8,
-		// 	// 	),
-		// 	// ),
-		// 	name: 'non-empty array',
-		// },
-		// {
-		// 	expectedCountError: 1,
-		// 	expectedResult: [],
-		// 	// mockReadFileSync: jest.fn(() => {
-		// 	// 	throw new Error('fake ajw err')
-		// 	// }),
-		// 	name: 'throws error',
-		// },
-	]
+	// const testCases_LoadFromFile: TestCase_LoadFromFile[] = [
+	// 	{
+	// 		expectedCountError: 0,
+	// 		expectedResult: [],
+	// 		// mockReadFileSync: jest.fn(() =>
+	// 		// 	Buffer.from(JSON.stringify([]), ENCODING_UTF8),
+	// 		// ),
+	// 		name: 'empty array',
+	// 	},
+	// {
+	// 	expectedCountError: 0,
+	// 	expectedResult: [
+	// 		new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
+	// 	],
+	// 	// mockReadFileSync: jest.fn(() =>
+	// 	// 	Buffer.from(
+	// 	// 		JSON.stringify([
+	// 	// 			new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
+	// 	// 		]),
+	// 	// 		ENCODING_UTF8,
+	// 	// 	),
+	// 	// ),
+	// 	name: 'non-empty array',
+	// },
+	// {
+	// 	expectedCountError: 1,
+	// 	expectedResult: [],
+	// 	// mockReadFileSync: jest.fn(() => {
+	// 	// 	throw new Error('fake ajw err')
+	// 	// }),
+	// 	name: 'throws error',
+	// },
+	// ]
 	// const testCases_UpdateUsersFile: TestCase_UpdateUsersFile[] = [
 	// 	{
 	// 		expectedCountError: 0,
@@ -244,12 +244,12 @@ describe('JSON Loader Service', () => {
 				describe(`w/ mocked loadUsersFromFile (${name})`, () => {
 					beforeEach(() => {
 						jest
-							.spyOn(service, 'loadUsersFromFile')
-							.mockImplementation(mockLoadUsersFromFile)
+							.spyOn(service as any, 'users', 'get')
+							.mockImplementation(() => mockLoadUsersFromFile())
 					})
 
 					afterEach(() => {
-						jest.spyOn(service, 'loadUsersFromFile').mockRestore()
+						jest.spyOn(service as any, 'users', 'get').mockRestore()
 					})
 
 					describe(`invoke getUserByFriendlyName("${param}")`, () => {
@@ -259,8 +259,7 @@ describe('JSON Loader Service', () => {
 							actualResult = service.getUserByFriendlyName(param)
 						})
 
-						it('invokes loadUsersFromFile, log, error correctly and returns expected result', () => {
-							expect(mockLoadUsersFromFile).toHaveBeenCalledTimes(1)
+						it('invokes log, error correctly and returns expected result', () => {
 							expect(actualResult).toEqual(expectedResult)
 						})
 					})
@@ -297,31 +296,31 @@ describe('JSON Loader Service', () => {
 		// 	},
 		// )
 
-		testCases_LoadFromFile.forEach(({ expectedResult, name }) => {
-			describe(`w/ mocked fs.readFileSync (${name})`, () => {
-				// beforeEach(() => {
-				// 	jest.spyOn(fs, 'readFileSync').mockImplementation(mockReadFileSync)
-				// })
+		// testCases_LoadFromFile.forEach(({ expectedResult, name }) => {
+		// 	describe(`w/ mocked fs.readFileSync (${name})`, () => {
+		// 		// beforeEach(() => {
+		// 		// 	jest.spyOn(fs, 'readFileSync').mockImplementation(mockReadFileSync)
+		// 		// })
 
-				// afterEach(() => {
-				// 	jest.spyOn(fs, 'readFileSync').mockRestore()
-				// })
+		// 		// afterEach(() => {
+		// 		// 	jest.spyOn(fs, 'readFileSync').mockRestore()
+		// 		// })
 
-				describe('invoke loadUsersFromFile()', () => {
-					let actualResult: User[]
+		// 		describe('invoke loadUsersFromFile()', () => {
+		// 			let actualResult: User[]
 
-					beforeEach(() => {
-						actualResult = service.loadUsersFromFile()
-					})
+		// 			beforeEach(() => {
+		// 				actualResult = service.loadUsersFromFile()
+		// 			})
 
-					it('invokes read, log, error correctly and returns expected result', () => {
-						// expect(mockReadFileSync).toHaveBeenCalledTimes(1)
-						// expect(actualResult).toEqual(expectedResult)
-						expect(actualResult.length).toBeGreaterThan(0)
-					})
-				})
-			})
-		})
+		// 			it('invokes read, log, error correctly and returns expected result', () => {
+		// 				// expect(mockReadFileSync).toHaveBeenCalledTimes(1)
+		// 				// expect(actualResult).toEqual(expectedResult)
+		// 				expect(actualResult.length).toBeGreaterThan(0)
+		// 			})
+		// 		})
+		// 	})
+		// })
 
 		// testCases_UpdateUsersFile.forEach(({ mockWriteFileSync, name, param }) => {
 		// 	describe(`w/ mocked fs.writeFileSync (${name})`, () => {

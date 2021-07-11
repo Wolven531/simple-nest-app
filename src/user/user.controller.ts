@@ -40,7 +40,7 @@ export class UserController {
 	async getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		return this.jsonService.loadUsersFromFile()
+		return this.jsonService.users
 	}
 
 	@Get('search')
