@@ -6,6 +6,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 // import childProcess from 'child_process'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
+import { JsonLoaderService } from '../services/json-loader.service'
 import { SummonerService } from '../services/summoner.service'
 import { UserController } from './user.controller'
 
@@ -23,6 +24,13 @@ describe('UserController', () => {
 					provide: SummonerService,
 					useFactory: () => ({
 						searchByName: jest.fn(() => Promise.resolve()),
+					}),
+				},
+				{
+					provide: JsonLoaderService,
+					useFactory: () => ({
+						getUserByFriendlyName: jest.fn(() => undefined),
+						loadUsersFromFile: jest.fn(() => []),
 					}),
 				},
 				Logger,
