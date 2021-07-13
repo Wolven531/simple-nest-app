@@ -98,5 +98,31 @@ describe('MasteryController', () => {
 				expect(resp).toBe(fakeMasteryTotal)
 			})
 		})
+
+		describe('invoke getMasteryTotal() w/ summonerId and withUser=true', () => {
+			let resp: number | SummonerWithMastery
+
+			beforeEach(async () => {
+				resp = await controller.getMasteryTotal(fakeSummonerId, true)
+			})
+
+			it('invokes service methods properly and returns mocked values (including user data)', () => {
+				expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
+
+				expect(mockGetMasteryTotal).toHaveBeenCalledTimes(1)
+				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(
+					fakeRiotToken,
+					fakeSummonerId,
+				)
+
+				expect(mockGetBySummonerId).toHaveBeenCalledTimes(1)
+				expect(mockGetBySummonerId).toHaveBeenLastCalledWith(fakeSummonerId)
+
+				expect(resp).toEqual({
+					...fakeSummoner,
+					masteryTotal: fakeMasteryTotal,
+				} as SummonerWithMastery)
+			})
+		})
 	})
 })
