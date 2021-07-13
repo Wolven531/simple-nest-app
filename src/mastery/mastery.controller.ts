@@ -16,18 +16,24 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
+import { Summoner } from '../models/summoner.model'
 import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
+import { SummonerService } from '../services/summoner.service'
+
+export type SummonerWithMastery = Summoner & { masteryTotal: number }
 
 @ApiTags('mastery')
 @Controller('mastery')
 @ApiExtraModels()
 export class MasteryController {
 	constructor(
-		@Inject(MasteryService)
-		private readonly masteryService: MasteryService,
 		@Inject(AppService)
 		private readonly appService: AppService,
+		@Inject(MasteryService)
+		private readonly masteryService: MasteryService,
+		@Inject(SummonerService)
+		private readonly summonerService: SummonerService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -85,13 +91,27 @@ export class MasteryController {
 	async getMasteryTotal(
 		@Param('summonerId') summonerId: string,
 		@Query('withUser') withUser = false,
-	): Promise<number> {
+	): Promise<number | SummonerWithMastery> {
 		this.logger.log(
 			`summonerId="${summonerId}" withUser=${withUser}`,
 			' getMasteryTotal | MatchlistCtrl ',
 		)
 		const apiKey = this.appService.getRiotToken()
 
-		return this.masteryService.getMasteryTotal(apiKey, summonerId)
+		const masteryTotal = await this.masteryService.getMasteryTotal(
+			apiKey,
+			summonerId,
+		)
+
+		if (!withUser) {
+			return masteryTotal
+		}
+
+		const summoner = await this.summonerService.getBySummonerId(summonerId)
+
+		return {
+			...summoner,
+			masteryTotal,
+		}
 	}
 }
