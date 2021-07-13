@@ -1,23 +1,36 @@
 import { HttpModule, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { Summoner } from '../models/summoner.model'
 import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
-import { MasteryController } from './mastery.controller'
+import { SummonerService } from '../services/summoner.service'
+import { MasteryController, SummonerWithMastery } from './mastery.controller'
 
 describe('MasteryController', () => {
 	const fakeMasteryTotal = 57
 	const fakeRiotToken = 'fake-token'
 	const fakeSummonerId = 'some-summ-id'
+	const fakeSummoner: Summoner = {
+		accountId: `${fakeSummonerId}-account`,
+		id: fakeSummonerId,
+		name: 'some name',
+		profileIconId: 1,
+		puuid: `${fakeSummonerId}-puuid`,
+		revisionDate: new Date(2021, 7, 1).getTime(),
+		summonerLevel: 2,
+	}
 
 	let controller: MasteryController
 	let testModule: TestingModule
 	let mockGetMasteryTotal: jest.Mock
 	let mockGetRiotToken: jest.Mock
+	let mockGetBySummonerId: jest.Mock
 
 	beforeEach(async () => {
 		mockGetMasteryTotal = jest.fn().mockResolvedValue(fakeMasteryTotal)
 		mockGetRiotToken = jest.fn().mockReturnValue(fakeRiotToken)
+		mockGetBySummonerId = jest.fn().mockResolvedValue(fakeSummoner)
 
 		testModule = await Test.createTestingModule({
 			controllers: [MasteryController],
@@ -36,6 +49,13 @@ describe('MasteryController', () => {
 						({
 							getMasteryTotal: mockGetMasteryTotal,
 						} as unknown as MasteryService),
+				},
+				{
+					provide: SummonerService,
+					useFactory: () =>
+						({
+							getBySummonerId: mockGetBySummonerId,
+						} as unknown as SummonerService),
 				},
 				Logger,
 			],
@@ -58,7 +78,7 @@ describe('MasteryController', () => {
 		})
 
 		describe('invoke getMasteryTotal() w/ summonerId', () => {
-			let resp: number
+			let resp: number | SummonerWithMastery
 
 			beforeEach(async () => {
 				resp = await controller.getMasteryTotal(fakeSummonerId)
@@ -72,6 +92,8 @@ describe('MasteryController', () => {
 					fakeRiotToken,
 					fakeSummonerId,
 				)
+
+				expect(mockGetBySummonerId).not.toHaveBeenCalled()
 
 				expect(resp).toBe(fakeMasteryTotal)
 			})
