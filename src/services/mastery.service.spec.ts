@@ -3,7 +3,7 @@ import { HttpModule, HttpService, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
-import { JsonLoaderService } from './json-loader.service'
+import { AppService } from './app.service'
 import { MasteryService } from './mastery.service'
 
 type TestCase_GetMasteryTotal = {
@@ -13,7 +13,6 @@ type TestCase_GetMasteryTotal = {
 	expectedResult: number
 	mockHttpGet: jest.Mock
 	// mockLoadUsersFromFile: jest.Mock
-	param1: string
 	param2: string
 	param3: number | undefined
 }
@@ -29,51 +28,48 @@ type TestCase_GetMasteryTotal = {
 // }
 
 describe('Mastery Service', () => {
+	const fakeAPIKey = 'some-api-key'
+
 	const testCases_getMasteryTotal: TestCase_GetMasteryTotal[] = [
 		{
 			descriptionMockedBehavior: 'empty array of Users',
-			descriptionParams:
-				'empty API key, empty summonerId, undefined defaultMasteryTotal',
+			descriptionParams: 'empty summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 			mockHttpGet: jest.fn(() => from(Promise.resolve({ data: -1 }))),
 			// mockLoadUsersFromFile: jest.fn(() => []),
-			param1: '',
 			param2: '',
 			param3: undefined,
 		},
 		// {
 		// 	descriptionMockedBehavior: 'array of single User',
 		// 	descriptionParams:
-		// 		'empty API key, empty summonerId, undefined defaultMasteryTotal',
+		// 		'empty summonerId, undefined defaultMasteryTotal',
 		// 	expectedCountGet: 0,
 		// 	expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
 		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
 		// 	// ]),
-		// 	param1: '',
 		// 	param2: '',
 		// 	param3: undefined,
 		// },
 		// {
 		// 	descriptionMockedBehavior: 'array of single User where isFresh === true',
 		// 	descriptionParams:
-		// 		'empty API key, matching summonerId, undefined defaultMasteryTotal',
+		// 		'matching summonerId, undefined defaultMasteryTotal',
 		// 	expectedCountGet: 0,
 		// 	expectedResult: 75, // comes from fresh User
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
 		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
 		// 	// ]),
-		// 	param1: '',
 		// 	param2: 'summ-1',
 		// 	param3: undefined,
 		// },
 		{
 			descriptionMockedBehavior: 'array of single User where isFresh !== true',
-			descriptionParams:
-				'empty API key, matching summonerId, undefined defaultMasteryTotal',
+			descriptionParams: 'matching summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: 113, // comes from http INSTEAD of User
 			mockHttpGet: jest.fn(() => from(Promise.resolve({ data: '113' }))),
@@ -86,15 +82,13 @@ describe('Mastery Service', () => {
 			// 		'summ-1',
 			// 	),
 			// ]),
-			param1: '',
 			param2: 'summ-1',
 			param3: undefined,
 		},
 		{
 			descriptionMockedBehavior:
 				'array of single User where isFresh !== true but HTTP GET rejects',
-			descriptionParams:
-				'empty API key, matching summonerId, undefined defaultMasteryTotal',
+			descriptionParams: 'matching summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: 5, // comes from param3
 			mockHttpGet: jest.fn(() =>
@@ -109,7 +103,6 @@ describe('Mastery Service', () => {
 			// 		'summ-1',
 			// 	),
 			// ]),
-			param1: '',
 			param2: 'summ-1',
 			param3: 5,
 		},
@@ -176,7 +169,16 @@ describe('Mastery Service', () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [HttpModule],
-			providers: [JsonLoaderService, MasteryService, Logger],
+			providers: [
+				{
+					provide: AppService,
+					useFactory: () => ({
+						getRiotToken: jest.fn().mockReturnValue(fakeAPIKey),
+					}),
+				},
+				MasteryService,
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(MasteryService)
@@ -203,7 +205,6 @@ describe('Mastery Service', () => {
 				expectedResult,
 				mockHttpGet,
 				// mockLoadUsersFromFile,
-				param1,
 				param2,
 				param3,
 			}) => {
@@ -224,15 +225,11 @@ describe('Mastery Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getMasteryTotal("${param1}", "${param2}", ${param3}) [${descriptionParams}]`, () => {
+					describe(`invoke getMasteryTotal("${param2}", ${param3}) [${descriptionParams}]`, () => {
 						let actualResult: number
 
 						beforeEach(async () => {
-							actualResult = await service.getMasteryTotal(
-								param1,
-								param2,
-								param3,
-							)
+							actualResult = await service.getMasteryTotal(param2, param3)
 						})
 
 						it('invokes loadUsersFromFile() and get() correctly and returns expected result', () => {
@@ -247,7 +244,7 @@ describe('Mastery Service', () => {
 											'Accept-Charset':
 												'application/x-www-form-urlencoded; charset=UTF-8',
 											'Accept-Language': 'en-US,en;q=0.9',
-											'X-Riot-Token': param1,
+											'X-Riot-Token': fakeAPIKey,
 										},
 									},
 								)
