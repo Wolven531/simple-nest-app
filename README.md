@@ -21,6 +21,6 @@ $env:SERVER_SECRET="YOUR_SERVER_SECRET_HERE"
 
 ## To-do
 
-[ ] remove API key param from mastery service method signatures (inject AppService into MasteryService)
+[x] remove API key param from mastery service method signatures (inject AppService into MasteryService)
 [ ] improve query and param swagger docs
 [ ] add examples to swagger docs
