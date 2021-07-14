@@ -9,7 +9,6 @@ import { MatchlistService } from './matchlist.service'
 
 type TestCase_GetGame = {
 	descriptionMockedBehavior: string
-	descriptionParams: string
 	expectedCountGet: number
 	expectedResult: Game | null
 	mockHttpGet: jest.Mock
@@ -18,7 +17,6 @@ type TestCase_GetGame = {
 }
 type TestCase_GetMatchlist = {
 	descriptionMockedBehavior: string
-	descriptionParams: string
 	expectedCountGet: number
 	expectedCountGetGame: number
 	expectedResult: Match[] | Game[]
@@ -34,7 +32,6 @@ describe('Matchlist Service', () => {
 	const testCases_getGame: TestCase_GetGame[] = [
 		{
 			descriptionMockedBehavior: 'Http error occurs',
-			descriptionParams: 'empty API key, gameId=0',
 			expectedCountGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() =>
@@ -45,7 +42,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is bad',
-			descriptionParams: 'empty API key, gameId=0',
 			expectedCountGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
@@ -54,7 +50,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
-			descriptionParams: 'empty API key, gameId=0',
 			expectedCountGet: 1,
 			expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
 			mockHttpGet: jest.fn(() =>
@@ -71,8 +66,6 @@ describe('Matchlist Service', () => {
 	const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		{
 			descriptionMockedBehavior: 'Http error occurs',
-			descriptionParams:
-				'empty API key, empty AccountID, undefined getLast, undefined includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 0,
 			expectedResult: [],
@@ -87,8 +80,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is bad',
-			descriptionParams:
-				'empty API key, empty AccountID, undefined getLast, undefined includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 0,
 			expectedResult: [],
@@ -101,8 +92,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
-			descriptionParams:
-				'empty API key, empty AccountID, undefined getLast, undefined includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 0,
 			expectedResult: [
@@ -148,8 +137,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
-			descriptionParams:
-				'empty API key, empty AccountID, 0 getLast (less than min), undefined includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 0,
 			expectedResult: [],
@@ -184,8 +171,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
-			descriptionParams:
-				'empty API key, empty AccountID, 101 getLast (greater than max), undefined includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 0,
 			expectedResult: [
@@ -231,8 +216,6 @@ describe('Matchlist Service', () => {
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
-			descriptionParams:
-				'empty API key, empty AccountID, 1 getLast, true includeGameData',
 			expectedCountGet: 1,
 			expectedCountGetGame: 1,
 			expectedResult: [
@@ -329,7 +312,6 @@ describe('Matchlist Service', () => {
 		testCases_getGame.forEach(
 			({
 				descriptionMockedBehavior,
-				descriptionParams,
 				expectedCountGet,
 				expectedResult,
 				mockHttpGet,
@@ -347,7 +329,7 @@ describe('Matchlist Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getGame("${param1}", "${param2}") [${descriptionParams}]`, () => {
+					describe(`invoke getGame("${param1}", "${param2}")`, () => {
 						let actualResult: Game | null
 
 						beforeEach(async () => {
@@ -380,7 +362,6 @@ describe('Matchlist Service', () => {
 		testCases_getMatchlist.forEach(
 			({
 				descriptionMockedBehavior,
-				descriptionParams,
 				expectedCountGet,
 				expectedCountGetGame,
 				expectedResult,
@@ -404,7 +385,7 @@ describe('Matchlist Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getMatchlist("${param1}", "${param2}") [${descriptionParams}]`, () => {
+					describe(`invoke getMatchlist("${param1}", "${param2}")`, () => {
 						let actualResult: Game[] | Match[]
 
 						beforeEach(async () => {
