@@ -4,6 +4,7 @@ import { HealthModule } from '../health/health.module'
 import { MasteryModule } from '../mastery/mastery.module'
 import { MatchlistModule } from '../matchlist/matchlist.module'
 import { SharedModule } from '../shared/shared.module'
+import { StatsModule } from '../stats/stats.module'
 import { UserModule } from '../user/user.module'
 // local
 import { AppController } from './app.controller'
@@ -16,6 +17,7 @@ import { AppController } from './app.controller'
 		HealthModule, // contains health endpoints
 		MasteryModule, // contains user endpoints
 		MatchlistModule, // contains matchlist endpoints
+		StatsModule, // contains stats endpoints
 		UserModule, // contains user endpoints
 	],
 	providers: [],
