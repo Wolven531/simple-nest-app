@@ -6,14 +6,14 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
 import { MatchlistService } from './matchlist.service'
+import { AppService } from './app.service'
 
 type TestCase_GetGame = {
 	descriptionMockedBehavior: string
 	expectedCountGet: number
 	expectedResult: Game | null
 	mockHttpGet: jest.Mock
-	param1: string
-	param2: number
+	param1: number
 }
 type TestCase_GetMatchlist = {
 	descriptionMockedBehavior: string
@@ -23,12 +23,13 @@ type TestCase_GetMatchlist = {
 	mockGetGame: jest.Mock
 	mockHttpGet: jest.Mock
 	param1: string
-	param2: string
-	param3: number | undefined
-	param4: boolean | undefined
+	param2: number | undefined
+	param3: boolean | undefined
 }
 
 describe('Matchlist Service', () => {
+	const fakeAPIKey = 'some-api-key'
+
 	const testCases_getGame: TestCase_GetGame[] = [
 		{
 			descriptionMockedBehavior: 'Http error occurs',
@@ -37,16 +38,14 @@ describe('Matchlist Service', () => {
 			mockHttpGet: jest.fn(() =>
 				from(Promise.reject(new Error('Fake ajw error'))),
 			),
-			param1: '',
-			param2: 0,
+			param1: 0,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is bad',
 			expectedCountGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			param1: '',
-			param2: 0,
+			param1: 0,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
@@ -59,8 +58,7 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: '',
-			param2: 0,
+			param1: 0,
 		},
 	]
 	const testCases_getMatchlist: TestCase_GetMatchlist[] = [
@@ -74,9 +72,8 @@ describe('Matchlist Service', () => {
 				from(Promise.reject(new Error('Fake ajw error'))),
 			),
 			param1: '',
-			param2: '',
+			param2: undefined,
 			param3: undefined,
-			param4: undefined,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is bad',
@@ -86,9 +83,8 @@ describe('Matchlist Service', () => {
 			mockGetGame: jest.fn(() => Promise.resolve()),
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
 			param1: '',
-			param2: '',
+			param2: undefined,
 			param3: undefined,
-			param4: undefined,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
@@ -131,9 +127,8 @@ describe('Matchlist Service', () => {
 				),
 			),
 			param1: '',
-			param2: '',
+			param2: undefined,
 			param3: undefined,
-			param4: undefined,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
@@ -165,9 +160,8 @@ describe('Matchlist Service', () => {
 				),
 			),
 			param1: '',
-			param2: '',
-			param3: 0,
-			param4: undefined,
+			param2: 0,
+			param3: undefined,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
@@ -210,9 +204,8 @@ describe('Matchlist Service', () => {
 				),
 			),
 			param1: '',
-			param2: '',
-			param3: 101,
-			param4: undefined,
+			param2: 101,
+			param3: undefined,
 		},
 		{
 			descriptionMockedBehavior: 'Returned data is good',
@@ -278,19 +271,30 @@ describe('Matchlist Service', () => {
 				),
 			),
 			param1: '',
-			param2: '',
-			param3: 1,
-			param4: true,
+			param2: 1,
+			param3: true,
 		},
 	]
 	let service: MatchlistService
 	let testModule: TestingModule
+	let mockGetRiotToken: jest.Mock
 
 	beforeEach(async () => {
+		mockGetRiotToken = jest.fn().mockReturnValue(fakeAPIKey)
+
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [HttpModule],
-			providers: [MatchlistService, Logger],
+			providers: [
+				{
+					provide: AppService,
+					useFactory: () => ({
+						getRiotToken: mockGetRiotToken,
+					}),
+				},
+				MatchlistService,
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(MatchlistService)
@@ -316,7 +320,6 @@ describe('Matchlist Service', () => {
 				expectedResult,
 				mockHttpGet,
 				param1,
-				param2,
 			}) => {
 				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
@@ -329,14 +332,16 @@ describe('Matchlist Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getGame("${param1}", "${param2}")`, () => {
+					describe(`invoke getGame("${param1}")`, () => {
 						let actualResult: Game | null
 
 						beforeEach(async () => {
-							actualResult = await service.getGame(param1, param2)
+							actualResult = await service.getGame(param1)
 						})
 
-						it('invokes get() correctly and returns expected result', () => {
+						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
+							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
+
 							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
 							if (expectedCountGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
@@ -346,7 +351,7 @@ describe('Matchlist Service', () => {
 											'Accept-Charset':
 												'application/x-www-form-urlencoded; charset=UTF-8',
 											'Accept-Language': 'en-US,en;q=0.9',
-											'X-Riot-Token': param1,
+											'X-Riot-Token': fakeAPIKey,
 										},
 									},
 								)
@@ -370,7 +375,6 @@ describe('Matchlist Service', () => {
 				param1,
 				param2,
 				param3,
-				param4,
 			}) => {
 				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
@@ -385,19 +389,16 @@ describe('Matchlist Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getMatchlist("${param1}", "${param2}")`, () => {
+					describe(`invoke getMatchlist("${param1}", "${param2}", "${param3}")`, () => {
 						let actualResult: Game[] | Match[]
 
 						beforeEach(async () => {
-							actualResult = await service.getMatchlist(
-								param1,
-								param2,
-								param3,
-								param4,
-							)
+							actualResult = await service.getMatchlist(param1, param2, param3)
 						})
 
-						it('invokes get() correctly and returns expected result', () => {
+						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
+							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
+
 							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
 							expect(mockGetGame).toHaveBeenCalledTimes(expectedCountGetGame)
 
