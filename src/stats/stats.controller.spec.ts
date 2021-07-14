@@ -1,30 +1,37 @@
 import { BadRequestException, HttpModule, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
-import { AppService } from '../services/app.service'
-import { JsonLoaderService } from '../services/json-loader.service'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
 
 describe('StatsController', () => {
+	const fakeGame: Game = {} as Game
 	let controller: StatsController
 	let testModule: TestingModule
+	let mockGetGame: jest.Mock
+	let mockGetMatchlist: jest.Mock
 
 	beforeEach(async () => {
+		mockGetGame = jest.fn().mockResolvedValue(fakeGame)
+		mockGetMatchlist = jest.fn().mockResolvedValue([])
+
 		testModule = await Test.createTestingModule({
 			controllers: [StatsController],
 			imports: [HttpModule],
 			providers: [
-				MatchlistService,
-				AppService,
-				ConfigService,
+				{
+					provide: MatchlistService,
+					useFactory: () =>
+						({
+							getGame: mockGetGame,
+							getMatchlist: mockGetMatchlist,
+						} as unknown as MatchlistService),
+				},
 				StatsService,
 				Logger,
-				JsonLoaderService,
 			],
 		}).compile()
 
@@ -77,21 +84,13 @@ describe('StatsController', () => {
 			const fakeKDA = 3.14
 			let capturedError: Error
 			let mockCalculateGeneralStats: jest.Mock
-			let mockGetMatchlist: jest.Mock
 			let resp: CalculatedStats
 
 			beforeEach(async () => {
 				mockCalculateGeneralStats = jest.fn(
 					(targetAccountKey, games) => ({ kDA: fakeKDA } as CalculatedStats),
 				)
-				mockGetMatchlist = jest.fn(
-					(apiKey, accountId, getLastX, includeGameData) =>
-						Promise.resolve([] as Array<Game>),
-				)
 
-				jest
-					.spyOn(testModule.get(MatchlistService), 'getMatchlist')
-					.mockImplementationOnce(mockGetMatchlist)
 				jest
 					.spyOn(testModule.get(StatsService), 'calculateGeneralStats')
 					.mockImplementationOnce(mockCalculateGeneralStats)

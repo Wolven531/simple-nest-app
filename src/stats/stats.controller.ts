@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
-import { AppService } from '../services/app.service'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
@@ -20,8 +19,6 @@ export class StatsController {
 	constructor(
 		@Inject(MatchlistService)
 		private readonly matchlistService: MatchlistService,
-		@Inject(AppService)
-		private readonly appService: AppService,
 		@Inject(StatsService)
 		private readonly statsService: StatsService,
 		@Inject(Logger)
@@ -54,10 +51,7 @@ export class StatsController {
 			' getSummary | StatsCtrl ',
 		)
 
-		const apiKey = this.appService.getRiotToken()
-
 		const matches = await this.matchlistService.getMatchlist(
-			apiKey,
 			accountId,
 			getLastX,
 			includeGameData,
