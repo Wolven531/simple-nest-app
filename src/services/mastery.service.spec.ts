@@ -13,8 +13,8 @@ type TestCase_GetMasteryTotal = {
 	expectedResult: number
 	mockHttpGet: jest.Mock
 	// mockLoadUsersFromFile: jest.Mock
-	param2: string
-	param3: number | undefined
+	param1: string
+	param2: number | undefined
 }
 // type TestCase_RefreshMasteryTotalForAllUsers = {
 // 	descriptionMockedBehavior: string
@@ -38,8 +38,8 @@ describe('Mastery Service', () => {
 			expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 			mockHttpGet: jest.fn(() => from(Promise.resolve({ data: -1 }))),
 			// mockLoadUsersFromFile: jest.fn(() => []),
-			param2: '',
-			param3: undefined,
+			param1: '',
+			param2: undefined,
 		},
 		// {
 		// 	descriptionMockedBehavior: 'array of single User',
@@ -51,8 +51,8 @@ describe('Mastery Service', () => {
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
 		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
 		// 	// ]),
-		// 	param2: '',
-		// 	param3: undefined,
+		// 	param1: '',
+		// 	param2: undefined,
 		// },
 		// {
 		// 	descriptionMockedBehavior: 'array of single User where isFresh === true',
@@ -64,8 +64,8 @@ describe('Mastery Service', () => {
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
 		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
 		// 	// ]),
-		// 	param2: 'summ-1',
-		// 	param3: undefined,
+		// 	param1: 'summ-1',
+		// 	param2: undefined,
 		// },
 		{
 			descriptionMockedBehavior: 'array of single User where isFresh !== true',
@@ -82,8 +82,8 @@ describe('Mastery Service', () => {
 			// 		'summ-1',
 			// 	),
 			// ]),
-			param2: 'summ-1',
-			param3: undefined,
+			param1: 'summ-1',
+			param2: undefined,
 		},
 		{
 			descriptionMockedBehavior:
@@ -103,8 +103,8 @@ describe('Mastery Service', () => {
 			// 		'summ-1',
 			// 	),
 			// ]),
-			param2: 'summ-1',
-			param3: 5,
+			param1: 'summ-1',
+			param2: 5,
 		},
 	]
 	/*
@@ -164,8 +164,11 @@ describe('Mastery Service', () => {
 	*/
 	let service: MasteryService
 	let testModule: TestingModule
+	let mockGetRiotToken: jest.Mock
 
 	beforeEach(async () => {
+		mockGetRiotToken = jest.fn().mockReturnValue(fakeAPIKey)
+
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [HttpModule],
@@ -173,7 +176,7 @@ describe('Mastery Service', () => {
 				{
 					provide: AppService,
 					useFactory: () => ({
-						getRiotToken: jest.fn().mockReturnValue(fakeAPIKey),
+						getRiotToken: mockGetRiotToken,
 					}),
 				},
 				MasteryService,
@@ -205,8 +208,8 @@ describe('Mastery Service', () => {
 				expectedResult,
 				mockHttpGet,
 				// mockLoadUsersFromFile,
+				param1,
 				param2,
-				param3,
 			}) => {
 				describe(`w/ mocked loadUsersFromFile (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
@@ -225,20 +228,21 @@ describe('Mastery Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getMasteryTotal("${param2}", ${param3}) [${descriptionParams}]`, () => {
+					describe(`invoke getMasteryTotal("${param1}", ${param2}) [${descriptionParams}]`, () => {
 						let actualResult: number
 
 						beforeEach(async () => {
-							actualResult = await service.getMasteryTotal(param2, param3)
+							actualResult = await service.getMasteryTotal(param1, param2)
 						})
 
-						it('invokes loadUsersFromFile() and get() correctly and returns expected result', () => {
+						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
+							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 							// expect(mockLoadUsersFromFile).toHaveBeenCalledTimes(1)
 
 							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
 							if (expectedCountGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
-									`https://na1.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/${param2}`,
+									`https://na1.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/${param1}`,
 									{
 										headers: {
 											'Accept-Charset':
