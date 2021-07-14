@@ -47,9 +47,6 @@ export class MasteryController {
 		tags: ['mastery', 'summoner', 'summonerId', 'total'],
 	})
 	@ApiParam({
-		name: 'summonerId',
-		type: 'string',
-		required: true,
 		allowEmptyValue: false,
 		description: 'Summoner ID to user during lookup',
 		examples: {
@@ -60,12 +57,12 @@ export class MasteryController {
 				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
 			},
 		},
+		name: 'summonerId',
+		required: true,
 		style: 'simple',
+		type: 'string',
 	})
 	@ApiQuery({
-		name: 'withUser',
-		type: 'boolean',
-		required: false,
 		allowEmptyValue: false,
 		description:
 			'If true, return user data alongside number; otherwise, return simple number alone',
@@ -80,7 +77,10 @@ export class MasteryController {
 				value: false,
 			},
 		},
+		name: 'withUser',
+		required: false,
 		style: 'simple',
+		type: 'boolean',
 	})
 	@ApiTags('mastery', 'total')
 	@HttpCode(HttpStatus.OK)

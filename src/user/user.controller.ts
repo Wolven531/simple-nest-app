@@ -8,7 +8,7 @@ import {
 	Logger,
 	Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
@@ -55,11 +55,26 @@ export class UserController {
 			'Confirm a user exists by searching for them using their summoner name',
 		tags: ['name', 'searchKey', 'summoner', 'user', 'username'],
 	})
+	@ApiQuery({
+		allowEmptyValue: false,
+		description: 'Value to use when searching the Riot API',
+		examples: {
+			'Custom searchKey': {
+				value: '',
+			},
+			'Search for 0NeveroDDoreveN0': {
+				value: '0NeveroDDoreveN0',
+			},
+		},
+		name: 'searchKey',
+		required: true,
+		style: 'simple',
+		type: 'string',
+	})
 	@ApiTags('user', 'search')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async searchUsers(
-		// @Param('searchKey') searchKey: string,
 		@Query('searchKey') searchKey: string,
 	): Promise<Summoner | null> {
 		this.logger.debug(`searchKey="${searchKey}"`, ' User-Ctrl | searchUsers ')
