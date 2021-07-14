@@ -1,4 +1,3 @@
-// import { User } from '../models/user.model'
 import { HttpModule, HttpService, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
@@ -8,7 +7,6 @@ import { MasteryService } from './mastery.service'
 
 type TestCase_GetMasteryTotal = {
 	descriptionMockedBehavior: string
-	descriptionParams: string
 	expectedCountGet: number
 	expectedResult: number
 	mockHttpGet: jest.Mock
@@ -33,7 +31,6 @@ describe('Mastery Service', () => {
 	const testCases_getMasteryTotal: TestCase_GetMasteryTotal[] = [
 		{
 			descriptionMockedBehavior: 'empty array of Users',
-			descriptionParams: 'empty summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 			mockHttpGet: jest.fn(() => from(Promise.resolve({ data: -1 }))),
@@ -43,8 +40,6 @@ describe('Mastery Service', () => {
 		},
 		// {
 		// 	descriptionMockedBehavior: 'array of single User',
-		// 	descriptionParams:
-		// 		'empty summonerId, undefined defaultMasteryTotal',
 		// 	expectedCountGet: 0,
 		// 	expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
@@ -56,8 +51,6 @@ describe('Mastery Service', () => {
 		// },
 		// {
 		// 	descriptionMockedBehavior: 'array of single User where isFresh === true',
-		// 	descriptionParams:
-		// 		'matching summonerId, undefined defaultMasteryTotal',
 		// 	expectedCountGet: 0,
 		// 	expectedResult: 75, // comes from fresh User
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
@@ -69,7 +62,6 @@ describe('Mastery Service', () => {
 		// },
 		{
 			descriptionMockedBehavior: 'array of single User where isFresh !== true',
-			descriptionParams: 'matching summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: 113, // comes from http INSTEAD of User
 			mockHttpGet: jest.fn(() => from(Promise.resolve({ data: '113' }))),
@@ -88,7 +80,6 @@ describe('Mastery Service', () => {
 		{
 			descriptionMockedBehavior:
 				'array of single User where isFresh !== true but HTTP GET rejects',
-			descriptionParams: 'matching summonerId, undefined defaultMasteryTotal',
 			expectedCountGet: 1,
 			expectedResult: 5, // comes from param3
 			mockHttpGet: jest.fn(() =>
@@ -203,7 +194,6 @@ describe('Mastery Service', () => {
 		testCases_getMasteryTotal.forEach(
 			({
 				descriptionMockedBehavior,
-				descriptionParams,
 				expectedCountGet,
 				expectedResult,
 				mockHttpGet,
@@ -228,7 +218,7 @@ describe('Mastery Service', () => {
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
-					describe(`invoke getMasteryTotal("${param1}", ${param2}) [${descriptionParams}]`, () => {
+					describe(`invoke getMasteryTotal("${param1}", ${param2})`, () => {
 						let actualResult: number
 
 						beforeEach(async () => {
