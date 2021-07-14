@@ -3,10 +3,13 @@ import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
 import { HttpService, Inject, Injectable, Logger } from '@nestjs/common'
 import { MAX_NUM_MATCHES, MIN_NUM_MATCHES, REGION } from '../constants'
+import { AppService } from './app.service'
 
 @Injectable()
 export class MatchlistService {
 	constructor(
+		@Inject(AppService)
+		private readonly appService: AppService,
 		@Inject(HttpService)
 		private readonly httpService: HttpService,
 		@Inject(Logger)
@@ -16,12 +19,13 @@ export class MatchlistService {
 	/**
 	 * This method retrieves a Game from the Riot API
 	 *
-	 * @param apiKey String value to use when interacting w/ Riot API
 	 * @param gameId Numeric identifier for which game to retrieve
 	 *
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
-	getGame(apiKey: string, gameId: number): Promise<Game | null> {
+	getGame(gameId: number): Promise<Game | null> {
+		const apiKey = this.appService.getRiotToken()
+
 		return this.httpService
 			.get(
 				`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
@@ -56,11 +60,12 @@ export class MatchlistService {
 	}
 
 	getMatchlist(
-		apiKey: string,
 		accountId: string,
 		getLastX: number | undefined,
 		includeGameData = false,
 	): Promise<Match[] | Game[]> {
+		const apiKey = this.appService.getRiotToken()
+
 		return this.httpService
 			.get(
 				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}`,
@@ -100,7 +105,7 @@ export class MatchlistService {
 				return includeGameData
 					? await Promise.all(
 							returnData.map(
-								(match) => this.getGame(apiKey, match.gameId) as Promise<Game>,
+								(match) => this.getGame(match.gameId) as Promise<Game>,
 							),
 					  )
 					: returnData
