@@ -17,7 +17,6 @@ import {
 	ApiTags,
 } from '@nestjs/swagger'
 import { Summoner } from '../models/summoner.model'
-import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
 
@@ -28,8 +27,6 @@ export type SummonerWithMastery = Summoner & { masteryTotal: number }
 @ApiExtraModels()
 export class MasteryController {
 	constructor(
-		@Inject(AppService)
-		private readonly appService: AppService,
 		@Inject(MasteryService)
 		private readonly masteryService: MasteryService,
 		@Inject(SummonerService)
@@ -96,12 +93,8 @@ export class MasteryController {
 			`summonerId="${summonerId}" withUser=${withUser}`,
 			' getMasteryTotal | MatchlistCtrl ',
 		)
-		const apiKey = this.appService.getRiotToken()
 
-		const masteryTotal = await this.masteryService.getMasteryTotal(
-			apiKey,
-			summonerId,
-		)
+		const masteryTotal = await this.masteryService.getMasteryTotal(summonerId)
 
 		if (!withUser) {
 			return masteryTotal

@@ -2,14 +2,12 @@ import { HttpModule, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
-import { AppService } from '../services/app.service'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
 import { MasteryController, SummonerWithMastery } from './mastery.controller'
 
 describe('MasteryController', () => {
 	const fakeMasteryTotal = 57
-	const fakeRiotToken = 'fake-token'
 	const fakeSummonerId = 'some-summ-id'
 	const fakeSummoner: Summoner = {
 		accountId: `${fakeSummonerId}-account`,
@@ -24,25 +22,16 @@ describe('MasteryController', () => {
 	let controller: MasteryController
 	let testModule: TestingModule
 	let mockGetMasteryTotal: jest.Mock
-	let mockGetRiotToken: jest.Mock
 	let mockGetBySummonerId: jest.Mock
 
 	beforeEach(async () => {
 		mockGetMasteryTotal = jest.fn().mockResolvedValue(fakeMasteryTotal)
-		mockGetRiotToken = jest.fn().mockReturnValue(fakeRiotToken)
 		mockGetBySummonerId = jest.fn().mockResolvedValue(fakeSummoner)
 
 		testModule = await Test.createTestingModule({
 			controllers: [MasteryController],
 			imports: [HttpModule],
 			providers: [
-				{
-					provide: AppService,
-					useFactory: () =>
-						({
-							getRiotToken: mockGetRiotToken,
-						} as unknown as AppService),
-				},
 				{
 					provide: MasteryService,
 					useFactory: () =>
@@ -85,13 +74,8 @@ describe('MasteryController', () => {
 			})
 
 			it('invokes service methods properly and returns mocked value', () => {
-				expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
-
 				expect(mockGetMasteryTotal).toHaveBeenCalledTimes(1)
-				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(
-					fakeRiotToken,
-					fakeSummonerId,
-				)
+				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(fakeSummonerId)
 
 				expect(mockGetBySummonerId).not.toHaveBeenCalled()
 
@@ -107,13 +91,8 @@ describe('MasteryController', () => {
 			})
 
 			it('invokes service methods properly and returns mocked values (including user data)', () => {
-				expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
-
 				expect(mockGetMasteryTotal).toHaveBeenCalledTimes(1)
-				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(
-					fakeRiotToken,
-					fakeSummonerId,
-				)
+				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(fakeSummonerId)
 
 				expect(mockGetBySummonerId).toHaveBeenCalledTimes(1)
 				expect(mockGetBySummonerId).toHaveBeenLastCalledWith(fakeSummonerId)
