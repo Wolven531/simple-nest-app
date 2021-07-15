@@ -1,4 +1,3 @@
-// import { User } from '../models/user.model'
 // import { HttpModule, HttpService, HttpStatus, Logger } from '@nestjs/common'
 import { HttpModule, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
@@ -21,16 +20,17 @@ describe('UserController', () => {
 			imports: [HttpModule],
 			providers: [
 				{
-					provide: SummonerService,
-					useFactory: () => ({
-						searchByName: jest.fn(() => Promise.resolve()),
-					}),
-				},
-				{
 					provide: JsonLoaderService,
 					useFactory: () => ({
 						getUserByFriendlyName: jest.fn(() => undefined),
 						loadUsersFromFile: jest.fn(() => []),
+					}),
+				},
+				{
+					provide: SummonerService,
+					useFactory: () => ({
+						getBySummonerId: jest.fn().mockResolvedValue(undefined),
+						searchByName: jest.fn().mockResolvedValue(undefined),
 					}),
 				},
 				Logger,
@@ -159,6 +159,41 @@ describe('UserController', () => {
 				)
 				expect(capturedError).toBeUndefined()
 				expect(resp).toEqual({ name: 'nameForWhichToSearch' } as Summoner)
+			})
+		})
+
+		describe('invoke getById()', () => {
+			let capturedError: Error
+			let mockGetBySummonerId: jest.Mock
+			let resp: Summoner | null
+
+			beforeEach(async () => {
+				mockGetBySummonerId = jest
+					.fn()
+					.mockResolvedValue({ id: 'id-that-was-searched' } as Summoner)
+
+				try {
+					jest
+						.spyOn(summonerService, 'getBySummonerId')
+						.mockImplementation(mockGetBySummonerId)
+
+					resp = await controller.getBySummonerId('id-that-was-searched')
+				} catch (err) {
+					capturedError = err
+				}
+			})
+
+			afterEach(() => {
+				jest.spyOn(summonerService, 'getBySummonerId').mockRestore()
+			})
+
+			it('invokes SummonerService.getBySummonerId(), does NOT throw error', () => {
+				expect(mockGetBySummonerId).toHaveBeenCalledTimes(1)
+				expect(mockGetBySummonerId).toHaveBeenLastCalledWith(
+					'id-that-was-searched',
+				)
+				expect(capturedError).toBeUndefined()
+				expect(resp).toEqual({ id: 'id-that-was-searched' } as Summoner)
 			})
 		})
 	})

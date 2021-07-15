@@ -28,9 +28,8 @@ export class HealthController {
 	@ApiOperation({
 		description: 'Basic endpoint to test server health',
 		summary: 'Basic endpoint to test server health',
-		tags: ['check', 'health', 'healthcheck', 'server'],
 	})
-	@ApiTags('health')
+	@ApiTags('check', 'health', 'healthcheck', 'server')
 	@HttpCode(HttpStatus.OK)
 	getHealth(): string {
 		this.logger.verbose('GET request received', ' getHealth | Health-Ctrl ')
