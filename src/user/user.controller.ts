@@ -6,9 +6,10 @@ import {
 	HttpStatus,
 	Inject,
 	Logger,
+	Param,
 	Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
@@ -32,9 +33,8 @@ export class UserController {
 	@ApiOperation({
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
-		tags: ['server', 'user', 'users'],
 	})
-	@ApiTags('users')
+	@ApiTags('server', 'user', 'users')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getUsers(): Promise<User[]> {
@@ -53,7 +53,6 @@ export class UserController {
 		},
 		summary:
 			'Confirm a user exists by searching for them using their summoner name',
-		tags: ['name', 'searchKey', 'summoner', 'user', 'username'],
 	})
 	@ApiQuery({
 		allowEmptyValue: false,
@@ -71,7 +70,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('user', 'search')
+	@ApiTags('name', 'summoner', 'user', 'username')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async searchUsers(
@@ -80,6 +79,42 @@ export class UserController {
 		this.logger.debug(`searchKey="${searchKey}"`, ' User-Ctrl | searchUsers ')
 
 		return this.summonerService.searchByName(searchKey)
+	}
+
+	@Get('get/:summonerId')
+	@ApiOperation({
+		description: 'Search the Riot API for a given Summoner by summoner ID',
+		externalDocs: {
+			description: 'Riot API User Search Endpoint Docs',
+			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getBySummonerId',
+		},
+		summary: 'Get user details by searching for them using their summoner ID',
+	})
+	@ApiParam({
+		allowEmptyValue: false,
+		description: 'Summoner ID to use during lookup',
+		examples: {
+			'Custom Summoner ID': {
+				value: '',
+			},
+			'Summoner ID for 0NeveroDDoreveN0': {
+				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
+			},
+		},
+		name: 'summonerId',
+		required: true,
+		style: 'simple',
+		type: 'string',
+	})
+	@ApiTags('summoner', 'summonerId', 'user')
+	@HttpCode(HttpStatus.OK)
+	@Header('Cache-Control', 'none')
+	async getById(
+		@Param('summonerId') summonerId: string,
+	): Promise<Summoner | null> {
+		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | getById ')
+
+		return this.summonerService.getBySummonerId(summonerId)
 	}
 
 	// @Get('refresh')
