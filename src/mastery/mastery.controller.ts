@@ -44,11 +44,10 @@ export class MasteryController {
 			url: 'https://developer.riotgames.com/apis#champion-mastery-v4/GET_getChampionMasteryScore',
 		},
 		summary: 'Get total mastery score for a given summonerId',
-		tags: ['mastery', 'summoner', 'summonerId', 'total'],
 	})
 	@ApiParam({
 		allowEmptyValue: false,
-		description: 'Summoner ID to user during lookup',
+		description: 'Summoner ID to use during lookup',
 		examples: {
 			'Custom Summoner ID': {
 				value: '',
@@ -82,7 +81,7 @@ export class MasteryController {
 		style: 'simple',
 		type: 'boolean',
 	})
-	@ApiTags('mastery', 'total')
+	@ApiTags('mastery', 'summoner', 'total')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getMasteryTotal(
