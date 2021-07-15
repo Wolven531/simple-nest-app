@@ -109,10 +109,13 @@ export class UserController {
 	@ApiTags('summoner', 'summonerId', 'user')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async getById(
+	async getBySummonerId(
 		@Param('summonerId') summonerId: string,
 	): Promise<Summoner | null> {
-		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | getById ')
+		this.logger.debug(
+			`summonerId="${summonerId}"`,
+			' User-Ctrl | getBySummonerId ',
+		)
 
 		return this.summonerService.getBySummonerId(summonerId)
 	}
