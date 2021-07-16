@@ -23,7 +23,7 @@ async function bootstrap() {
 
 	const appService = app.get(AppService)
 	const configService = app.get(ConfigService)
-	// const jsonLoaderService = app.get(JsonLoaderService)
+	// const userService = app.get(UserService)
 	const logger = app.get(Logger)
 	// const masteryService = app.get(MasteryService)
 
@@ -62,7 +62,7 @@ async function bootstrap() {
 	}
 
 	// TODO - potentially update users on app start
-	// const isFresh = jsonLoaderService.isUsersFileFresh()
+	// const isFresh = userService.isUsersFileFresh()
 
 	// if (isFresh) {
 	// 	logger.log('Skipping user refresh since users were all fresh', ctx)

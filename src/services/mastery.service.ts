@@ -30,7 +30,7 @@ export class MasteryService {
 		summonerId: string,
 		defaultMasteryTotal = DEFAULT_TOTAL_MASTERY_SCORE,
 	): Promise<number> {
-		// const loadedUsers = this.jsonLoaderService.loadUsersFromFile()
+		// const loadedUsers = this.userService.loadUsersFromFile()
 		// const targetUser = loadedUsers.find(
 		// 	(user) => user.summonerId === summonerId,
 		// )
@@ -98,7 +98,7 @@ export class MasteryService {
 	 *   the users file; it then returns the updated Users
 	 */
 	// refreshMasteryTotalForAllUsers(): Promise<User[]> {
-	// 	const loadedUsers = this.jsonLoaderService.loadUsersFromFile()
+	// 	const loadedUsers = this.userService.loadUsersFromFile()
 	// 	const apiKey = this.appService.getRiotToken()
 
 	// 	return Promise.all(
@@ -133,7 +133,7 @@ export class MasteryService {
 	// 		),
 	// 	)
 	// 		.then((updatedUsers) => {
-	// 			this.jsonLoaderService.updateUsersFile(updatedUsers)
+	// 			this.userService.updateUsersFile(updatedUsers)
 
 	// 			return updatedUsers
 	// 		})
