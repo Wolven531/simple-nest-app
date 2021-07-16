@@ -1,8 +1,8 @@
 import { User } from '../models/user.model'
-import { HttpModule, Logger } from '@nestjs/common'
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
-import { JsonLoaderService } from './json-loader.service'
+import { UserService } from './user.service'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
@@ -29,7 +29,7 @@ type TestCase_GetUserByFriendlyName = {
 // 	param: User[]
 // }
 
-describe('JSON Loader Service', () => {
+describe('User Service', () => {
 	const testCases_GetUserByFriendlyName: TestCase_GetUserByFriendlyName[] = [
 		{
 			expectedResult: undefined,
@@ -213,17 +213,17 @@ describe('JSON Loader Service', () => {
 	// 	},
 	// ]
 
-	let service: JsonLoaderService
+	let service: UserService
 	let testModule: TestingModule
 
 	beforeEach(async () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
-			imports: [HttpModule],
-			providers: [JsonLoaderService, Logger],
+			imports: [],
+			providers: [UserService, Logger],
 		}).compile()
 
-		service = testModule.get(JsonLoaderService)
+		service = testModule.get(UserService)
 	})
 
 	afterEach(async () => {
