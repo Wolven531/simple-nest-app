@@ -24,6 +24,20 @@ export class UserService {
 	}
 
 	/**
+	 * This method adds the provided user to the collection of users IN MEMORY ONLY
+	 *
+	 * @param newUser User instance to add to users collection
+	 */
+	addUser(newUser: User) {
+		this.logger.log(
+			`Adding user ${JSON.stringify(newUser)}`,
+			' addUser | user-svc ',
+		)
+
+		this._users.splice(this._users.length - 1, 0, newUser)
+	}
+
+	/**
 	 * This method uses loadUsersFromFile and a friendlyName parameter to search for a user in the users file
 	 *
 	 * @param friendlyName String value (case insensitive) to use when searching for a User
