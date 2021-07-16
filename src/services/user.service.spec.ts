@@ -239,6 +239,28 @@ describe('User Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
+		describe('invoke addUser()', () => {
+			const fakeUser: User = {
+				accountId: 'account-id',
+				lastUpdated: new Date(2021, 7, 1).getTime(),
+				masteryTotal: 1,
+				name: 'name 1',
+				summonerId: 'summ-id',
+			} as User
+
+			beforeEach(() => {
+				jest
+					.spyOn(service as any, 'loadUsersFromFile')
+					.mockImplementation(() => jest.fn().mockReturnValue([]))
+
+				service.addUser(fakeUser)
+			})
+
+			it('adds user to collection of users in service', () => {
+				expect(service.users).toContain(fakeUser)
+			})
+		})
+
 		testCases_GetUserByFriendlyName.forEach(
 			({ expectedResult, mockLoadUsersFromFile, name, param }) => {
 				describe(`w/ mocked loadUsersFromFile (${name})`, () => {
@@ -246,10 +268,6 @@ describe('User Service', () => {
 						jest
 							.spyOn(service as any, 'users', 'get')
 							.mockImplementation(() => mockLoadUsersFromFile())
-					})
-
-					afterEach(() => {
-						jest.spyOn(service as any, 'users', 'get').mockRestore()
 					})
 
 					describe(`invoke getUserByFriendlyName("${param}")`, () => {
@@ -274,10 +292,6 @@ describe('User Service', () => {
 		// 				jest
 		// 					.spyOn(service, 'loadUsersFromFile')
 		// 					.mockImplementation(mockLoadUsersFromFile)
-		// 			})
-
-		// 			afterEach(() => {
-		// 				jest.spyOn(service, 'loadUsersFromFile').mockRestore()
 		// 			})
 
 		// 			describe('invoke isUsersFileFresh()', () => {
@@ -326,10 +340,6 @@ describe('User Service', () => {
 		// 	describe(`w/ mocked fs.writeFileSync (${name})`, () => {
 		// 		beforeEach(() => {
 		// 			jest.spyOn(fs, 'writeFileSync').mockImplementation(mockWriteFileSync)
-		// 		})
-
-		// 		afterEach(() => {
-		// 			jest.spyOn(fs, 'writeFileSync').mockRestore()
 		// 		})
 
 		// 		describe(`invoke updateUsersFile(${param.length}-length user array)`, () => {
