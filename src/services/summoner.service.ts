@@ -73,8 +73,8 @@ export class SummonerService {
 	 *
 	 * @returns Promise<Summoner | null> - information about a Summoner, if found; null otherwise
 	 */
-	async getBySummonerId(summonerId: string): Promise<Summoner | null> {
-		const ctx = ' Summoner-Svc | getBySummonerId '
+	async getSummonerById(summonerId: string): Promise<Summoner | null> {
+		const ctx = ' Summoner-Svc | getSummonerById '
 
 		try {
 			this.logger.verbose('Grabbing riotToken...', ctx)

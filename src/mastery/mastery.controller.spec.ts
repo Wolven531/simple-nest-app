@@ -22,11 +22,11 @@ describe('MasteryController', () => {
 	let controller: MasteryController
 	let testModule: TestingModule
 	let mockGetMasteryTotal: jest.Mock
-	let mockGetBySummonerId: jest.Mock
+	let mockGetSummonerById: jest.Mock
 
 	beforeEach(async () => {
 		mockGetMasteryTotal = jest.fn().mockResolvedValue(fakeMasteryTotal)
-		mockGetBySummonerId = jest.fn().mockResolvedValue(fakeSummoner)
+		mockGetSummonerById = jest.fn().mockResolvedValue(fakeSummoner)
 
 		testModule = await Test.createTestingModule({
 			controllers: [MasteryController],
@@ -43,7 +43,7 @@ describe('MasteryController', () => {
 					provide: SummonerService,
 					useFactory: () =>
 						({
-							getBySummonerId: mockGetBySummonerId,
+							getSummonerById: mockGetSummonerById,
 						} as unknown as SummonerService),
 				},
 				Logger,
@@ -77,7 +77,7 @@ describe('MasteryController', () => {
 				expect(mockGetMasteryTotal).toHaveBeenCalledTimes(1)
 				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(fakeSummonerId)
 
-				expect(mockGetBySummonerId).not.toHaveBeenCalled()
+				expect(mockGetSummonerById).not.toHaveBeenCalled()
 
 				expect(resp).toBe(fakeMasteryTotal)
 			})
@@ -94,8 +94,8 @@ describe('MasteryController', () => {
 				expect(mockGetMasteryTotal).toHaveBeenCalledTimes(1)
 				expect(mockGetMasteryTotal).toHaveBeenLastCalledWith(fakeSummonerId)
 
-				expect(mockGetBySummonerId).toHaveBeenCalledTimes(1)
-				expect(mockGetBySummonerId).toHaveBeenLastCalledWith(fakeSummonerId)
+				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
+				expect(mockGetSummonerById).toHaveBeenLastCalledWith(fakeSummonerId)
 
 				expect(resp).toEqual({
 					...fakeSummoner,

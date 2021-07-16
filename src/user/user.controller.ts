@@ -29,12 +29,51 @@ export class UserController {
 		private readonly logger: Logger,
 	) {}
 
+	@Get('get/:summonerId')
+	@ApiOperation({
+		description: 'Search the Riot API for a given Summoner by summoner ID',
+		externalDocs: {
+			description: 'Riot API User Search Endpoint Docs',
+			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getSummonerById',
+		},
+		summary: 'Get user details by searching for them using their summoner ID',
+	})
+	@ApiParam({
+		allowEmptyValue: false,
+		description: 'Summoner ID to use during lookup',
+		examples: {
+			'Custom Summoner ID': {
+				value: '',
+			},
+			'Summoner ID for 0NeveroDDoreveN0': {
+				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
+			},
+		},
+		name: 'summonerId',
+		required: true,
+		style: 'simple',
+		type: 'string',
+	})
+	@ApiTags('summoner', 'summonerId')
+	@HttpCode(HttpStatus.OK)
+	@Header('Cache-Control', 'none')
+	async getSummonerById(
+		@Param('summonerId') summonerId: string,
+	): Promise<Summoner | null> {
+		this.logger.debug(
+			`summonerId="${summonerId}"`,
+			' User-Ctrl | getSummonerById ',
+		)
+
+		return this.summonerService.getSummonerById(summonerId)
+	}
+
 	@Get()
 	@ApiOperation({
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
 	})
-	@ApiTags('server', 'user', 'users')
+	@ApiTags('server', 'user')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getUsers(): Promise<User[]> {
@@ -70,54 +109,18 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('name', 'summoner', 'user', 'username')
+	@ApiTags('name', 'summoner')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async searchUsers(
+	async searchSummoners(
 		@Query('searchKey') searchKey: string,
 	): Promise<Summoner | null> {
-		this.logger.debug(`searchKey="${searchKey}"`, ' User-Ctrl | searchUsers ')
-
-		return this.summonerService.searchByName(searchKey)
-	}
-
-	@Get('get/:summonerId')
-	@ApiOperation({
-		description: 'Search the Riot API for a given Summoner by summoner ID',
-		externalDocs: {
-			description: 'Riot API User Search Endpoint Docs',
-			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getBySummonerId',
-		},
-		summary: 'Get user details by searching for them using their summoner ID',
-	})
-	@ApiParam({
-		allowEmptyValue: false,
-		description: 'Summoner ID to use during lookup',
-		examples: {
-			'Custom Summoner ID': {
-				value: '',
-			},
-			'Summoner ID for 0NeveroDDoreveN0': {
-				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
-			},
-		},
-		name: 'summonerId',
-		required: true,
-		style: 'simple',
-		type: 'string',
-	})
-	@ApiTags('summoner', 'summonerId', 'user')
-	@HttpCode(HttpStatus.OK)
-	@Header('Cache-Control', 'none')
-	async getBySummonerId(
-		@Param('summonerId') summonerId: string,
-	): Promise<Summoner | null> {
 		this.logger.debug(
-			`summonerId="${summonerId}"`,
-			' User-Ctrl | getBySummonerId ',
+			`searchKey="${searchKey}"`,
+			' User-Ctrl | searchSummoners ',
 		)
 
-		return this.summonerService.getBySummonerId(summonerId)
+		return this.summonerService.searchByName(searchKey)
 	}
 
 	// @Get('refresh')

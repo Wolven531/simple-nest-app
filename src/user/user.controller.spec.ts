@@ -22,7 +22,7 @@ describe('UserController', () => {
 				{
 					provide: SummonerService,
 					useFactory: () => ({
-						getBySummonerId: jest.fn().mockResolvedValue(undefined),
+						getSummonerById: jest.fn().mockResolvedValue(undefined),
 						searchByName: jest.fn().mockResolvedValue(undefined),
 					}),
 				},
@@ -116,7 +116,7 @@ describe('UserController', () => {
 		// 	})
 		// })
 
-		describe('invoke searchUsers()', () => {
+		describe('invoke searchSummoners()', () => {
 			let capturedError: Error
 			// let mockHttpServiceGet: jest.Mock
 			let mockSearchByName: jest.Mock
@@ -139,7 +139,7 @@ describe('UserController', () => {
 						.spyOn(summonerService, 'searchByName')
 						.mockImplementation(mockSearchByName)
 
-					resp = await controller.searchUsers('nameForWhichToSearch')
+					resp = await controller.searchSummoners('nameForWhichToSearch')
 				} catch (err) {
 					capturedError = err
 				}
@@ -164,32 +164,32 @@ describe('UserController', () => {
 
 		describe('invoke getById()', () => {
 			let capturedError: Error
-			let mockGetBySummonerId: jest.Mock
+			let mockGetSummonerById: jest.Mock
 			let resp: Summoner | null
 
 			beforeEach(async () => {
-				mockGetBySummonerId = jest
+				mockGetSummonerById = jest
 					.fn()
 					.mockResolvedValue({ id: 'id-that-was-searched' } as Summoner)
 
 				try {
 					jest
-						.spyOn(summonerService, 'getBySummonerId')
-						.mockImplementation(mockGetBySummonerId)
+						.spyOn(summonerService, 'getSummonerById')
+						.mockImplementation(mockGetSummonerById)
 
-					resp = await controller.getBySummonerId('id-that-was-searched')
+					resp = await controller.getSummonerById('id-that-was-searched')
 				} catch (err) {
 					capturedError = err
 				}
 			})
 
 			afterEach(() => {
-				jest.spyOn(summonerService, 'getBySummonerId').mockRestore()
+				jest.spyOn(summonerService, 'getSummonerById').mockRestore()
 			})
 
-			it('invokes SummonerService.getBySummonerId(), does NOT throw error', () => {
-				expect(mockGetBySummonerId).toHaveBeenCalledTimes(1)
-				expect(mockGetBySummonerId).toHaveBeenLastCalledWith(
+			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
+				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
+				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
 					'id-that-was-searched',
 				)
 				expect(capturedError).toBeUndefined()
