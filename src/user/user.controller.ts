@@ -14,15 +14,15 @@ import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
-import { JsonLoaderService } from '../services/json-loader.service'
 import { SummonerService } from '../services/summoner.service'
+import { UserService } from '../services/user.service'
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject(JsonLoaderService)
-		private readonly jsonService: JsonLoaderService,
+		@Inject(UserService)
+		private readonly userService: UserService,
 		@Inject(SummonerService)
 		private readonly summonerService: SummonerService,
 		@Inject(Logger)
@@ -40,7 +40,7 @@ export class UserController {
 	async getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		return this.jsonService.users
+		return this.userService.users
 	}
 
 	@Get('search')

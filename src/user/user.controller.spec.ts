@@ -5,8 +5,8 @@ import { Test, TestingModule } from '@nestjs/testing'
 // import childProcess from 'child_process'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
-import { JsonLoaderService } from '../services/json-loader.service'
 import { SummonerService } from '../services/summoner.service'
+import { UserService } from '../services/user.service'
 import { UserController } from './user.controller'
 
 describe('UserController', () => {
@@ -20,17 +20,17 @@ describe('UserController', () => {
 			imports: [HttpModule],
 			providers: [
 				{
-					provide: JsonLoaderService,
-					useFactory: () => ({
-						getUserByFriendlyName: jest.fn(() => undefined),
-						loadUsersFromFile: jest.fn(() => []),
-					}),
-				},
-				{
 					provide: SummonerService,
 					useFactory: () => ({
 						getBySummonerId: jest.fn().mockResolvedValue(undefined),
 						searchByName: jest.fn().mockResolvedValue(undefined),
+					}),
+				},
+				{
+					provide: UserService,
+					useFactory: () => ({
+						getUserByFriendlyName: jest.fn(() => undefined),
+						loadUsersFromFile: jest.fn(() => []),
 					}),
 				},
 				Logger,
@@ -94,7 +94,7 @@ describe('UserController', () => {
 
 		// 		try {
 		// 			jest
-		// 				.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+		// 				.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 		// 				.mockImplementation(mockLoadUsersFromFile)
 
 		// 			resp = await controller.getUsers()
@@ -105,7 +105,7 @@ describe('UserController', () => {
 
 		// 	afterEach(() => {
 		// 		jest
-		// 			.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+		// 			.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 		// 			.mockRestore()
 		// 	})
 
