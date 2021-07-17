@@ -7,6 +7,7 @@ import {
 	Inject,
 	Logger,
 	Param,
+	Post,
 	Query,
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
@@ -28,6 +29,57 @@ export class UserController {
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
+
+	@Post('add/:summonerId')
+	@ApiOperation({
+		description:
+			'Add a user to the collection of users on the server using their summoner ID',
+		summary:
+			'Add a user to the collection of users on the server using their summoner ID',
+	})
+	@ApiParam({
+		allowEmptyValue: false,
+		description: 'Summoner ID to add',
+		examples: {
+			'Custom Summoner ID': {
+				value: '',
+			},
+		},
+		name: 'summonerId',
+		required: true,
+		style: 'simple',
+		type: 'string',
+	})
+	@ApiTags('add', 'server', 'user')
+	@HttpCode(HttpStatus.OK)
+	@Header('Cache-Control', 'none')
+	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
+		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | addUser ')
+
+		if (this.userService.users.map((u) => u.summonerId).includes(summonerId)) {
+			this.logger.debug(
+				'user already in collection, not adding again',
+				' User-Ctrl | addUser ',
+			)
+
+			return this.userService.users
+		}
+
+		const summ = await this.summonerService.getSummonerById(summonerId)
+
+		this.userService.addUser({
+			accountId: summ.accountId,
+			lastUpdated: summ.revisionDate,
+			// TODO - grab value from service
+			masteryTotal: 0,
+			name: summ.name,
+			summonerId,
+		} as User)
+
+		this.logger.debug('added user to collection', ' User-Ctrl | addUser ')
+
+		return this.userService.users
+	}
 
 	@Get('get/:summonerId')
 	@ApiOperation({

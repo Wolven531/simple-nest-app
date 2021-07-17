@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
 import { ConfigurationModule } from '../config'
-import { HealthModule } from '../health/health.module'
-import { MasteryModule } from '../mastery/mastery.module'
-// import { MatchlistModule } from '../matchlist/matchlist.module'
+import { HealthModule } from '../health'
+import { MasteryModule } from '../mastery'
+// import { MatchlistModule } from '../matchlist'
 import { SharedModule } from '../shared/shared.module'
-// import { StatsModule } from '../stats/stats.module'
-import { UserModule } from '../user/user.module'
+// import { StatsModule } from '../stats'
+import { UserModule } from '../user'
 import { AppController } from './app.controller'
 
 @Module({
