@@ -34,7 +34,7 @@ export class UserService {
 			' addUser | user-svc ',
 		)
 
-		this._users.splice(this._users.length - 1, 0, newUser)
+		this._users.push(newUser)
 	}
 
 	/**
