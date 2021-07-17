@@ -99,7 +99,7 @@ export class MasteryController {
 			return masteryTotal
 		}
 
-		const summoner = await this.summonerService.getBySummonerId(summonerId)
+		const summoner = await this.summonerService.getSummonerById(summonerId)
 
 		return {
 			...summoner,

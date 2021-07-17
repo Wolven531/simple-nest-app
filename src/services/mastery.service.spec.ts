@@ -204,7 +204,7 @@ describe('Mastery Service', () => {
 				describe(`w/ mocked loadUsersFromFile (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
 						// jest
-						// 	.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+						// 	.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 						// 	.mockImplementation(mockLoadUsersFromFile)
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
@@ -213,7 +213,7 @@ describe('Mastery Service', () => {
 
 					afterEach(() => {
 						// jest
-						// 	.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+						// 	.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 						// 	.mockRestore()
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
@@ -266,10 +266,10 @@ describe('Mastery Service', () => {
 				describe(`w/ mocked HttpGet, updateUsersFile, loadUsersFromFile (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
 						jest
-							.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+							.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 							.mockImplementation(mockLoadUsersFromFile)
 						jest
-							.spyOn(testModule.get(JsonLoaderService), 'updateUsersFile')
+							.spyOn(testModule.get(UserService), 'updateUsersFile')
 							.mockImplementation(mockUpdateUsersFile)
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
@@ -278,10 +278,10 @@ describe('Mastery Service', () => {
 
 					afterEach(() => {
 						jest
-							.spyOn(testModule.get(JsonLoaderService), 'loadUsersFromFile')
+							.spyOn(testModule.get(UserService), 'loadUsersFromFile')
 							.mockRestore()
 						jest
-							.spyOn(testModule.get(JsonLoaderService), 'updateUsersFile')
+							.spyOn(testModule.get(UserService), 'updateUsersFile')
 							.mockRestore()
 						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})

@@ -1,19 +1,19 @@
 import { User } from '../models/user.model'
-import { HttpModule, Logger } from '@nestjs/common'
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
-import { JsonLoaderService } from './json-loader.service'
+import { UserService } from './user.service'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
-	mockLoadUsersFromFile: jest.Mock
+	mockLoadedUsers: User[]
 	name: string
 	param: string
 }
 // type TestCase_IsFileFresh = {
 // 	expectedCountError: number
 // 	expectedResult: boolean
-// 	mockLoadUsersFromFile: jest.Mock
+// 	mockLoadedUsers: User[]
 // 	name: string
 // }
 // type TestCase_LoadFromFile = {
@@ -29,11 +29,11 @@ type TestCase_GetUserByFriendlyName = {
 // 	param: User[]
 // }
 
-describe('JSON Loader Service', () => {
+describe('User Service', () => {
 	const testCases_GetUserByFriendlyName: TestCase_GetUserByFriendlyName[] = [
 		{
 			expectedResult: undefined,
-			mockLoadUsersFromFile: jest.fn(() => []),
+			mockLoadedUsers: [],
 			name: 'when no users',
 			param: 'any name',
 		},
@@ -45,7 +45,7 @@ describe('JSON Loader Service', () => {
 				'name 1',
 				'summ-id-1',
 			),
-			mockLoadUsersFromFile: jest.fn(() => [
+			mockLoadedUsers: [
 				new User(
 					'account-id-1',
 					new Date(1990, 11, 15).getTime(),
@@ -60,8 +60,8 @@ describe('JSON Loader Service', () => {
 					'name 2',
 					'summ-id-2',
 				),
-			]),
-			name: 'when multiple users, one name matches exactly',
+			],
+			name: 'multiple users, one name matches exactly',
 			param: 'name 1',
 		},
 		{
@@ -72,7 +72,7 @@ describe('JSON Loader Service', () => {
 				'name 1',
 				'summ-id-1',
 			),
-			mockLoadUsersFromFile: jest.fn(() => [
+			mockLoadedUsers: [
 				new User(
 					'account-id-1',
 					new Date(1990, 11, 15).getTime(),
@@ -87,13 +87,13 @@ describe('JSON Loader Service', () => {
 					'name 2',
 					'summ-id-2',
 				),
-			]),
-			name: 'when multiple users, one name matches w/ different casing',
+			],
+			name: 'multiple users, one name matches w/ different casing',
 			param: 'nAmE 1',
 		},
 		{
 			expectedResult: undefined,
-			mockLoadUsersFromFile: jest.fn(() => [
+			mockLoadedUsers: [
 				new User(
 					'account-id-1',
 					new Date().getTime(),
@@ -108,8 +108,8 @@ describe('JSON Loader Service', () => {
 					'name 2',
 					'summ-id-2',
 				),
-			]),
-			name: 'when multiple users, none match',
+			],
+			name: 'multiple users, none match',
 			param: 'non-matching name',
 		},
 	]
@@ -117,13 +117,13 @@ describe('JSON Loader Service', () => {
 	// 	{
 	// 		expectedCountError: 0,
 	// 		expectedResult: true,
-	// 		mockLoadUsersFromFile: jest.fn(() => []),
+	// 		mockLoadedUsers: [],
 	// 		name: 'when no users',
 	// 	},
 	// 	{
 	// 		expectedCountError: 0,
 	// 		expectedResult: true,
-	// 		mockLoadUsersFromFile: jest.fn(() => [
+	// 		mockLoadedUsers: [
 	// 			new User(
 	// 				'account-id-1',
 	// 				new Date().getTime(),
@@ -138,13 +138,13 @@ describe('JSON Loader Service', () => {
 	// 				'name 2',
 	// 				'summ-id-2',
 	// 			),
-	// 		]),
+	// 		],
 	// 		name: 'when multiple users, all fresh',
 	// 	},
 	// 	{
 	// 		expectedCountError: 0,
 	// 		expectedResult: false,
-	// 		mockLoadUsersFromFile: jest.fn(() => [
+	// 		mockLoadedUsers: [
 	// 			new User(
 	// 				'account-id-1',
 	// 				new Date().getTime(),
@@ -159,7 +159,7 @@ describe('JSON Loader Service', () => {
 	// 				'name 2',
 	// 				'summ-id-2',
 	// 			),
-	// 		]),
+	// 		],
 	// 		name: 'when multiple users, one is stale',
 	// 	},
 	// ]
@@ -213,17 +213,17 @@ describe('JSON Loader Service', () => {
 	// 	},
 	// ]
 
-	let service: JsonLoaderService
+	let service: UserService
 	let testModule: TestingModule
 
 	beforeEach(async () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
-			imports: [HttpModule],
-			providers: [JsonLoaderService, Logger],
+			imports: [],
+			providers: [UserService, Logger],
 		}).compile()
 
-		service = testModule.get(JsonLoaderService)
+		service = testModule.get(UserService)
 	})
 
 	afterEach(async () => {
@@ -239,17 +239,48 @@ describe('JSON Loader Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
+		describe('invoke addUser()', () => {
+			const fakeUser: User = {
+				accountId: 'account-id',
+				lastUpdated: new Date(2021, 7, 1).getTime(),
+				masteryTotal: 1,
+				name: 'name 1',
+				summonerId: 'summ-id',
+			} as User
+
+			beforeEach(() => {
+				jest
+					.spyOn(service as any, 'loadUsersFromFile')
+					.mockImplementation(() => jest.fn().mockReturnValue([]))
+
+				service.addUser(fakeUser)
+			})
+
+			afterEach(() => {
+				jest.spyOn(service as any, 'loadUsersFromFile').mockRestore()
+			})
+
+			it('adds user to collection of users in service', () => {
+				expect(service.users).toContain(fakeUser)
+			})
+		})
+
 		testCases_GetUserByFriendlyName.forEach(
-			({ expectedResult, mockLoadUsersFromFile, name, param }) => {
-				describe(`w/ mocked loadUsersFromFile (${name})`, () => {
+			({ expectedResult, mockLoadedUsers, name, param }) => {
+				describe(`w/ mockLoadedUsers (${name})`, () => {
 					beforeEach(() => {
 						jest
 							.spyOn(service as any, 'users', 'get')
-							.mockImplementation(() => mockLoadUsersFromFile())
+							.mockReturnValue(mockLoadedUsers)
+
+						// TODO - not sure why below does not work...
+						// jest
+						// 	.spyOn(service as any, 'loadUsersFromFile')
+						// 	.mockReturnValue(mockLoadedUsers)
 					})
 
 					afterEach(() => {
-						jest.spyOn(service as any, 'users', 'get').mockRestore()
+						jest.spyOn(service as any, 'loadUsersFromFile').mockRestore()
 					})
 
 					describe(`invoke getUserByFriendlyName("${param}")`, () => {
@@ -268,16 +299,12 @@ describe('JSON Loader Service', () => {
 		)
 
 		// testCases_IsFileFresh.forEach(
-		// 	({ expectedResult, mockLoadUsersFromFile, name }) => {
+		// 	({ expectedResult, mockLoadedUsers, name }) => {
 		// 		describe(`w/ mocked loadUsersFromFile (${name})`, () => {
 		// 			beforeEach(() => {
 		// 				jest
 		// 					.spyOn(service, 'loadUsersFromFile')
-		// 					.mockImplementation(mockLoadUsersFromFile)
-		// 			})
-
-		// 			afterEach(() => {
-		// 				jest.spyOn(service, 'loadUsersFromFile').mockRestore()
+		// 					.mockReturnValue(mockLoadedUsers)
 		// 			})
 
 		// 			describe('invoke isUsersFileFresh()', () => {
@@ -288,7 +315,7 @@ describe('JSON Loader Service', () => {
 		// 				})
 
 		// 				it('invokes loadUsersFromFile, log, error correctly and returns expected result', () => {
-		// 					expect(mockLoadUsersFromFile).toHaveBeenCalledTimes(1)
+		// 					expect(mockLoadedUsers).toHaveBeenCalledTimes(1)
 		// 					expect(actualResult).toEqual(expectedResult)
 		// 				})
 		// 			})
@@ -326,10 +353,6 @@ describe('JSON Loader Service', () => {
 		// 	describe(`w/ mocked fs.writeFileSync (${name})`, () => {
 		// 		beforeEach(() => {
 		// 			jest.spyOn(fs, 'writeFileSync').mockImplementation(mockWriteFileSync)
-		// 		})
-
-		// 		afterEach(() => {
-		// 			jest.spyOn(fs, 'writeFileSync').mockRestore()
 		// 		})
 
 		// 		describe(`invoke updateUsersFile(${param.length}-length user array)`, () => {

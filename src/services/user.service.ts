@@ -7,7 +7,7 @@ import * as usersJsonData from '../data/users.json'
 import { User } from '../models/user.model'
 
 @Injectable()
-export class JsonLoaderService {
+export class UserService {
 	// private readonly DIRECTORY_DATA = 'data'
 	// private readonly FILENAME_USERS = 'users.json'
 	private _users: User[]
@@ -24,6 +24,20 @@ export class JsonLoaderService {
 	}
 
 	/**
+	 * This method adds the provided user to the collection of users IN MEMORY ONLY
+	 *
+	 * @param newUser User instance to add to users collection
+	 */
+	addUser(newUser: User) {
+		this.logger.log(
+			`Adding user ${JSON.stringify(newUser)}`,
+			' addUser | user-svc ',
+		)
+
+		this._users.push(newUser)
+	}
+
+	/**
 	 * This method uses loadUsersFromFile and a friendlyName parameter to search for a user in the users file
 	 *
 	 * @param friendlyName String value (case insensitive) to use when searching for a User
@@ -34,7 +48,7 @@ export class JsonLoaderService {
 
 		this.logger.log(
 			`Searching for friendlyName = "${searchKey}"`,
-			' getUserByFriendlyName | json-loader-svc ',
+			' getUserByFriendlyName | user-svc ',
 		)
 
 		return this.users.find((u) => u.name.toLowerCase() === searchKey)
@@ -50,7 +64,7 @@ export class JsonLoaderService {
 
 	// 	this.logger.log(
 	// 		`About to check isFresh for ${loadedUsers.length} users...`,
-	// 		' isUsersFileFresh | json-loader-svc ',
+	// 		' isUsersFileFresh | user-svc ',
 	// 	)
 
 	// 	return loadedUsers.every((user) => user.isFresh)
@@ -68,10 +82,10 @@ export class JsonLoaderService {
 			// 	join(__dirname, '..', this.DIRECTORY_DATA, this.FILENAME_USERS),
 			// ).toString(ENCODING_UTF8)
 
-			// this.logger.log(`fileContents=\n\n${fileContents}\n`, ' loadUsersFromFile | json-loader-svc ')
+			// this.logger.log(`fileContents=\n\n${fileContents}\n`, ' loadUsersFromFile | user-svc ')
 			// this.logger.log(
 			// 	`imported data=\n\n${JSON.stringify(usersJsonData)}\n`,
-			// 	' loadUsersFromFile | json-loader-svc ',
+			// 	' loadUsersFromFile | user-svc ',
 			// )
 
 			const users: User[] = deserializeArray(
@@ -81,14 +95,14 @@ export class JsonLoaderService {
 
 			this.logger.log(
 				`${users.length} users loaded from file`,
-				' loadUsersFromFile | json-loader-svc ',
+				' loadUsersFromFile | user-svc ',
 			)
 
 			return users
 		} catch (e) {
 			this.logger.error(
 				`Failed to load users file; err=\n\n${e}\n`,
-				' loadUsersFromFile | json-loader-svc ',
+				' loadUsersFromFile | user-svc ',
 			)
 		}
 		return []
@@ -109,7 +123,7 @@ export class JsonLoaderService {
 
 	// 	this.logger.log(
 	// 		`${updatedUsers.length} users about to be saved to file at "${filepathUsers}"`,
-	// 		' updateUsersFile | json-loader-svc ',
+	// 		' updateUsersFile | user-svc ',
 	// 	)
 
 	// 	try {
@@ -124,12 +138,12 @@ export class JsonLoaderService {
 
 	// 		this.logger.log(
 	// 			`users file updated\n\n${JSON.stringify(updatedUsers, null, 4)}\n`,
-	// 			' updateUsersFile | json-loader-svc ',
+	// 			' updateUsersFile | user-svc ',
 	// 		)
 	// 	} catch (e) {
 	// 		this.logger.error(
 	// 			`Failed to update users file; err=\n\n${e}\n`,
-	// 			' updateUsersFile | json-loader-svc ',
+	// 			' updateUsersFile | user-svc ',
 	// 		)
 	// 	}
 	// }
