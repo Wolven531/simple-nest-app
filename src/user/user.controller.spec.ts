@@ -5,6 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 // import childProcess from 'child_process'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
+import { User } from '../models/user.model'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
 import { UserController } from './user.controller'
@@ -13,6 +14,7 @@ describe('UserController', () => {
 	let controller: UserController
 	let testModule: TestingModule
 	let summonerService: SummonerService
+	let userService: UserService
 
 	beforeEach(async () => {
 		testModule = await Test.createTestingModule({
@@ -29,8 +31,10 @@ describe('UserController', () => {
 				{
 					provide: UserService,
 					useFactory: () => ({
+						addUser: jest.fn(),
 						getUserByFriendlyName: jest.fn(() => undefined),
 						loadUsersFromFile: jest.fn(() => []),
+						users: [],
 					}),
 				},
 				Logger,
@@ -39,6 +43,7 @@ describe('UserController', () => {
 
 		controller = testModule.get(UserController)
 		summonerService = testModule.get(SummonerService)
+		userService = testModule.get(UserService)
 	})
 
 	afterEach(async () => {
@@ -73,10 +78,6 @@ describe('UserController', () => {
 		// 		}
 		// 	})
 
-		// 	afterEach(() => {
-		// 		jest.spyOn(childProcess, 'execFileSync').mockRestore()
-		// 	})
-
 		// 	it('invokes execFileSync(), does NOT throw error', () => {
 		// 		expect(mockExecFileSync).toHaveBeenCalledTimes(1)
 		// 		expect(capturedError).toBeUndefined()
@@ -101,12 +102,6 @@ describe('UserController', () => {
 		// 		} catch (err) {
 		// 			capturedError = err
 		// 		}
-		// 	})
-
-		// 	afterEach(() => {
-		// 		jest
-		// 			.spyOn(testModule.get(UserService), 'loadUsersFromFile')
-		// 			.mockRestore()
 		// 	})
 
 		// 	it('invokes loadUsersFromFile(), does NOT throw error', () => {
@@ -145,12 +140,6 @@ describe('UserController', () => {
 				}
 			})
 
-			afterEach(() => {
-				// jest.spyOn(testModule.get(HttpService), 'get')
-				// 	.mockRestore()
-				jest.spyOn(summonerService, 'searchByName').mockRestore()
-			})
-
 			it('invokes SummonerService.searchByName(), does NOT throw error', () => {
 				// expect(mockHttpServiceGet).toHaveBeenCalledTimes(1)
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)
@@ -183,10 +172,6 @@ describe('UserController', () => {
 				}
 			})
 
-			afterEach(() => {
-				jest.spyOn(summonerService, 'getSummonerById').mockRestore()
-			})
-
 			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
 				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
 				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
@@ -194,6 +179,42 @@ describe('UserController', () => {
 				)
 				expect(capturedError).toBeUndefined()
 				expect(resp).toEqual({ id: 'id-that-was-searched' } as Summoner)
+			})
+		})
+
+		describe('invoke addUser()', () => {
+			let capturedError: Error
+			let mockGetSummonerById: jest.Mock
+			let spyAddUser: jest.SpyInstance
+			let resp: User[]
+
+			beforeEach(async () => {
+				mockGetSummonerById = jest
+					.fn()
+					.mockResolvedValue({ id: 'id-that-was-searched' } as Summoner)
+
+				jest
+					.spyOn(summonerService, 'getSummonerById')
+					.mockImplementation(mockGetSummonerById)
+
+				spyAddUser = jest.spyOn(userService, 'addUser')
+
+				try {
+					resp = await controller.addUser('id-that-was-searched')
+				} catch (err) {
+					capturedError = err
+				}
+			})
+
+			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
+				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
+				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
+					'id-that-was-searched',
+				)
+
+				expect(spyAddUser).toHaveBeenCalledTimes(1)
+
+				expect(capturedError).toBeUndefined()
 			})
 		})
 	})
