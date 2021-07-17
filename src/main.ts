@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 // import compression from 'compression'
 import 'reflect-metadata'
-import { AppModule } from './app/app.module'
+import { AppModule } from './app'
 import { ENV_API_PORT, ENV_API_PORT_DEFAULT } from './constants'
 import { AppService } from './services/app.service'
 
