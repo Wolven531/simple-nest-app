@@ -17,8 +17,8 @@ import {
 	ENV_API_SECRET_KEY,
 	ENV_API_SECRET_KEY_DEFAULT,
 } from '../constants'
+import { UpdateConfigDto } from '../models/update-config.dto'
 import { AppService } from '../services/app.service'
-import { UpdateConfigDto } from './update-config.dto'
 
 @ApiTags('config')
 @Controller('config')
