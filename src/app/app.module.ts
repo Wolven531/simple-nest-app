@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common'
+import { APP_INTERCEPTOR } from '@nestjs/core'
 import { ConfigurationModule } from '../config'
 import { HealthModule } from '../health'
+import { HttpRequestInterceptor } from '../http-request.interceptor'
 import { MasteryModule } from '../mastery'
 // import { MatchlistModule } from '../matchlist'
 import { SharedModule } from '../shared/shared.module'
@@ -20,6 +22,11 @@ import { AppController } from './app.controller'
 		// StatsModule, // contains stats endpoints
 		UserModule, // contains user endpoints
 	],
-	providers: [],
+	providers: [
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: HttpRequestInterceptor,
+		},
+	],
 })
 export class AppModule {}
