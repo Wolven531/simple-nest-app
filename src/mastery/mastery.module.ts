@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 // import { MatchlistService } from '../services/matchlist.service'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { SharedModule } from '../shared/shared.module'
+import { SharedModule } from '../shared'
 import { MasteryController } from './mastery.controller'
 
 @Module({
