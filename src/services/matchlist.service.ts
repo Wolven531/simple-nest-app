@@ -17,10 +17,9 @@ export class MatchlistService {
 	) {}
 
 	/**
-	 * This method retrieves a Game from the Riot API
+	 * This method uses the Riot Match API v4 to retrieve a Game
 	 *
-	 * @param gameId Numeric identifier for which game to retrieve
-	 *
+	 * @param gameId number Identifier for game to retrieve
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
 	v4GetGame(gameId: number): Promise<Game | null> {
@@ -97,7 +96,7 @@ export class MatchlistService {
 				},
 			)
 			.toPromise()
-			.then(async (resp) => {
+			.then<Match[]>((resp) => {
 				const matchlist: Matchlist = resp.data
 
 				this.logger.log(
@@ -105,17 +104,27 @@ export class MatchlistService {
 					' getMatchlist | match-svc ',
 				)
 
-				const allMatches: Match[] = matchlist.matches
+				return matchlist.matches
+			})
+			.then<Match[] | Game[]>((allMatches: Match[]) => {
+				const messageRetrieval = includeGameData
+					? `retrieving additional info for ${allMatches.length} indiviudal games...`
+					: 'returning info for matches w/o further data retrieval'
+
+				this.logger.log(
+					`includeGameData=${includeGameData}; ${messageRetrieval}`,
+					' getMatchlist | match-svc ',
+				)
 
 				return includeGameData
-					? await Promise.all(
+					? Promise.all(
 							allMatches.map((match) => this.v4GetGame(match.gameId)),
 							// could also be expressed (less efficiently) as below
 							// more info -
 							// https://www.freecodecamp.org/news/beware-of-chaining-array-methods-in-javascript-ef3983b60fbc
 							// allMatches.map((match) => match.gameId).map(this.v4GetGame),
 					  )
-					: allMatches
+					: Promise.resolve(allMatches)
 			})
 			.catch((err) => {
 				this.logger.error(
