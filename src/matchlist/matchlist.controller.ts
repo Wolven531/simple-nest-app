@@ -38,7 +38,7 @@ export class MatchlistController {
 			description: 'Riot API Get Matchlist Endpoint Docs',
 			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatchlist',
 		},
-		summary: 'Get matches for a given Summoner accountId',
+		summary: 'Get a list of matches for a given Summoner accountId',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
@@ -120,13 +120,28 @@ export class MatchlistController {
 
 	@Get('game/:gameId')
 	@ApiOperation({
-		description: 'Gets a game from the Riot API',
+		description:
+			'Get a Game from the Riot API (match v4 currently) using a given gameId',
 		externalDocs: {
 			description: 'Riot API Get Match Endpoint Docs',
 			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatch',
 		},
-		summary: 'Gets a game from the Riot API',
+		summary: 'Get a Game using a given gameId',
 	})
+	@ApiParam({
+		allowEmptyValue: false,
+		description: 'gameId of a Game',
+		examples: {
+			'Custom Game ID': {
+				value: '',
+			},
+		},
+		name: 'gameId',
+		required: true,
+		style: 'simple',
+		type: 'number',
+	})
+	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getGame(@Param('gameId') gameId: number): Promise<Game> {
