@@ -17,13 +17,12 @@ export class MatchlistService {
 	) {}
 
 	/**
-	 * This method retrieves a Game from the Riot API
+	 * This method uses the Riot Match API v4 to retrieve a Game
 	 *
-	 * @param gameId Numeric identifier for which game to retrieve
-	 *
+	 * @param gameId number Identifier for game to retrieve
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
-	getGame(gameId: number): Promise<Game | null> {
+	v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
 		return this.httpService
@@ -59,16 +58,34 @@ export class MatchlistService {
 			})
 	}
 
-	getMatchlist(
+	/**
+	 * This method uses the Riot Match API v4 to retrieve a list of matches for a specific Summoner
+	 *
+	 * @param accountId string `accountId` of a Summoner to use when retrieving matches
+	 * @param getLastX number Defaults to 10; number of matches to retrieve
+	 * @param includeGameData boolean Defaults to false; retrieves individual game data if true;
+	 *     otherwise, returns simple match data
+	 * @returns A collection of either Match objects (default) or Game objects (includeGameData=true)
+	 */
+	v4GetMatchlist(
 		accountId: string,
-		getLastX: number | undefined,
+		getLastX = 10,
 		includeGameData = false,
 	): Promise<Match[] | Game[]> {
 		const apiKey = this.appService.getRiotToken()
 
+		// update value BEFORE hitting Riot API
+		if (getLastX < MIN_NUM_MATCHES) {
+			getLastX = MIN_NUM_MATCHES
+		}
+
+		if (getLastX > MAX_NUM_MATCHES) {
+			getLastX = MAX_NUM_MATCHES
+		}
+
 		return this.httpService
 			.get(
-				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}`,
+				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}?endIndex=${getLastX}`,
 				{
 					headers: {
 						'Accept-Charset':
@@ -79,7 +96,7 @@ export class MatchlistService {
 				},
 			)
 			.toPromise()
-			.then(async (resp) => {
+			.then<Match[]>((resp) => {
 				const matchlist: Matchlist = resp.data
 
 				this.logger.log(
@@ -87,28 +104,27 @@ export class MatchlistService {
 					' getMatchlist | match-svc ',
 				)
 
-				const allMatches: Match[] = matchlist.matches
+				return matchlist.matches
+			})
+			.then<Match[] | Game[]>((allMatches: Match[]) => {
+				const messageRetrieval = includeGameData
+					? `retrieving additional info for ${allMatches.length} indiviudal games...`
+					: 'returning info for matches w/o further data retrieval'
 
-				if (getLastX === undefined) {
-					return allMatches
-				}
-				if (getLastX < MIN_NUM_MATCHES) {
-					return []
-				}
-				if (getLastX > MAX_NUM_MATCHES) {
-					getLastX = MAX_NUM_MATCHES
-				}
-
-				// TODO: incorporate this limit in request to Riot API
-				const returnData: Match[] = allMatches.slice(0, getLastX)
+				this.logger.log(
+					`includeGameData=${includeGameData}; ${messageRetrieval}`,
+					' getMatchlist | match-svc ',
+				)
 
 				return includeGameData
-					? await Promise.all(
-							returnData.map(
-								(match) => this.getGame(match.gameId) as Promise<Game>,
-							),
+					? Promise.all(
+							allMatches.map((match) => this.v4GetGame(match.gameId)),
+							// could also be expressed (less efficiently) as below
+							// more info -
+							// https://www.freecodecamp.org/news/beware-of-chaining-array-methods-in-javascript-ef3983b60fbc
+							// allMatches.map((match) => match.gameId).map(this.v4GetGame),
 					  )
-					: returnData
+					: Promise.resolve(allMatches)
 			})
 			.catch((err) => {
 				this.logger.error(

@@ -51,7 +51,7 @@ export class StatsController {
 			' getSummary | StatsCtrl ',
 		)
 
-		const matches = await this.matchlistService.getMatchlist(
+		const matches = await this.matchlistService.v4GetMatchlist(
 			accountId,
 			getLastX,
 			includeGameData,

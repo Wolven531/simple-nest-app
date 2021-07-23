@@ -1,6 +1,6 @@
 import { HttpModule, Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { SharedModule } from '../shared/shared.module'
+import { SharedModule } from '../shared'
 import { ConfigController } from './config.controller'
 
 @Module({

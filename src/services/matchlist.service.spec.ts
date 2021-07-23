@@ -1,30 +1,31 @@
-import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
-import { Matchlist } from '../models/matchlist.model'
 import { HttpModule, HttpService, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
-import { MatchlistService } from './matchlist.service'
+import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
+import { Matchlist } from '../models/matchlist.model'
 import { AppService } from './app.service'
+import { MatchlistService } from './matchlist.service'
 
 type TestCase_GetGame = {
-	descriptionMockedBehavior: string
-	expectedCountGet: number
+	description: string
+	expectedCountHttpGet: number
 	expectedResult: Game | null
 	mockHttpGet: jest.Mock
-	param1: number
+	paramGameId: number
 }
 type TestCase_GetMatchlist = {
-	descriptionMockedBehavior: string
-	expectedCountGet: number
+	description: string
+	expectedCountHttpGet: number
 	expectedCountGetGame: number
+	expectedUrlParam: number
 	expectedResult: Match[] | Game[]
 	mockGetGame: jest.Mock
 	mockHttpGet: jest.Mock
-	param1: string
-	param2: number | undefined
-	param3: boolean | undefined
+	paramAccountId: string
+	paramGetLastX: number | undefined
+	paramIncludeGameData: boolean | undefined
 }
 
 describe('Matchlist Service', () => {
@@ -32,24 +33,24 @@ describe('Matchlist Service', () => {
 
 	const testCases_getGame: TestCase_GetGame[] = [
 		{
-			descriptionMockedBehavior: 'Http error occurs',
-			expectedCountGet: 1,
+			description: 'Http error occurs',
+			expectedCountHttpGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() =>
 				from(Promise.reject(new Error('Fake ajw error'))),
 			),
-			param1: 0,
+			paramGameId: 1,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is bad',
-			expectedCountGet: 1,
+			description: 'Returned data is bad',
+			expectedCountHttpGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			param1: 0,
+			paramGameId: 2,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
 			expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
 			mockHttpGet: jest.fn(() =>
 				from(
@@ -58,38 +59,41 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: 0,
+			paramGameId: 3,
 		},
 	]
 	const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		{
-			descriptionMockedBehavior: 'Http error occurs',
-			expectedCountGet: 1,
+			description: 'Http error occurs',
+			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
+			expectedUrlParam: 10,
 			expectedResult: [],
 			mockGetGame: jest.fn(() => Promise.resolve()),
 			mockHttpGet: jest.fn(() =>
 				from(Promise.reject(new Error('Fake ajw error'))),
 			),
-			param1: '',
-			param2: undefined,
-			param3: undefined,
+			paramAccountId: 'some-account-id',
+			paramGetLastX: undefined,
+			paramIncludeGameData: undefined,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is bad',
-			expectedCountGet: 1,
+			description: 'Returned data is bad',
+			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
+			expectedUrlParam: 10,
 			expectedResult: [],
 			mockGetGame: jest.fn(() => Promise.resolve()),
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			param1: '',
-			param2: undefined,
-			param3: undefined,
+			paramAccountId: 'some-account-id',
+			paramGetLastX: undefined,
+			paramIncludeGameData: undefined,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
+			expectedUrlParam: 10,
 			expectedResult: [
 				new Match(
 					222,
@@ -126,47 +130,15 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: '',
-			param2: undefined,
-			param3: undefined,
+			paramAccountId: 'some-account-id',
+			paramGetLastX: undefined,
+			paramIncludeGameData: undefined,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedResult: [],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									1,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			param1: '',
-			param2: 0,
-			param3: undefined,
-		},
-		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
-			expectedCountGetGame: 0,
+			expectedUrlParam: 1,
 			expectedResult: [
 				new Match(
 					222,
@@ -203,14 +175,60 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: '',
-			param2: 101,
-			param3: undefined,
+			paramAccountId: 'some-account-id',
+			paramGetLastX: 0,
+			paramIncludeGameData: undefined,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
+			expectedCountGetGame: 0,
+			expectedUrlParam: 100,
+			expectedResult: [
+				new Match(
+					222,
+					'NONE',
+					2020,
+					'NA1',
+					100,
+					1,
+					'NONE',
+					new Date(2020, 1, 1).getTime(),
+				),
+			],
+			mockGetGame: jest.fn(() => Promise.resolve()),
+			mockHttpGet: jest.fn(() =>
+				from(
+					Promise.resolve({
+						data: {
+							endIndex: 1,
+							startIndex: 0,
+							matches: [
+								new Match(
+									222,
+									'NONE',
+									2020,
+									'NA1',
+									100,
+									1,
+									'NONE',
+									new Date(2020, 1, 1).getTime(),
+								),
+							] as Match[],
+							totalGames: 1,
+						} as Matchlist,
+					}),
+				),
+			),
+			paramAccountId: 'some-account-id',
+			paramGetLastX: 101,
+			paramIncludeGameData: undefined,
+		},
+		{
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
 			expectedCountGetGame: 1,
+			expectedUrlParam: 1,
 			expectedResult: [
 				new Game(
 					222,
@@ -270,9 +288,9 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: '',
-			param2: 1,
-			param3: true,
+			paramAccountId: 'some-account-id',
+			paramGetLastX: 1,
+			paramIncludeGameData: true,
 		},
 	]
 	let service: MatchlistService
@@ -315,37 +333,33 @@ describe('Matchlist Service', () => {
 
 		testCases_getGame.forEach(
 			({
-				descriptionMockedBehavior,
-				expectedCountGet,
+				description,
+				expectedCountHttpGet,
 				expectedResult,
 				mockHttpGet,
-				param1,
+				paramGameId,
 			}) => {
-				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
+				describe(`w/ mocked HttpGet (${description})`, () => {
 					beforeEach(() => {
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
 							.mockImplementation(mockHttpGet)
 					})
 
-					afterEach(() => {
-						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
-					})
-
-					describe(`invoke getGame("${param1}")`, () => {
+					describe(`invoke getGame(${paramGameId})`, () => {
 						let actualResult: Game | null
 
 						beforeEach(async () => {
-							actualResult = await service.getGame(param1)
+							actualResult = await service.v4GetGame(paramGameId)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
-							if (expectedCountGet > 0) {
+							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
-									'https://na1.api.riotgames.com/lol/match/v4/matches/0',
+									`https://na1.api.riotgames.com/lol/match/v4/matches/${paramGameId}`,
 									{
 										headers: {
 											'Accept-Charset':
@@ -366,40 +380,53 @@ describe('Matchlist Service', () => {
 
 		testCases_getMatchlist.forEach(
 			({
-				descriptionMockedBehavior,
-				expectedCountGet,
+				description,
+				expectedCountHttpGet,
 				expectedCountGetGame,
+				expectedUrlParam,
 				expectedResult,
 				mockGetGame,
 				mockHttpGet,
-				param1,
-				param2,
-				param3,
+				paramAccountId,
+				paramGetLastX,
+				paramIncludeGameData,
 			}) => {
-				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
+				describe(`w/ mocked HttpGet and v4GetGame (${description})`, () => {
 					beforeEach(() => {
-						jest.spyOn(service, 'getGame').mockImplementation(mockGetGame)
+						jest.spyOn(service, 'v4GetGame').mockImplementation(mockGetGame)
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
 							.mockImplementation(mockHttpGet)
 					})
 
-					afterEach(() => {
-						jest.spyOn(service, 'getGame').mockRestore()
-						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
-					})
-
-					describe(`invoke getMatchlist("${param1}", "${param2}", "${param3}")`, () => {
+					describe(`invoke getMatchlist("${paramAccountId}", ${paramGetLastX}, ${paramIncludeGameData})`, () => {
 						let actualResult: Game[] | Match[]
 
 						beforeEach(async () => {
-							actualResult = await service.getMatchlist(param1, param2, param3)
+							actualResult = await service.v4GetMatchlist(
+								paramAccountId,
+								paramGetLastX,
+								paramIncludeGameData,
+							)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							if (expectedCountHttpGet > 0) {
+								expect(mockHttpGet).toHaveBeenLastCalledWith(
+									`https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/${paramAccountId}?endIndex=${expectedUrlParam}`,
+									{
+										headers: {
+											'Accept-Charset':
+												'application/x-www-form-urlencoded; charset=UTF-8',
+											'Accept-Language': 'en-US,en;q=0.9',
+											'X-Riot-Token': fakeAPIKey,
+										},
+									},
+								)
+							}
 							expect(mockGetGame).toHaveBeenCalledTimes(expectedCountGetGame)
 
 							expect(actualResult).toEqual(expectedResult)

@@ -109,7 +109,7 @@ export class UserController {
 	@ApiTags('summoner', 'summonerId')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async getSummonerById(
+	getSummonerById(
 		@Param('summonerId') summonerId: string,
 	): Promise<Summoner | null> {
 		this.logger.debug(
@@ -128,10 +128,10 @@ export class UserController {
 	@ApiTags('server', 'user')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async getUsers(): Promise<User[]> {
+	getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		return this.userService.users
+		return Promise.resolve(this.userService.users)
 	}
 
 	@Get('search')
@@ -164,7 +164,7 @@ export class UserController {
 	@ApiTags('name', 'summoner')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async searchSummoners(
+	searchSummoners(
 		@Query('searchKey') searchKey: string,
 	): Promise<Summoner | null> {
 		this.logger.debug(
@@ -178,7 +178,7 @@ export class UserController {
 	// @Get('refresh')
 	// @HttpCode(HttpStatus.OK)
 	// @Header('Cache-Control', 'none')
-	// async refreshUserData(): Promise<string> {
+	// refreshUserData(): Promise<string> {
 	// 	this.logger.debug('', ' User-Ctrl | refreshUserData ')
 
 	// 	const dirContainingPackage = join(__dirname, '..', '..')
