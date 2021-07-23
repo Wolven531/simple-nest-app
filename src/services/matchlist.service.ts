@@ -23,7 +23,7 @@ export class MatchlistService {
 	 *
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
-	getGame(gameId: number): Promise<Game | null> {
+	v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
 		return this.httpService
@@ -59,7 +59,7 @@ export class MatchlistService {
 			})
 	}
 
-	getMatchlist(
+	v4GetMatchlist(
 		accountId: string,
 		getLastX: number | undefined,
 		includeGameData = false,
@@ -105,7 +105,7 @@ export class MatchlistService {
 				return includeGameData
 					? await Promise.all(
 							returnData.map(
-								(match) => this.getGame(match.gameId) as Promise<Game>,
+								(match) => this.v4GetGame(match.gameId) as Promise<Game>,
 							),
 					  )
 					: returnData

@@ -1,12 +1,12 @@
-import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
-import { Matchlist } from '../models/matchlist.model'
 import { HttpModule, HttpService, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
-import { MatchlistService } from './matchlist.service'
+import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
+import { Matchlist } from '../models/matchlist.model'
 import { AppService } from './app.service'
+import { MatchlistService } from './matchlist.service'
 
 type TestCase_GetGame = {
 	descriptionMockedBehavior: string
@@ -328,15 +328,11 @@ describe('Matchlist Service', () => {
 							.mockImplementation(mockHttpGet)
 					})
 
-					afterEach(() => {
-						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
-					})
-
 					describe(`invoke getGame("${param1}")`, () => {
 						let actualResult: Game | null
 
 						beforeEach(async () => {
-							actualResult = await service.getGame(param1)
+							actualResult = await service.v4GetGame(param1)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
@@ -378,22 +374,21 @@ describe('Matchlist Service', () => {
 			}) => {
 				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
-						jest.spyOn(service, 'getGame').mockImplementation(mockGetGame)
+						jest.spyOn(service, 'v4GetGame').mockImplementation(mockGetGame)
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
 							.mockImplementation(mockHttpGet)
-					})
-
-					afterEach(() => {
-						jest.spyOn(service, 'getGame').mockRestore()
-						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
 					})
 
 					describe(`invoke getMatchlist("${param1}", "${param2}", "${param3}")`, () => {
 						let actualResult: Game[] | Match[]
 
 						beforeEach(async () => {
-							actualResult = await service.getMatchlist(param1, param2, param3)
+							actualResult = await service.v4GetMatchlist(
+								param1,
+								param2,
+								param3,
+							)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {

@@ -45,7 +45,7 @@ export class MatchlistController {
 			`accountId=${accountId} getLastX=${getLastX} includeGameData=${includeGameData}`,
 			' getMatchlist | MatchlistCtrl ',
 		)
-		return this.matchlistService.getMatchlist(
+		return this.matchlistService.v4GetMatchlist(
 			accountId,
 			getLastX,
 			includeGameData,
@@ -66,6 +66,6 @@ export class MatchlistController {
 	async getGame(@Param('gameId') gameId: number): Promise<Game> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
 
-		return this.matchlistService.getGame(gameId) as Promise<Game>
+		return this.matchlistService.v4GetGame(gameId) as Promise<Game>
 	}
 }
