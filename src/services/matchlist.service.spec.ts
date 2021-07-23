@@ -9,11 +9,11 @@ import { AppService } from './app.service'
 import { MatchlistService } from './matchlist.service'
 
 type TestCase_GetGame = {
-	descriptionMockedBehavior: string
-	expectedCountGet: number
+	description: string
+	expectedCountHttpGet: number
 	expectedResult: Game | null
 	mockHttpGet: jest.Mock
-	param1: number
+	paramGameId: number
 }
 type TestCase_GetMatchlist = {
 	description: string
@@ -33,24 +33,24 @@ describe('Matchlist Service', () => {
 
 	const testCases_getGame: TestCase_GetGame[] = [
 		{
-			descriptionMockedBehavior: 'Http error occurs',
-			expectedCountGet: 1,
+			description: 'Http error occurs',
+			expectedCountHttpGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() =>
 				from(Promise.reject(new Error('Fake ajw error'))),
 			),
-			param1: 0,
+			paramGameId: 1,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is bad',
-			expectedCountGet: 1,
+			description: 'Returned data is bad',
+			expectedCountHttpGet: 1,
 			expectedResult: null,
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			param1: 0,
+			paramGameId: 2,
 		},
 		{
-			descriptionMockedBehavior: 'Returned data is good',
-			expectedCountGet: 1,
+			description: 'Returned data is good',
+			expectedCountHttpGet: 1,
 			expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
 			mockHttpGet: jest.fn(() =>
 				from(
@@ -59,7 +59,7 @@ describe('Matchlist Service', () => {
 					}),
 				),
 			),
-			param1: 0,
+			paramGameId: 3,
 		},
 	]
 	const testCases_getMatchlist: TestCase_GetMatchlist[] = [
@@ -333,33 +333,33 @@ describe('Matchlist Service', () => {
 
 		testCases_getGame.forEach(
 			({
-				descriptionMockedBehavior,
-				expectedCountGet,
+				description,
+				expectedCountHttpGet,
 				expectedResult,
 				mockHttpGet,
-				param1,
+				paramGameId,
 			}) => {
-				describe(`w/ mocked HttpGet (${descriptionMockedBehavior})`, () => {
+				describe(`w/ mocked HttpGet (${description})`, () => {
 					beforeEach(() => {
 						jest
 							.spyOn(testModule.get(HttpService), 'get')
 							.mockImplementation(mockHttpGet)
 					})
 
-					describe(`invoke getGame("${param1}")`, () => {
+					describe(`invoke getGame(${paramGameId})`, () => {
 						let actualResult: Game | null
 
 						beforeEach(async () => {
-							actualResult = await service.v4GetGame(param1)
+							actualResult = await service.v4GetGame(paramGameId)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
-							if (expectedCountGet > 0) {
+							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
-									'https://na1.api.riotgames.com/lol/match/v4/matches/0',
+									`https://na1.api.riotgames.com/lol/match/v4/matches/${paramGameId}`,
 									{
 										headers: {
 											'Accept-Charset':
