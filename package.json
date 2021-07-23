@@ -19,7 +19,7 @@
     "start:dev": "nest start",
     "start:dev:watch": "nest start --watch",
     "start:prod": "node dist/main",
-    "test": "jest --coverage",
+    "test": "jest --coverage --coveragePathIgnorePatterns=.+\\.module\\.ts$ --coveragePathIgnorePatterns=.+\\.dto\\.ts$ --coveragePathIgnorePatterns=.+\\.model\\.ts$ --coveragePathIgnorePatterns=^index\\.ts$ --coveragePathIgnorePatterns=^main\\.ts$",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:no-cov": "jest",
