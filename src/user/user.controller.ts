@@ -100,6 +100,9 @@ export class UserController {
 			'Summoner ID for 0NeveroDDoreveN0': {
 				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
 			},
+			'Summoner ID for DucksInAC0at': {
+				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
+			},
 		},
 		name: 'summonerId',
 		required: true,
@@ -154,6 +157,9 @@ export class UserController {
 			},
 			'Search for 0NeveroDDoreveN0': {
 				value: '0NeveroDDoreveN0',
+			},
+			'Search for DucksInAC0at': {
+				value: 'DucksInAC0at',
 			},
 		},
 		name: 'searchKey',

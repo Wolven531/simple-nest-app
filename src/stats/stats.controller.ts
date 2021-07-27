@@ -42,6 +42,9 @@ export class StatsController {
 			'Account ID for 0NeveroDDoreveN0': {
 				value: '7vkJPzyJQkYakZV4ViaCkUQOjkEbQxqa_qAcmpqKLES7PruwK5slAuhA',
 			},
+			'Account ID for DucksInAC0at': {
+				value: '9XZGaiOZ-Bpv4U3Q3TjUO3vFAC0ZuRjN5IdaJ8BQ_m6aK5v3CaNKp2Tv',
+			},
 		},
 		name: 'accountId',
 		required: true,
