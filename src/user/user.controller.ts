@@ -50,7 +50,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('add', 'server', 'user')
+	@ApiTags('add', 'server')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
@@ -106,7 +106,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('summoner', 'summonerId')
+	@ApiTags('summoner')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getSummonerById(
@@ -125,7 +125,7 @@ export class UserController {
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
 	})
-	@ApiTags('server', 'user')
+	@ApiTags('server')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getUsers(): Promise<User[]> {

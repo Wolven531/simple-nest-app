@@ -81,7 +81,7 @@ export class MasteryController {
 		style: 'simple',
 		type: 'boolean',
 	})
-	@ApiTags('mastery', 'summoner', 'total')
+	@ApiTags('summoner', 'total')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getMasteryTotal(

@@ -32,7 +32,6 @@ export class ConfigController {
 		private readonly logger: Logger,
 	) {}
 
-	@ApiTags('config')
 	@Get()
 	@HttpCode(HttpStatus.OK)
 	async getConfig(
@@ -69,7 +68,7 @@ export class ConfigController {
 		return secret === serverSecret ? privateConfig : publicConfig
 	}
 
-	@ApiTags('config', 'token', 'valid')
+	@ApiTags('token', 'valid')
 	@Get('check-token')
 	@HttpCode(HttpStatus.OK)
 	isTokenValid(): Promise<boolean> {
@@ -78,7 +77,7 @@ export class ConfigController {
 		return this.appService.isRiotTokenValid()
 	}
 
-	@ApiTags('config', 'token', 'update')
+	@ApiTags('token', 'update')
 	@Post('set-token')
 	@HttpCode(HttpStatus.OK)
 	updateConfig(@Body() updateConfigDto: UpdateConfigDto): Promise<boolean> {
