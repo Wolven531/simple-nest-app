@@ -51,13 +51,13 @@ describe('StatsController', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
-		describe('invoke getSummary(undefined, undefined)', () => {
+		describe('invoke getSummaryForAccountId("", undefined)', () => {
 			let capturedError: Error
 			let resp: CalculatedStats
 
 			beforeEach(async () => {
 				try {
-					resp = await controller.getSummary(undefined, undefined)
+					resp = await controller.getSummaryForAccountId('', undefined)
 				} catch (err) {
 					capturedError = err
 				}
@@ -80,7 +80,7 @@ describe('StatsController', () => {
 			})
 		})
 
-		describe('invoke getSummary("someAccountId", undefined)', () => {
+		describe('invoke getSummaryForAccountId("someAccountId", undefined)', () => {
 			const fakeKDA = 3.14
 			let capturedError: Error
 			let mockCalculateGeneralStats: jest.Mock
@@ -96,7 +96,10 @@ describe('StatsController', () => {
 					.mockImplementationOnce(mockCalculateGeneralStats)
 
 				try {
-					resp = await controller.getSummary('someAccountId', undefined)
+					resp = await controller.getSummaryForAccountId(
+						'someAccountId',
+						undefined,
+					)
 				} catch (err) {
 					capturedError = err
 				}
