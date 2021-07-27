@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('healthcheck')
 @Controller('health')
 export class HealthController {
 	private POSSIBLE_RESPONSES = [
@@ -29,7 +30,7 @@ export class HealthController {
 		description: 'Basic endpoint to test server health',
 		summary: 'Basic endpoint to test server health',
 	})
-	@ApiTags('check', 'health', 'healthcheck', 'server')
+	@ApiTags('server')
 	@HttpCode(HttpStatus.OK)
 	getHealth(): string {
 		this.logger.verbose('GET request received', ' getHealth | Health-Ctrl ')

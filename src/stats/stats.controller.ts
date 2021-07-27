@@ -9,11 +9,13 @@ import {
 	Logger,
 	Query,
 } from '@nestjs/common'
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
+@ApiTags('stats')
 @Controller('stats')
 export class StatsController {
 	constructor(
@@ -26,14 +28,76 @@ export class StatsController {
 	) {}
 
 	@Get('summary')
+	@ApiOperation({
+		description: 'Get calculated stats using an account ID',
+		summary: 'Get calculated stats using an account ID',
+	})
+	@ApiQuery({
+		allowEmptyValue: false,
+		description: 'accountId to search for when parsing game data',
+		examples: {
+			'Custom Account ID': {
+				value: '',
+			},
+			'Account ID for 0NeveroDDoreveN0': {
+				value: '7vkJPzyJQkYakZV4ViaCkUQOjkEbQxqa_qAcmpqKLES7PruwK5slAuhA',
+			},
+			'Account ID for DucksInAC0at': {
+				value: '9XZGaiOZ-Bpv4U3Q3TjUO3vFAC0ZuRjN5IdaJ8BQ_m6aK5v3CaNKp2Tv',
+			},
+		},
+		name: 'accountId',
+		required: true,
+		style: 'simple',
+		type: 'string',
+	})
+	@ApiQuery({
+		allowEmptyValue: false,
+		description: 'Number of games to retrieve for parsing; 10 by default',
+		examples: {
+			'Default - Ten (10) Games': {
+				value: 10,
+			},
+			'Custom Number of Games': {
+				value: '',
+			},
+			'One (1) Game': {
+				value: 1,
+			},
+			'Three (3) Games': {
+				value: 3,
+			},
+			'Five (5) Games': {
+				value: 5,
+			},
+		},
+		name: 'getLastX',
+		required: false,
+		style: 'simple',
+		type: 'number',
+	})
+	// @ApiQuery({
+	// 	allowEmptyValue: false,
+	// 	description: 'accountId to search for when parsing game data',
+	// 	examples: {
+	// 		'Custom Account ID': {
+	// 			value: '',
+	// 		},
+	// 	},
+	// 	name: 'accountId',
+	// 	required: false,
+	// 	style: 'simple',
+	// 	type: 'boolean',
+	// })
+	@ApiTags('summary')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	async getSummary(
-		@Query('accountId') accountId: string | undefined,
-		@Query('getLastX') getLastX: number | undefined,
-		@Query('includeGameData') includeGameData = false,
+	async getSummaryForAccountId(
+		@Query('accountId') accountId: string,
+		@Query('getLastX') getLastX = 10,
+		// @Query('includeGameData') includeGameData = false,
 	): Promise<CalculatedStats> {
-		if (!accountId || accountId.length < 1) {
+		if (accountId.length < 1) {
 			throw new BadRequestException({
 				error: true,
 				headersRequired: [],
@@ -47,16 +111,16 @@ export class StatsController {
 		}
 
 		this.logger.log(
-			`accountId=${accountId} getLastX=${getLastX} includeGameData=${includeGameData}`,
-			' getSummary | StatsCtrl ',
+			`accountId=${accountId} getLastX=${getLastX}`,
+			' getSummaryForAccountId | StatsCtrl ',
 		)
 
-		const matches = await this.matchlistService.v4GetMatchlist(
+		const games: Game[] = (await this.matchlistService.v4GetMatchlist(
 			accountId,
 			getLastX,
-			includeGameData,
-		)
+			true,
+		)) as Game[]
 
-		return this.statsService.calculateGeneralStats(accountId, matches as Game[])
+		return this.statsService.calculateGeneralStats(accountId, games)
 	}
 }

@@ -14,9 +14,9 @@ import { StatsService } from './stats.service'
 
 type TestCase_CalculateGeneralStats = {
 	expectedResult: CalculatedStats
-	name: string
-	param1: string
-	param2: Game[]
+	testDescription: string
+	paramAccountKey: string
+	paramGames: Game[]
 }
 
 describe('Stats Service', () => {
@@ -122,9 +122,9 @@ describe('Stats Service', () => {
 				0,
 				0,
 			),
-			name: 'empty account id and empty games array',
-			param1: '',
-			param2: [],
+			testDescription: 'empty account id and empty games array',
+			paramAccountKey: '',
+			paramGames: [],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -144,9 +144,9 @@ describe('Stats Service', () => {
 				1,
 				100,
 			),
-			name: 'a single Game (w/ a win that matches)',
-			param1: 'a1',
-			param2: [fakeGame],
+			testDescription: 'a single Game (w/ a win that matches)',
+			paramAccountKey: 'a1',
+			paramGames: [fakeGame],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -166,9 +166,9 @@ describe('Stats Service', () => {
 				0,
 				0,
 			),
-			name: 'a single Game (w/ a loss that matches)',
-			param1: 'a2',
-			param2: [fakeGame],
+			testDescription: 'a single Game (w/ a loss that matches)',
+			paramAccountKey: 'a2',
+			paramGames: [fakeGame],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -188,9 +188,9 @@ describe('Stats Service', () => {
 				0,
 				0,
 			),
-			name: 'a single Game (w/ no identity matches)',
-			param1: 'a3',
-			param2: [fakeGame],
+			testDescription: 'a single Game (w/ no identity matches)',
+			paramAccountKey: 'a3',
+			paramGames: [fakeGame],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -210,9 +210,9 @@ describe('Stats Service', () => {
 				0,
 				0,
 			),
-			name: 'a single Game (w/ no participant matches)',
-			param1: 'a3',
-			param2: [
+			testDescription: 'a single Game (w/ no participant matches)',
+			paramAccountKey: 'a3',
+			paramGames: [
 				{
 					...fakeGame,
 					participantIdentities: fakeGame.participantIdentities.concat(
@@ -249,12 +249,15 @@ describe('Stats Service', () => {
 		})
 
 		testCases_CalculateGeneralStats.forEach(
-			({ expectedResult, param1, param2, name }) => {
-				describe(`invoke calculateGeneralStats("${param1}", ${param2.length} games) [${name}]`, () => {
+			({ expectedResult, paramAccountKey, paramGames, testDescription }) => {
+				describe(`invoke calculateGeneralStats("${paramAccountKey}", ${paramGames.length} games) [${testDescription}]`, () => {
 					let actualResult: CalculatedStats
 
 					beforeEach(() => {
-						actualResult = service.calculateGeneralStats(param1, param2)
+						actualResult = service.calculateGeneralStats(
+							paramAccountKey,
+							paramGames,
+						)
 					})
 
 					it('returns expected CalculatedStats', () => {

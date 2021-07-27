@@ -50,7 +50,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('add', 'server', 'user')
+	@ApiTags('add', 'server')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
@@ -100,13 +100,16 @@ export class UserController {
 			'Summoner ID for 0NeveroDDoreveN0': {
 				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
 			},
+			'Summoner ID for DucksInAC0at': {
+				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
+			},
 		},
 		name: 'summonerId',
 		required: true,
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('summoner', 'summonerId')
+	@ApiTags('summoner')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getSummonerById(
@@ -125,7 +128,7 @@ export class UserController {
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
 	})
-	@ApiTags('server', 'user')
+	@ApiTags('server')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getUsers(): Promise<User[]> {
@@ -154,6 +157,9 @@ export class UserController {
 			},
 			'Search for 0NeveroDDoreveN0': {
 				value: '0NeveroDDoreveN0',
+			},
+			'Search for DucksInAC0at': {
+				value: 'DucksInAC0at',
 			},
 		},
 		name: 'searchKey',

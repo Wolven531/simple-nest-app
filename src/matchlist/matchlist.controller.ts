@@ -20,6 +20,7 @@ import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
+@ApiTags('matchlist')
 @Controller('matchlist')
 @ApiExtraModels(Game, Match)
 export class MatchlistController {
@@ -98,7 +99,7 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'boolean',
 	})
-	@ApiTags('match', 'matchlist')
+	@ApiTags('match')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getMatchlist(

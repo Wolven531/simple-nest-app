@@ -55,6 +55,9 @@ export class MasteryController {
 			'Summoner ID for 0NeveroDDoreveN0': {
 				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
 			},
+			'Summoner ID for DucksInAC0at': {
+				value: 'CzGM4wLB8Ad-yoEVK69ae-pobKzrkf5t3N3KgBJIdbm3_qFo',
+			},
 		},
 		name: 'summonerId',
 		required: true,
@@ -81,7 +84,7 @@ export class MasteryController {
 		style: 'simple',
 		type: 'boolean',
 	})
-	@ApiTags('mastery', 'summoner', 'total')
+	@ApiTags('summoner', 'total')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getMasteryTotal(
