@@ -16,9 +16,20 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
+import * as usersJsonData from '../data/users.json'
 import { Summoner } from '../models/summoner.model'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
+
+// TODO - move this to util file
+// setup account examples based on user data
+const summonerIdExamples: any = {}
+summonerIdExamples['Custom Summoner ID'] = { value: '' }
+usersJsonData.forEach((user) => {
+	summonerIdExamples[`Summoner ID for ${user.name}`] = {
+		value: user.summonerId,
+	}
+})
 
 export type SummonerWithMastery = Summoner & { masteryTotal: number }
 
@@ -48,17 +59,7 @@ export class MasteryController {
 	@ApiParam({
 		allowEmptyValue: false,
 		description: 'Summoner ID to use during lookup',
-		examples: {
-			'Custom Summoner ID': {
-				value: '',
-			},
-			'Summoner ID for 0NeveroDDoreveN0': {
-				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
-			},
-			'Summoner ID for DucksInAC0at': {
-				value: 'CzGM4wLB8Ad-yoEVK69ae-pobKzrkf5t3N3KgBJIdbm3_qFo',
-			},
-		},
+		examples: summonerIdExamples,
 		name: 'summonerId',
 		required: true,
 		style: 'simple',

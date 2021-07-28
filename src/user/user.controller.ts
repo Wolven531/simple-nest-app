@@ -11,12 +11,29 @@ import {
 	Query,
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
+import * as usersJsonData from '../data/users.json'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
+
+// TODO - move this to util file
+const summonerIdExamples: any = {}
+summonerIdExamples['Custom Summoner ID'] = { value: '' }
+
+const searchKeyExamples: any = {}
+searchKeyExamples['Custom searchKey'] = { value: '' }
+
+usersJsonData.forEach((user) => {
+	summonerIdExamples[`Summoner ID for ${user.name}`] = {
+		value: user.summonerId,
+	}
+	searchKeyExamples[`Search for ${user.name}`] = {
+		value: user.name,
+	}
+})
 
 @ApiTags('user')
 @Controller('user')
@@ -93,17 +110,7 @@ export class UserController {
 	@ApiParam({
 		allowEmptyValue: false,
 		description: 'Summoner ID to use during lookup',
-		examples: {
-			'Custom Summoner ID': {
-				value: '',
-			},
-			'Summoner ID for 0NeveroDDoreveN0': {
-				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
-			},
-			'Summoner ID for DucksInAC0at': {
-				value: 'jzbq0gSuHosYXo4yk1oi0Cs432As65H-0xyaIG2qZuuVi_iY',
-			},
-		},
+		examples: summonerIdExamples,
 		name: 'summonerId',
 		required: true,
 		style: 'simple',
@@ -151,17 +158,7 @@ export class UserController {
 	@ApiQuery({
 		allowEmptyValue: false,
 		description: 'Value to use when searching the Riot API',
-		examples: {
-			'Custom searchKey': {
-				value: '',
-			},
-			'Search for 0NeveroDDoreveN0': {
-				value: '0NeveroDDoreveN0',
-			},
-			'Search for DucksInAC0at': {
-				value: 'DucksInAC0at',
-			},
-		},
+		examples: searchKeyExamples,
 		name: 'searchKey',
 		required: true,
 		style: 'simple',

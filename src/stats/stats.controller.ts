@@ -10,10 +10,21 @@ import {
 	Query,
 } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import * as usersJsonData from '../data/users.json'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
+
+// TODO - move this to util file
+// setup account examples based on user data
+const accountIdExamples: any = {}
+accountIdExamples['Custom Account ID'] = { value: '' }
+usersJsonData.forEach((user) => {
+	accountIdExamples[`Account ID for ${user.name}`] = {
+		value: user.accountId,
+	}
+})
 
 @ApiTags('stats')
 @Controller('stats')
@@ -35,17 +46,7 @@ export class StatsController {
 	@ApiQuery({
 		allowEmptyValue: false,
 		description: 'accountId to search for when parsing game data',
-		examples: {
-			'Custom Account ID': {
-				value: '',
-			},
-			'Account ID for 0NeveroDDoreveN0': {
-				value: '7vkJPzyJQkYakZV4ViaCkUQOjkEbQxqa_qAcmpqKLES7PruwK5slAuhA',
-			},
-			'Account ID for DucksInAC0at': {
-				value: '9XZGaiOZ-Bpv4U3Q3TjUO3vFAC0ZuRjN5IdaJ8BQ_m6aK5v3CaNKp2Tv',
-			},
-		},
+		examples: accountIdExamples,
 		name: 'accountId',
 		required: true,
 		style: 'simple',
@@ -79,11 +80,7 @@ export class StatsController {
 	// @ApiQuery({
 	// 	allowEmptyValue: false,
 	// 	description: 'accountId to search for when parsing game data',
-	// 	examples: {
-	// 		'Custom Account ID': {
-	// 			value: '',
-	// 		},
-	// 	},
+	// 	examples: accountIdExamples,
 	// 	name: 'accountId',
 	// 	required: false,
 	// 	style: 'simple',
