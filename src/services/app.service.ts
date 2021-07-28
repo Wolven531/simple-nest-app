@@ -1,11 +1,7 @@
-import {
-	HttpService,
-	HttpStatus,
-	Inject,
-	Injectable,
-	Logger,
-} from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { firstValueFrom } from 'rxjs'
 import { ENV_API_KEY, ENV_API_KEY_DEFAULT, REGION } from '../constants'
 
 @Injectable()
@@ -41,18 +37,21 @@ export class AppService {
 			this.logger.verbose(`riotToken="${riotToken}"`, ctx)
 			this.logger.debug('About to contact Riot API...', ctx)
 
-			const getResp = await this.httpService
-				.get(`${AppService.BASE}/${AppService.ENDPOINT_STATUS}`, {
-					headers: {
-						'Accept-Charset':
-							'application/x-www-form-urlencoded; charset=UTF-8',
-						'Accept-Language': 'en-US,en;q=0.9',
-						'X-Riot-Token': riotToken,
-						// "Origin": "https://developer.riotgames.com",
-						// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36",
+			const getResp = await firstValueFrom(
+				this.httpService.get(
+					`${AppService.BASE}/${AppService.ENDPOINT_STATUS}`,
+					{
+						headers: {
+							'Accept-Charset':
+								'application/x-www-form-urlencoded; charset=UTF-8',
+							'Accept-Language': 'en-US,en;q=0.9',
+							'X-Riot-Token': riotToken,
+							// "Origin": "https://developer.riotgames.com",
+							// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36",
+						},
 					},
-				})
-				.toPromise()
+				),
+			)
 
 			this.logger.debug(
 				`Returning comparison of HttpStatus.OK 200 to response status ${getResp.status}...`,

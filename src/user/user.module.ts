@@ -1,4 +1,5 @@
-import { HttpModule, Logger, Module } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'

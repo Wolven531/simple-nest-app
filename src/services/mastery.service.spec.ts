@@ -1,4 +1,5 @@
-import { HttpModule, HttpService, Logger } from '@nestjs/common'
+import { HttpModule, HttpService } from '@nestjs/axios'
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'

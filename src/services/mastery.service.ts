@@ -1,4 +1,6 @@
-import { HttpService, Inject, Injectable, Logger } from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { firstValueFrom } from 'rxjs'
 // import { utc } from 'moment'
 import { DEFAULT_TOTAL_MASTERY_SCORE, REGION } from '../constants'
 import { AppService } from './app.service'
@@ -53,8 +55,8 @@ export class MasteryService {
 		// }
 		const apiKey = this.appService.getRiotToken()
 
-		return this.httpService
-			.get(
+		return firstValueFrom(
+			this.httpService.get(
 				`https://${REGION}.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/${summonerId}`,
 				{
 					headers: {
@@ -64,8 +66,8 @@ export class MasteryService {
 						'X-Riot-Token': apiKey,
 					},
 				},
-			)
-			.toPromise()
+			),
+		)
 			.then((resp) => {
 				const masteryTotalScore = parseInt(resp.data, 10)
 
@@ -103,7 +105,7 @@ export class MasteryService {
 
 	// 	return Promise.all(
 	// 		loadedUsers.map((user) =>
-	// 			this.httpService
+	// 			firstValueFrom(this.httpService
 	// 				.get(
 	// 					`https://${REGION}.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/${user.summonerId}`,
 	// 					{
@@ -114,8 +116,7 @@ export class MasteryService {
 	// 							'X-Riot-Token': apiKey,
 	// 						},
 	// 					},
-	// 				)
-	// 				.toPromise()
+	// 				))
 	// 				.then((resp) => {
 	// 					const masteryTotalScore = parseInt(resp.data, 10)
 	// 					const utcNow = utc()

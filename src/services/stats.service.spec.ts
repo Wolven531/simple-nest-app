@@ -1,15 +1,16 @@
+import { HttpModule } from '@nestjs/axios'
+import { Logger } from '@nestjs/common'
+import { Test, TestingModule } from '@nestjs/testing'
+import {
+	generateParticipantIdentity,
+	toggleMockedLogger,
+} from '../../test/utils'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { Participant } from '../models/participant.model'
 import { Stats } from '../models/stats.model'
 import { Team } from '../models/team.model'
 import { Timeline } from '../models/timeline.model'
-import { HttpModule, Logger } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
-import {
-	generateParticipantIdentity,
-	toggleMockedLogger,
-} from '../../test/utils'
 import { StatsService } from './stats.service'
 
 type TestCase_CalculateGeneralStats = {

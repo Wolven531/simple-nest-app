@@ -1,4 +1,5 @@
-import { HttpModule, HttpService, HttpStatus, Logger } from '@nestjs/common'
+import { HttpModule, HttpService } from '@nestjs/axios'
+import { HttpStatus, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AxiosResponse } from 'axios'
 import { from } from 'rxjs'

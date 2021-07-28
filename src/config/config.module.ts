@@ -1,4 +1,5 @@
-import { HttpModule, Logger, Module } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { SharedModule } from '../shared'
 import { ConfigController } from './config.controller'

@@ -1,5 +1,5 @@
-// import { HttpModule, HttpService, HttpStatus, Logger } from '@nestjs/common'
-import { HttpModule, Logger } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 // import { AxiosResponse } from 'axios'
 // import childProcess from 'child_process'

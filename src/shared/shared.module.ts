@@ -1,5 +1,6 @@
 import { object, string } from '@hapi/joi'
-import { HttpModule, Logger, Module } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { Logger, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APIConfig } from '../config'
 import { AppService } from '../services/app.service'

@@ -1,8 +1,10 @@
+import { HttpService } from '@nestjs/axios'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { firstValueFrom } from 'rxjs'
+import { MAX_NUM_MATCHES, MIN_NUM_MATCHES, REGION } from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
-import { HttpService, Inject, Injectable, Logger } from '@nestjs/common'
-import { MAX_NUM_MATCHES, MIN_NUM_MATCHES, REGION } from '../constants'
 import { AppService } from './app.service'
 
 @Injectable()
@@ -25,8 +27,8 @@ export class MatchlistService {
 	v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
-		return this.httpService
-			.get(
+		return firstValueFrom(
+			this.httpService.get(
 				`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
 				{
 					headers: {
@@ -36,8 +38,8 @@ export class MatchlistService {
 						'X-Riot-Token': apiKey,
 					},
 				},
-			)
-			.toPromise()
+			),
+		)
 			.then((resp) => {
 				const gameInfo: Game = resp.data
 
@@ -83,8 +85,8 @@ export class MatchlistService {
 			getLastX = MAX_NUM_MATCHES
 		}
 
-		return this.httpService
-			.get(
+		return firstValueFrom(
+			this.httpService.get(
 				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}?endIndex=${getLastX}`,
 				{
 					headers: {
@@ -94,8 +96,8 @@ export class MatchlistService {
 						'X-Riot-Token': apiKey,
 					},
 				},
-			)
-			.toPromise()
+			),
+		)
 			.then<Match[]>((resp) => {
 				const matchlist: Matchlist = resp.data
 

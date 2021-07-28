@@ -1,4 +1,5 @@
-import { BadRequestException, HttpModule, Logger } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { BadRequestException, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { CalculatedStats } from '../models/calculated-stats.model'

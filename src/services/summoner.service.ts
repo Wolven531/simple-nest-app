@@ -1,11 +1,7 @@
-import {
-	HttpService,
-	HttpStatus,
-	Inject,
-	Injectable,
-	Logger,
-} from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AxiosResponse } from 'axios'
+import { firstValueFrom } from 'rxjs'
 import { REGION } from '../constants'
 import { Summoner } from '../models/summoner.model'
 import { AppService } from './app.service'
@@ -43,8 +39,8 @@ export class SummonerService {
 			this.logger.verbose(`riotToken="${riotToken}"`, ctx)
 			this.logger.debug('About to contact Riot API...', ctx)
 
-			const getResp: AxiosResponse<Summoner> = await this.httpService
-				.get(
+			const getResp: AxiosResponse<Summoner> = await firstValueFrom(
+				this.httpService.get(
 					`${SummonerService.BASE}/${SummonerService.ENDPOINT_SEARCH_BY_NAME}/${searchKey}`,
 					{
 						headers: {
@@ -54,8 +50,8 @@ export class SummonerService {
 							'X-Riot-Token': riotToken,
 						},
 					},
-				)
-				.toPromise()
+				),
+			)
 
 			if (getResp.status === HttpStatus.NOT_FOUND) {
 				this.logger.debug('Summoner was not found, returning null...', ctx)
@@ -84,8 +80,8 @@ export class SummonerService {
 			this.logger.verbose(`riotToken="${riotToken}"`, ctx)
 			this.logger.debug('About to contact Riot API...', ctx)
 
-			const getResp: AxiosResponse<Summoner> = await this.httpService
-				.get(
+			const getResp: AxiosResponse<Summoner> = await firstValueFrom(
+				this.httpService.get(
 					`${SummonerService.BASE}/${SummonerService.ENDPOINT_GET_BY_SUMMONER_ID}/${summonerId}`,
 					{
 						headers: {
@@ -95,8 +91,8 @@ export class SummonerService {
 							'X-Riot-Token': riotToken,
 						},
 					},
-				)
-				.toPromise()
+				),
+			)
 
 			if (getResp.status === HttpStatus.NOT_FOUND) {
 				this.logger.debug('Summoner was not found, returning null...', ctx)
