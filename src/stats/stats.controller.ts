@@ -10,21 +10,11 @@ import {
 	Query,
 } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
-import * as usersJsonData from '../data/users.json'
+import { accountIdExamples } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
-
-// TODO - move this to util file
-// setup account examples based on user data
-const accountIdExamples: any = {}
-accountIdExamples['Custom Account ID'] = { value: '' }
-usersJsonData.forEach((user) => {
-	accountIdExamples[`Account ID for ${user.name}`] = {
-		value: user.accountId,
-	}
-})
 
 @ApiTags('stats')
 @Controller('stats')

@@ -11,29 +11,13 @@ import {
 	Query,
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import * as usersJsonData from '../data/users.json'
+import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
-
-// TODO - move this to util file
-const summonerIdExamples: any = {}
-summonerIdExamples['Custom Summoner ID'] = { value: '' }
-
-const searchKeyExamples: any = {}
-searchKeyExamples['Custom searchKey'] = { value: '' }
-
-usersJsonData.forEach((user) => {
-	summonerIdExamples[`Summoner ID for ${user.name}`] = {
-		value: user.summonerId,
-	}
-	searchKeyExamples[`Search for ${user.name}`] = {
-		value: user.name,
-	}
-})
 
 @ApiTags('user')
 @Controller('user')

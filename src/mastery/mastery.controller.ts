@@ -16,20 +16,10 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
-import * as usersJsonData from '../data/users.json'
+import { summonerIdExamples } from '../constants'
 import { Summoner } from '../models/summoner.model'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-
-// TODO - move this to util file
-// setup account examples based on user data
-const summonerIdExamples: any = {}
-summonerIdExamples['Custom Summoner ID'] = { value: '' }
-usersJsonData.forEach((user) => {
-	summonerIdExamples[`Summoner ID for ${user.name}`] = {
-		value: user.summonerId,
-	}
-})
 
 export type SummonerWithMastery = Summoner & { masteryTotal: number }
 
