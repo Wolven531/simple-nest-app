@@ -21,8 +21,8 @@ import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
 @ApiTags('matchlist')
-@Controller('matchlist')
 @ApiExtraModels(Game, Match)
+@Controller('matchlist')
 export class MatchlistController {
 	constructor(
 		@Inject(MatchlistService)

@@ -24,8 +24,8 @@ import { SummonerService } from '../services/summoner.service'
 export type SummonerWithMastery = Summoner & { masteryTotal: number }
 
 @ApiTags('mastery')
+@ApiExtraModels(Summoner)
 @Controller('mastery')
-@ApiExtraModels()
 export class MasteryController {
 	constructor(
 		@Inject(MasteryService)

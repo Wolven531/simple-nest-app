@@ -10,7 +10,13 @@ import {
 	Post,
 	Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
+import {
+	ApiExtraModels,
+	ApiOperation,
+	ApiParam,
+	ApiQuery,
+	ApiTags,
+} from '@nestjs/swagger'
 import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
@@ -20,6 +26,7 @@ import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
 
 @ApiTags('user')
+@ApiExtraModels(Summoner, User)
 @Controller('user')
 export class UserController {
 	constructor(

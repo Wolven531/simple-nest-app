@@ -9,7 +9,12 @@ import {
 	Logger,
 	Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import {
+	ApiExtraModels,
+	ApiOperation,
+	ApiQuery,
+	ApiTags,
+} from '@nestjs/swagger'
 import { accountIdExamples } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
@@ -17,6 +22,7 @@ import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
 @ApiTags('stats')
+@ApiExtraModels(CalculatedStats)
 @Controller('stats')
 export class StatsController {
 	constructor(
