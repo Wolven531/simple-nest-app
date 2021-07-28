@@ -1,3 +1,5 @@
+import * as usersJsonData from './data/users.json'
+
 // Environment constants
 export const ENV_API_KEY = 'RIOT_SECRET'
 export const ENV_API_KEY_DEFAULT = ''
@@ -31,3 +33,26 @@ export const TIME_MILLIS_IN_DAY =
 	TIME_SECS_IN_MINUTE *
 	TIME_MINS_IN_HOUR *
 	TIME_HOURS_IN_DAY
+
+const accountIdExamples: any = {}
+accountIdExamples['Custom Account ID'] = { value: '' }
+
+const summonerIdExamples: any = {}
+summonerIdExamples['Custom Summoner ID'] = { value: '' }
+
+const searchKeyExamples: any = {}
+searchKeyExamples['Custom searchKey'] = { value: '' }
+
+usersJsonData.forEach((user) => {
+	accountIdExamples[`Account ID for ${user.name}`] = {
+		value: user.accountId,
+	}
+	summonerIdExamples[`Summoner ID for ${user.name}`] = {
+		value: user.summonerId,
+	}
+	searchKeyExamples[`Search for ${user.name}`] = {
+		value: user.name,
+	}
+})
+
+export { accountIdExamples, summonerIdExamples, searchKeyExamples }
