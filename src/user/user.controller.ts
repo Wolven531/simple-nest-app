@@ -22,6 +22,7 @@ import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
+import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
 
@@ -30,10 +31,12 @@ import { UserService } from '../services/user.service'
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject(UserService)
-		private readonly userService: UserService,
+		@Inject(MasteryService)
+		private readonly masteryService: MasteryService,
 		@Inject(SummonerService)
 		private readonly summonerService: SummonerService,
+		@Inject(UserService)
+		private readonly userService: UserService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -132,7 +135,18 @@ export class UserController {
 	getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		return Promise.resolve(this.userService.users)
+		const updatedUsers = Promise.all(
+			this.userService.users.map(async (user) => {
+				const masteryTotal = await this.masteryService.getMasteryTotal(
+					user.summonerId,
+				)
+				user.masteryTotal = masteryTotal
+
+				return user
+			}),
+		)
+
+		return updatedUsers
 	}
 
 	@Get('search')

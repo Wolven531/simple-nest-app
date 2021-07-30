@@ -6,13 +6,18 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
+import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
 import { UserService } from '../services/user.service'
 import { UserController } from './user.controller'
 
 describe('UserController', () => {
+	const fakeMasteryTotal = 7
+
 	let controller: UserController
 	let testModule: TestingModule
+
+	let masteryService: MasteryService
 	let summonerService: SummonerService
 	let userService: UserService
 
@@ -21,6 +26,12 @@ describe('UserController', () => {
 			controllers: [UserController],
 			imports: [HttpModule],
 			providers: [
+				{
+					provide: MasteryService,
+					useFactory: () => ({
+						getMasteryTotal: jest.fn().mockResolvedValue(fakeMasteryTotal),
+					}),
+				},
 				{
 					provide: SummonerService,
 					useFactory: () => ({
@@ -42,6 +53,7 @@ describe('UserController', () => {
 		}).compile()
 
 		controller = testModule.get(UserController)
+		masteryService = testModule.get(MasteryService)
 		summonerService = testModule.get(SummonerService)
 		userService = testModule.get(UserService)
 	})
@@ -85,31 +97,33 @@ describe('UserController', () => {
 		// 	})
 		// })
 
-		// describe('invoke getUsers()', () => {
-		// 	let capturedError: Error
-		// 	let mockLoadUsersFromFile: jest.Mock
-		// 	let resp: User[]
+		describe('invoke getUsers()', () => {
+			let capturedError: Error
+			let resp: User[]
 
-		// 	beforeEach(async () => {
-		// 		mockLoadUsersFromFile = jest.fn(() => [])
+			beforeEach(async () => {
+				try {
+					;(userService as any)['users'] = [
+						{ summonerId: 'some-summoner-id' } as User,
+					]
 
-		// 		try {
-		// 			jest
-		// 				.spyOn(testModule.get(UserService), 'loadUsersFromFile')
-		// 				.mockImplementation(mockLoadUsersFromFile)
+					resp = await controller.getUsers()
+				} catch (err) {
+					capturedError = err
+				}
+			})
 
-		// 			resp = await controller.getUsers()
-		// 		} catch (err) {
-		// 			capturedError = err
-		// 		}
-		// 	})
-
-		// 	it('invokes loadUsersFromFile(), does NOT throw error', () => {
-		// 		expect(mockLoadUsersFromFile).toHaveBeenCalledTimes(1)
-		// 		expect(capturedError).toBeUndefined()
-		// 		expect(resp).toEqual([])
-		// 	})
-		// })
+			it('gets users from service w/ updated masteryTotal, does NOT throw error', () => {
+				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(1)
+				expect(capturedError).toBeUndefined()
+				expect(resp).toEqual([
+					{
+						masteryTotal: fakeMasteryTotal,
+						summonerId: 'some-summoner-id',
+					} as User,
+				])
+			})
+		})
 
 		describe('invoke searchSummoners()', () => {
 			let capturedError: Error
@@ -124,7 +138,10 @@ describe('UserController', () => {
 				// 		status: HttpStatus.OK,
 				// 	} as AxiosResponse<Summoner>))
 				mockSearchByName = jest.fn(() =>
-					Promise.resolve({ name: 'nameForWhichToSearch' } as Summoner),
+					Promise.resolve({
+						masteryTotal: fakeMasteryTotal,
+						name: 'nameForWhichToSearch',
+					} as unknown as Summoner),
 				)
 
 				try {
@@ -141,13 +158,15 @@ describe('UserController', () => {
 			})
 
 			it('invokes SummonerService.searchByName(), does NOT throw error', () => {
-				// expect(mockHttpServiceGet).toHaveBeenCalledTimes(1)
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)
 				expect(mockSearchByName).toHaveBeenLastCalledWith(
 					'nameForWhichToSearch',
 				)
 				expect(capturedError).toBeUndefined()
-				expect(resp).toEqual({ name: 'nameForWhichToSearch' } as Summoner)
+				expect(resp).toEqual({
+					masteryTotal: fakeMasteryTotal,
+					name: 'nameForWhichToSearch',
+				} as unknown as Summoner)
 			})
 		})
 
@@ -220,7 +239,7 @@ describe('UserController', () => {
 			beforeEach(async () => {
 				mockGetSummonerById = jest
 					.fn()
-					.mockResolvedValue({ id: 'id-that-was-searched' } as Summoner)
+					.mockResolvedValue({ id: 'user-that-is-being-added' } as Summoner)
 
 				jest
 					.spyOn(summonerService, 'getSummonerById')
@@ -229,7 +248,7 @@ describe('UserController', () => {
 				spyAddUser = jest.spyOn(userService, 'addUser')
 
 				try {
-					resp = await controller.addUser('id-that-was-searched')
+					resp = await controller.addUser('user-that-is-being-added')
 				} catch (err) {
 					capturedError = err
 				}
@@ -238,7 +257,7 @@ describe('UserController', () => {
 			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
 				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
 				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
-					'id-that-was-searched',
+					'user-that-is-being-added',
 				)
 
 				expect(spyAddUser).toHaveBeenCalledTimes(1)
