@@ -13,6 +13,7 @@ import { UserController } from './user.controller'
 
 describe('UserController', () => {
 	const fakeMasteryTotal = 7
+	const fakeUpdated = new Date(2021, 7, 29).getTime()
 
 	let controller: UserController
 	let testModule: TestingModule
@@ -22,6 +23,8 @@ describe('UserController', () => {
 	let userService: UserService
 
 	beforeEach(async () => {
+		jest.spyOn(Date, 'now').mockReturnValue(fakeUpdated)
+
 		testModule = await Test.createTestingModule({
 			controllers: [UserController],
 			imports: [HttpModule],
@@ -118,6 +121,7 @@ describe('UserController', () => {
 				expect(capturedError).toBeUndefined()
 				expect(resp).toEqual([
 					{
+						lastUpdated: fakeUpdated,
 						masteryTotal: fakeMasteryTotal,
 						summonerId: 'some-summoner-id',
 					} as User,

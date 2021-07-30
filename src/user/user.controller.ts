@@ -140,6 +140,7 @@ export class UserController {
 				const masteryTotal = await this.masteryService.getMasteryTotal(
 					user.summonerId,
 				)
+				user.lastUpdated = Date.now()
 				user.masteryTotal = masteryTotal
 
 				return user
