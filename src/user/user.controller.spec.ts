@@ -151,6 +151,35 @@ describe('UserController', () => {
 			})
 		})
 
+		describe('invoke searchSummoners() w/ special chars ["Míyukí"]', () => {
+			let capturedError: Error
+			let mockSearchByName: jest.Mock
+			let resp: Summoner | null
+
+			beforeEach(async () => {
+				mockSearchByName = jest.fn(() =>
+					Promise.resolve({ name: 'Míyukí' } as Summoner),
+				)
+
+				try {
+					jest
+						.spyOn(summonerService, 'searchByName')
+						.mockImplementation(mockSearchByName)
+
+					resp = await controller.searchSummoners('Míyukí')
+				} catch (err) {
+					capturedError = err
+				}
+			})
+
+			it('invokes SummonerService.searchByName() w/ encoded value, does NOT throw error', () => {
+				expect(mockSearchByName).toHaveBeenCalledTimes(1)
+				expect(mockSearchByName).toHaveBeenLastCalledWith('M%C3%ADyuk%C3%AD')
+				expect(capturedError).toBeUndefined()
+				expect(resp).toEqual({ name: 'Míyukí' } as Summoner)
+			})
+		})
+
 		describe('invoke getById()', () => {
 			let capturedError: Error
 			let mockGetSummonerById: jest.Mock
