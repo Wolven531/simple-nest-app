@@ -16,7 +16,7 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
-import { accountIdExamples } from 'src/constants'
+import { accountIdExamples } from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
