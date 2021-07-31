@@ -16,6 +16,7 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
+import { accountIdExamples } from 'src/constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
@@ -44,14 +45,7 @@ export class MatchlistController {
 	@ApiParam({
 		allowEmptyValue: false,
 		description: 'accountId of a Summoner',
-		examples: {
-			'Custom Account ID': {
-				value: '',
-			},
-			'0NevErOddOrEveN0 accountId': {
-				value: '7vkJPzyJQkYakZV4ViaCkUQOjkEbQxqa_qAcmpqKLES7PruwK5slAuhA',
-			},
-		},
+		examples: accountIdExamples,
 		name: 'accountId',
 		required: true,
 		style: 'simple',
