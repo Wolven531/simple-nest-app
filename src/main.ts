@@ -10,7 +10,6 @@ import 'reflect-metadata'
 import { AppModule } from './app'
 import { ENV_API_PORT, ENV_API_PORT_DEFAULT } from './constants'
 import { AppService } from './services/app.service'
-// import { monokaiTheme3 } from './theme-monokai-hack'
 
 async function bootstrap() {
 	const ctx = ' bootstrap | main '
@@ -36,22 +35,7 @@ async function bootstrap() {
 		// logger.log(`Global middleware, path="${req.path}"`, ctx)
 
 		if (req.path === '/swagger-ui.css') {
-			// attempt 1 - C:\dev\simple-nest-app\dist\theme-monokai.css
-			// const monokaiTheme = readFileSync(join(__dirname, 'theme-monokai.css'), {
-			// 	encoding: ENCODING_UTF8,
-			// })
-			// attempt 2 - C:\dev\simple-nest-app\theme-monokai.css
-			// const monokaiTheme = readFileSync(resolve('./theme-monokai.css'), {
-			// 	encoding: ENCODING_UTF8,
-			// })
-			// attempt 3 - C:\dev\simple-nest-app\dist\public\theme-monokai.css
-			// const monokaiTheme = readFileSync(
-			// 	join(__dirname, 'public', 'theme-monokai.css'),
-			// 	{
-			// 		encoding: ENCODING_UTF8,
-			// 	},
-			// )
-			// attempt 4 is hack that works, but style is ugly
+			// !!! hacky; works, but style is ugly
 			// res.setHeader('Content-Type', 'text/css')
 			// res.end(monokaiTheme3, ENCODING_UTF8)
 			// return
