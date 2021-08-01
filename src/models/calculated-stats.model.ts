@@ -2,24 +2,6 @@ import { ApiProperty } from '@nestjs/swagger'
 
 class CalculatedStats {
 	@ApiProperty()
-	gamesCount: number
-
-	@ApiProperty()
-	goldEarnedAvg: number
-
-	@ApiProperty()
-	goldEarnedTotal: number
-
-	@ApiProperty()
-	kDA: number
-
-	@ApiProperty()
-	timePlayedAvg: number
-
-	@ApiProperty()
-	timePlayedTotal: number
-
-	@ApiProperty()
 	assistsAvg: number
 
 	@ApiProperty()
@@ -32,16 +14,40 @@ class CalculatedStats {
 	deathsTotal: number
 
 	@ApiProperty()
+	gamesCount: number
+
+	@ApiProperty()
+	goldEarnedAvg: number
+
+	@ApiProperty()
+	goldEarnedTotal: number
+
+	@ApiProperty()
+	kDA: number
+
+	@ApiProperty()
 	killsAvg: number
 
 	@ApiProperty()
 	killsTotal: number
 
 	@ApiProperty()
+	timePlayedAvg: number
+
+	@ApiProperty()
+	timePlayedTotal: number
+
+	@ApiProperty()
 	totalLosses: number
 
 	@ApiProperty()
 	totalWins: number
+
+	@ApiProperty()
+	visionScoreAvg: number
+
+	@ApiProperty()
+	visionScoreTotal: number
 
 	@ApiProperty()
 	winPercentage: number
@@ -62,6 +68,8 @@ class CalculatedStats {
 	 * @param totalLosses - total number of losses across all games
 	 * @param totalWins - total number of wins across all games
 	 * @param winPercentage - ratio of wins to total number games
+	 * @param visionScoreAvg - average vision score per game
+	 * @param visionScoreTotal - total vision score across all games
 	 */
 	constructor(
 		gamesCount: number,
@@ -79,6 +87,8 @@ class CalculatedStats {
 		totalLosses: number,
 		totalWins: number,
 		winPercentage: number,
+		visionScoreAvg: number,
+		visionScoreTotal: number,
 	) {
 		this.gamesCount = gamesCount
 		this.goldEarnedAvg = goldEarnedAvg
@@ -95,6 +105,8 @@ class CalculatedStats {
 		this.totalLosses = totalLosses
 		this.totalWins = totalWins
 		this.winPercentage = winPercentage
+		this.visionScoreAvg = visionScoreAvg
+		this.visionScoreTotal = visionScoreTotal
 	}
 }
 
