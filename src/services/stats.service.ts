@@ -21,11 +21,11 @@ export class StatsService {
 		targetAccountKey: string,
 		games: Game[],
 	): CalculatedStats {
-		const FUNC = ' calculateGeneralStats | StatsSvc '
+		const ctx = ' calculateGeneralStats | StatsSvc '
 
 		this.logger.log(
 			`About to calc stats for ${games.length} games w/ account = ${targetAccountKey}...`,
-			FUNC,
+			ctx,
 		)
 
 		const timePlayedTotal = games
@@ -37,6 +37,7 @@ export class StatsService {
 		let deathsTotal = 0
 		let goldEarnedTotal = 0
 		let killsTotal = 0
+		let visionScoreTotal = 0
 		let totalWins = 0
 
 		games.forEach((g) => {
@@ -60,6 +61,7 @@ export class StatsService {
 			deathsTotal += participant.stats.deaths
 			goldEarnedTotal += participant.stats.goldEarned
 			killsTotal += participant.stats.kills
+			visionScoreTotal += participant.stats.visionScore
 			totalWins += participant.stats.win ? 1 : 0
 		})
 
@@ -69,23 +71,27 @@ export class StatsService {
 		const killsAvg = killsTotal / games.length || 0
 		const kDA = (killsTotal + assistsTotal) / deathsTotal || 0
 		const totalLosses = games.length - totalWins
+		const visionScoreAvg = visionScoreTotal / games.length || 0
+		const winPercentage = (totalWins / games.length || 0) * 100
 
-		return {
+		return new CalculatedStats(
+			games.length,
+			goldEarnedAvg,
+			goldEarnedTotal,
+			kDA,
+			timePlayedAvg,
+			timePlayedTotal,
 			assistsAvg,
 			assistsTotal,
 			deathsAvg,
 			deathsTotal,
-			gamesCount: games.length,
-			goldEarnedAvg,
-			goldEarnedTotal,
-			kDA,
 			killsAvg,
 			killsTotal,
-			timePlayedAvg,
-			timePlayedTotal,
 			totalLosses,
 			totalWins,
-			winPercentage: (totalWins / games.length || 0) * 100,
-		}
+			winPercentage,
+			visionScoreAvg,
+			visionScoreTotal,
+		)
 	}
 }
