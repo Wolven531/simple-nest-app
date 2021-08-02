@@ -7,7 +7,7 @@ export interface QueueInfo {
 	queueId: number
 }
 
-const allQueues: QueueInfo[] = [
+const ALL_QUEUES: QueueInfo[] = [
 	{
 		description: null,
 		map: 'Custom games',
@@ -208,4 +208,4 @@ const allQueues: QueueInfo[] = [
 	},
 ]
 
-export { allQueues }
+export { ALL_QUEUES }

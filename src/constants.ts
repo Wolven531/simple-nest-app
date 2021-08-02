@@ -1,3 +1,4 @@
+import { ALL_QUEUES } from './data/queues'
 import * as usersJsonData from './data/users.json'
 
 // Environment constants
@@ -12,19 +13,13 @@ export const DEFAULT_TOTAL_MASTERY_SCORE = -1
 
 // API constants
 export const COMMON_QUEUE_TYPES = {
-	aram: { id: 450, paramValue: 'aram' },
-	summonersRiftNormalBlind: {
-		id: 430,
-		paramValue: 'srNormalBlind',
-	},
-	summonersRiftNormalDraft: {
-		id: 400,
-		paramValue: 'srNormalDraft',
-	},
-	summonersRiftRankedFlex: { id: 440, paramValue: 'srRankedFlex' },
-	summonersRiftRankedSolo: { id: 420, paramValue: 'srRankedSolo' },
-	tftNormal: { id: 1090, paramValue: 'tftNormal' },
-	tftRanked: { id: 1100, paramValue: 'tftRanked' },
+	aram: { id: 450 },
+	srNormalBlind: { id: 430 },
+	srNormalDraft: { id: 400 },
+	srRankedFlex: { id: 440 },
+	srRankedSolo: { id: 420 },
+	tftNormal: { id: 1090 },
+	tftRanked: { id: 1100 },
 }
 // export const MAX_NUM_MATCHES = 100
 export const MAX_NUM_MATCHES = 19 // need soft cap here until rate limit is in place
@@ -64,11 +59,17 @@ searchKeyExamples['Custom searchKey'] = { value: '' }
 const summonerIdExamples: any = {}
 summonerIdExamples['Custom Summoner ID'] = { value: '' }
 
-Object.keys(COMMON_QUEUE_TYPES).forEach((queueType) => {
-	queueTypeExamples[`Queue Filter - ${queueType}`] = {
-		value: queueType,
-	}
-})
+// TODO - add support for all queues
+Object.keys(COMMON_QUEUE_TYPES).forEach(
+	(queueType: keyof typeof COMMON_QUEUE_TYPES) => {
+		const { id } = COMMON_QUEUE_TYPES[queueType]
+		const queue = ALL_QUEUES.find(({ queueId }) => queueId === id)
+
+		queueTypeExamples[`${queue?.description} - ${queueType}`] = {
+			value: queueType,
+		}
+	},
+)
 
 usersJsonData.forEach((user) => {
 	accountIdExamples[`Account ID for ${user.name}`] = {
