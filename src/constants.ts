@@ -11,7 +11,23 @@ export const ENV_API_SECRET_KEY_DEFAULT = ''
 export const DEFAULT_TOTAL_MASTERY_SCORE = -1
 
 // API constants
-export const MAX_NUM_MATCHES = 100
+export const COMMON_QUEUE_TYPES = {
+	aram: { id: 450, paramValue: 'aram' },
+	summonersRiftNormalBlind: {
+		id: 430,
+		paramValue: 'srNormalBlind',
+	},
+	summonersRiftNormalDraft: {
+		id: 400,
+		paramValue: 'srNormalDraft',
+	},
+	summonersRiftRankedFlex: { id: 440, paramValue: 'srRankedFlex' },
+	summonersRiftRankedSolo: { id: 420, paramValue: 'srRankedSolo' },
+	tftNormal: { id: 1090, paramValue: 'tftNormal' },
+	tftRanked: { id: 1100, paramValue: 'tftRanked' },
+}
+// export const MAX_NUM_MATCHES = 100
+export const MAX_NUM_MATCHES = 19 // need soft cap here until rate limit is in place
 export const MIN_NUM_MATCHES = 1
 export const REGION = 'na1'
 
