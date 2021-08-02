@@ -58,6 +58,7 @@ describe('MatchlistController', () => {
 					'some-account-id',
 					undefined,
 					undefined,
+					undefined,
 				)) as Match[]
 			})
 
