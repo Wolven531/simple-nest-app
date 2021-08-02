@@ -86,6 +86,6 @@ usersJsonData.forEach((user) => {
 export {
 	accountIdExamples,
 	queueTypeExamples,
-	summonerIdExamples,
 	searchKeyExamples,
+	summonerIdExamples,
 }
