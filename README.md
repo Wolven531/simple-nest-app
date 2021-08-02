@@ -21,9 +21,9 @@ $env:SERVER_SECRET="YOUR_SERVER_SECRET_HERE"
 
 ## To-do
 
-- [] add queue type param for stats (filter by queue)
-- [] add GHA that runs e2e tests
-- [] add rate limiting for requests that would exceed Riot API rate limit
+- [ ] add GHA that runs e2e tests
+- [ ] add rate limiting for requests that would exceed Riot API rate limit
+- [x] add queue type param for stats (filter by queue)
 - [x] add examples to swagger docs
 - [x] improve query and param swagger docs
 - [x] remove API key param from mastery service method signatures (inject AppService into MasteryService)
