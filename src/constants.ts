@@ -53,11 +53,22 @@ export const TIME_MILLIS_IN_DAY =
 const accountIdExamples: any = {}
 accountIdExamples['Custom Account ID'] = { value: '' }
 
+const queueTypeExamples: any = {}
+queueTypeExamples['Default (not specified)'] = {
+	value: undefined,
+}
+
 const searchKeyExamples: any = {}
 searchKeyExamples['Custom searchKey'] = { value: '' }
 
 const summonerIdExamples: any = {}
 summonerIdExamples['Custom Summoner ID'] = { value: '' }
+
+Object.keys(COMMON_QUEUE_TYPES).forEach((queueType) => {
+	queueTypeExamples[`Queue Filter - ${queueType}`] = {
+		value: queueType,
+	}
+})
 
 usersJsonData.forEach((user) => {
 	accountIdExamples[`Account ID for ${user.name}`] = {
@@ -71,4 +82,9 @@ usersJsonData.forEach((user) => {
 	}
 })
 
-export { accountIdExamples, summonerIdExamples, searchKeyExamples }
+export {
+	accountIdExamples,
+	queueTypeExamples,
+	summonerIdExamples,
+	searchKeyExamples,
+}
