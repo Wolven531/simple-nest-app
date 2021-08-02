@@ -16,7 +16,11 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
-import { accountIdExamples } from '../constants'
+import {
+	accountIdExamples,
+	MAX_NUM_MATCHES,
+	MIN_NUM_MATCHES,
+} from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
@@ -62,10 +66,10 @@ export class MatchlistController {
 				value: '',
 			},
 			'Minimum number of matches': {
-				value: 1,
+				value: MIN_NUM_MATCHES,
 			},
 			'Maximum number of matches': {
-				value: 100,
+				value: MAX_NUM_MATCHES,
 			},
 		},
 		name: 'getLastX',
