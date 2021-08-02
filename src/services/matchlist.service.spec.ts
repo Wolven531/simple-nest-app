@@ -342,9 +342,10 @@ describe('Matchlist Service', () => {
 			}) => {
 				describe(`w/ mocked HttpGet (${description})`, () => {
 					beforeEach(() => {
-						jest
-							.spyOn(testModule.get(HttpService), 'get')
-							.mockImplementation(mockHttpGet)
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockImplementation(mockHttpGet)
 					})
 
 					describe(`invoke getGame(${paramGameId})`, () => {
@@ -357,7 +358,9 @@ describe('Matchlist Service', () => {
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(
+								expectedCountHttpGet,
+							)
 							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
 									`https://na1.api.riotgames.com/lol/match/v4/matches/${paramGameId}`,
@@ -394,10 +397,13 @@ describe('Matchlist Service', () => {
 			}) => {
 				describe(`w/ mocked HttpGet and v4GetGame (${description})`, () => {
 					beforeEach(() => {
-						jest.spyOn(service, 'v4GetGame').mockImplementation(mockGetGame)
-						jest
-							.spyOn(testModule.get(HttpService), 'get')
-							.mockImplementation(mockHttpGet)
+						jest.spyOn(service, 'v4GetGame').mockImplementation(
+							mockGetGame,
+						)
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockImplementation(mockHttpGet)
 					})
 
 					describe(`invoke getMatchlist("${paramAccountId}", ${paramGetLastX}, ${paramIncludeGameData})`, () => {
@@ -414,7 +420,9 @@ describe('Matchlist Service', () => {
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(
+								expectedCountHttpGet,
+							)
 							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
 									`https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/${paramAccountId}?endIndex=${expectedUrlParam}`,
@@ -428,7 +436,9 @@ describe('Matchlist Service', () => {
 									},
 								)
 							}
-							expect(mockGetGame).toHaveBeenCalledTimes(expectedCountGetGame)
+							expect(mockGetGame).toHaveBeenCalledTimes(
+								expectedCountGetGame,
+							)
 
 							expect(actualResult).toEqual(expectedResult)
 						})
