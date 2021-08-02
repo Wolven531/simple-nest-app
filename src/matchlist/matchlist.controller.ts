@@ -16,7 +16,13 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
-import { accountIdExamples } from '../constants'
+import {
+	accountIdExamples,
+	COMMON_QUEUE_TYPES,
+	MAX_NUM_MATCHES,
+	MIN_NUM_MATCHES,
+	queueTypeExamples,
+} from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
@@ -62,10 +68,10 @@ export class MatchlistController {
 				value: '',
 			},
 			'Minimum number of matches': {
-				value: 1,
+				value: MIN_NUM_MATCHES,
 			},
 			'Maximum number of matches': {
-				value: 100,
+				value: MAX_NUM_MATCHES,
 			},
 		},
 		name: 'getLastX',
@@ -93,6 +99,17 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'boolean',
 	})
+	@ApiQuery({
+		allowEmptyValue: false,
+		description:
+			'Optional filter to return only matches w/ a certain queue',
+		enum: Object.keys(COMMON_QUEUE_TYPES),
+		examples: queueTypeExamples,
+		name: 'queueType',
+		required: false,
+		style: 'simple',
+		type: 'string',
+	})
 	@ApiTags('match')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
@@ -100,9 +117,11 @@ export class MatchlistController {
 		@Param('accountId') accountId: string,
 		@Query('getLastX') getLastX = 10,
 		@Query('includeGameData') includeGameData = false,
+		@Query('queueType')
+		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
 	): Promise<Match[] | Game[]> {
 		this.logger.log(
-			`accountId="${accountId}" getLastX=${getLastX} includeGameData=${includeGameData}`,
+			`accountId="${accountId}" getLastX=${getLastX} includeGameData=${includeGameData} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
 		)
 
@@ -110,6 +129,7 @@ export class MatchlistController {
 			accountId,
 			getLastX,
 			includeGameData,
+			queueType,
 		)
 	}
 

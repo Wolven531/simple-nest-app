@@ -3,6 +3,11 @@ import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
+import {
+	COMMON_QUEUE_TYPES,
+	MAX_NUM_MATCHES,
+	MIN_NUM_MATCHES,
+} from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
@@ -20,13 +25,15 @@ type TestCase_GetMatchlist = {
 	description: string
 	expectedCountHttpGet: number
 	expectedCountGetGame: number
-	expectedUrlParam: number
+	expectedUrlParamCount: number
+	expectedUrlParamQueueFilter: string
 	expectedResult: Match[] | Game[]
 	mockGetGame: jest.Mock
 	mockHttpGet: jest.Mock
 	paramAccountId: string
 	paramGetLastX: number | undefined
 	paramIncludeGameData: boolean | undefined
+	paramQueueType: keyof typeof COMMON_QUEUE_TYPES | undefined
 }
 
 describe('Matchlist Service', () => {
@@ -68,7 +75,8 @@ describe('Matchlist Service', () => {
 			description: 'Http error occurs',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedUrlParam: 10,
+			expectedUrlParamCount: 10,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [],
 			mockGetGame: jest.fn(() => Promise.resolve()),
 			mockHttpGet: jest.fn(() =>
@@ -77,24 +85,28 @@ describe('Matchlist Service', () => {
 			paramAccountId: 'some-account-id',
 			paramGetLastX: undefined,
 			paramIncludeGameData: undefined,
+			paramQueueType: undefined,
 		},
 		{
 			description: 'Returned data is bad',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedUrlParam: 10,
+			expectedUrlParamCount: 10,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [],
 			mockGetGame: jest.fn(() => Promise.resolve()),
 			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
 			paramAccountId: 'some-account-id',
 			paramGetLastX: undefined,
 			paramIncludeGameData: undefined,
+			paramQueueType: undefined,
 		},
 		{
-			description: 'Returned data is good',
+			description: 'No filters - Returned data is good',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedUrlParam: 10,
+			expectedUrlParamCount: 10,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [
 				new Match(
 					222,
@@ -102,7 +114,7 @@ describe('Matchlist Service', () => {
 					2020,
 					'NA1',
 					100,
-					1,
+					COMMON_QUEUE_TYPES.aram.id,
 					'NONE',
 					new Date(2020, 1, 1).getTime(),
 				),
@@ -121,7 +133,7 @@ describe('Matchlist Service', () => {
 									2020,
 									'NA1',
 									100,
-									1,
+									COMMON_QUEUE_TYPES.aram.id,
 									'NONE',
 									new Date(2020, 1, 1).getTime(),
 								),
@@ -134,12 +146,15 @@ describe('Matchlist Service', () => {
 			paramAccountId: 'some-account-id',
 			paramGetLastX: undefined,
 			paramIncludeGameData: undefined,
+			paramQueueType: undefined,
 		},
 		{
-			description: 'Returned data is good',
+			description:
+				'Get Last X is below MIN_NUM_MATCHES - Returned data is good',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedUrlParam: 1,
+			expectedUrlParamCount: MIN_NUM_MATCHES,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [
 				new Match(
 					222,
@@ -147,7 +162,7 @@ describe('Matchlist Service', () => {
 					2020,
 					'NA1',
 					100,
-					1,
+					COMMON_QUEUE_TYPES.aram.id,
 					'NONE',
 					new Date(2020, 1, 1).getTime(),
 				),
@@ -166,7 +181,7 @@ describe('Matchlist Service', () => {
 									2020,
 									'NA1',
 									100,
-									1,
+									COMMON_QUEUE_TYPES.aram.id,
 									'NONE',
 									new Date(2020, 1, 1).getTime(),
 								),
@@ -177,14 +192,17 @@ describe('Matchlist Service', () => {
 				),
 			),
 			paramAccountId: 'some-account-id',
-			paramGetLastX: 0,
+			paramGetLastX: MIN_NUM_MATCHES - 1,
 			paramIncludeGameData: undefined,
+			paramQueueType: undefined,
 		},
 		{
-			description: 'Returned data is good',
+			description:
+				'Get Last X is above MAX_NUM_MATCHES - Returned data is good',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 0,
-			expectedUrlParam: 100,
+			expectedUrlParamCount: MAX_NUM_MATCHES,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [
 				new Match(
 					222,
@@ -192,7 +210,7 @@ describe('Matchlist Service', () => {
 					2020,
 					'NA1',
 					100,
-					1,
+					COMMON_QUEUE_TYPES.aram.id,
 					'NONE',
 					new Date(2020, 1, 1).getTime(),
 				),
@@ -211,7 +229,7 @@ describe('Matchlist Service', () => {
 									2020,
 									'NA1',
 									100,
-									1,
+									COMMON_QUEUE_TYPES.aram.id,
 									'NONE',
 									new Date(2020, 1, 1).getTime(),
 								),
@@ -222,14 +240,16 @@ describe('Matchlist Service', () => {
 				),
 			),
 			paramAccountId: 'some-account-id',
-			paramGetLastX: 101,
+			paramGetLastX: MAX_NUM_MATCHES + 1,
 			paramIncludeGameData: undefined,
+			paramQueueType: undefined,
 		},
 		{
-			description: 'Returned data is good',
+			description: 'Include game data - Returned data is good',
 			expectedCountHttpGet: 1,
 			expectedCountGetGame: 1,
-			expectedUrlParam: 1,
+			expectedUrlParamCount: 1,
+			expectedUrlParamQueueFilter: '',
 			expectedResult: [
 				new Game(
 					222,
@@ -242,7 +262,7 @@ describe('Matchlist Service', () => {
 					[],
 					[],
 					'p1',
-					1,
+					COMMON_QUEUE_TYPES.aram.id,
 					2020,
 					[],
 				),
@@ -260,7 +280,7 @@ describe('Matchlist Service', () => {
 						[],
 						[],
 						'p1',
-						1,
+						COMMON_QUEUE_TYPES.aram.id,
 						2020,
 						[],
 					),
@@ -279,7 +299,7 @@ describe('Matchlist Service', () => {
 									2020,
 									'NA1',
 									100,
-									1,
+									COMMON_QUEUE_TYPES.aram.id,
 									'NONE',
 									new Date(2020, 1, 1).getTime(),
 								),
@@ -292,6 +312,77 @@ describe('Matchlist Service', () => {
 			paramAccountId: 'some-account-id',
 			paramGetLastX: 1,
 			paramIncludeGameData: true,
+			paramQueueType: undefined,
+		},
+		{
+			description: 'include queue filter - Returned data is good',
+			expectedCountHttpGet: 1,
+			expectedCountGetGame: 1,
+			expectedUrlParamCount: 1,
+			expectedUrlParamQueueFilter: `&queue=${COMMON_QUEUE_TYPES.aram.id}`,
+			expectedResult: [
+				new Game(
+					222,
+					333,
+					444,
+					'CLASSIC',
+					'MATCHED_GAME',
+					'v1',
+					1,
+					[],
+					[],
+					'p1',
+					COMMON_QUEUE_TYPES.aram.id,
+					2020,
+					[],
+				),
+			],
+			mockGetGame: jest.fn(() =>
+				Promise.resolve(
+					new Game(
+						222,
+						333,
+						444,
+						'CLASSIC',
+						'MATCHED_GAME',
+						'v1',
+						1,
+						[],
+						[],
+						'p1',
+						COMMON_QUEUE_TYPES.aram.id,
+						2020,
+						[],
+					),
+				),
+			),
+			mockHttpGet: jest.fn(() =>
+				from(
+					Promise.resolve({
+						data: {
+							endIndex: 1,
+							startIndex: 0,
+							matches: [
+								new Match(
+									222,
+									'NONE',
+									2020,
+									'NA1',
+									100,
+									COMMON_QUEUE_TYPES.aram.id,
+									'NONE',
+									new Date(2020, 1, 1).getTime(),
+								),
+							] as Match[],
+							totalGames: 1,
+						} as Matchlist,
+					}),
+				),
+			),
+			paramAccountId: 'some-account-id',
+			paramGetLastX: 1,
+			paramIncludeGameData: true,
+			paramQueueType: 'aram',
 		},
 	]
 	let service: MatchlistService
@@ -342,9 +433,10 @@ describe('Matchlist Service', () => {
 			}) => {
 				describe(`w/ mocked HttpGet (${description})`, () => {
 					beforeEach(() => {
-						jest
-							.spyOn(testModule.get(HttpService), 'get')
-							.mockImplementation(mockHttpGet)
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockImplementation(mockHttpGet)
 					})
 
 					describe(`invoke getGame(${paramGameId})`, () => {
@@ -357,7 +449,9 @@ describe('Matchlist Service', () => {
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(
+								expectedCountHttpGet,
+							)
 							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
 									`https://na1.api.riotgames.com/lol/match/v4/matches/${paramGameId}`,
@@ -384,23 +478,30 @@ describe('Matchlist Service', () => {
 				description,
 				expectedCountHttpGet,
 				expectedCountGetGame,
-				expectedUrlParam,
+				expectedUrlParamCount,
+				expectedUrlParamQueueFilter,
 				expectedResult,
 				mockGetGame,
 				mockHttpGet,
 				paramAccountId,
 				paramGetLastX,
 				paramIncludeGameData,
+				paramQueueType,
 			}) => {
 				describe(`w/ mocked HttpGet and v4GetGame (${description})`, () => {
 					beforeEach(() => {
-						jest.spyOn(service, 'v4GetGame').mockImplementation(mockGetGame)
-						jest
-							.spyOn(testModule.get(HttpService), 'get')
-							.mockImplementation(mockHttpGet)
+						jest.spyOn(service, 'v4GetGame').mockImplementation(
+							mockGetGame,
+						)
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockImplementation(mockHttpGet)
 					})
 
-					describe(`invoke getMatchlist("${paramAccountId}", ${paramGetLastX}, ${paramIncludeGameData})`, () => {
+					describe(`invoke getMatchlist("${paramAccountId}", ${paramGetLastX}, ${paramIncludeGameData}, ${
+						paramQueueType ? `"${paramQueueType}"` : paramQueueType
+					})`, () => {
 						let actualResult: Game[] | Match[]
 
 						beforeEach(async () => {
@@ -408,16 +509,31 @@ describe('Matchlist Service', () => {
 								paramAccountId,
 								paramGetLastX,
 								paramIncludeGameData,
+								paramQueueType,
 							)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
 							expect(mockGetRiotToken).toHaveBeenCalledTimes(1)
 
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountHttpGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(
+								expectedCountHttpGet,
+							)
 							if (expectedCountHttpGet > 0) {
+								const expectedFullUrl =
+									'https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'
+										.concat(paramAccountId)
+										.concat(
+											`?endIndex=${expectedUrlParamCount}`,
+										)
+										.concat(
+											paramQueueType
+												? expectedUrlParamQueueFilter
+												: '',
+										)
+
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
-									`https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/${paramAccountId}?endIndex=${expectedUrlParam}`,
+									expectedFullUrl,
 									{
 										headers: {
 											'Accept-Charset':
@@ -428,7 +544,9 @@ describe('Matchlist Service', () => {
 									},
 								)
 							}
-							expect(mockGetGame).toHaveBeenCalledTimes(expectedCountGetGame)
+							expect(mockGetGame).toHaveBeenCalledTimes(
+								expectedCountGetGame,
+							)
 
 							expect(actualResult).toEqual(expectedResult)
 						})

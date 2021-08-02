@@ -1,6 +1,6 @@
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
-import { Inject, Injectable, Logger } from '@nestjs/common'
 
 @Injectable()
 export class StatsService {

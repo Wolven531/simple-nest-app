@@ -1,3 +1,4 @@
+import { ALL_QUEUES } from './data/queues'
 import * as usersJsonData from './data/users.json'
 
 // Environment constants
@@ -11,7 +12,17 @@ export const ENV_API_SECRET_KEY_DEFAULT = ''
 export const DEFAULT_TOTAL_MASTERY_SCORE = -1
 
 // API constants
-export const MAX_NUM_MATCHES = 100
+export const COMMON_QUEUE_TYPES = {
+	aram: { id: 450 },
+	srNormalBlind: { id: 430 },
+	srNormalDraft: { id: 400 },
+	srRankedFlex: { id: 440 },
+	srRankedSolo: { id: 420 },
+	tftNormal: { id: 1090 },
+	tftRanked: { id: 1100 },
+}
+// export const MAX_NUM_MATCHES = 100
+export const MAX_NUM_MATCHES = 19 // need soft cap here until rate limit is in place
 export const MIN_NUM_MATCHES = 1
 export const REGION = 'na1'
 
@@ -37,11 +48,28 @@ export const TIME_MILLIS_IN_DAY =
 const accountIdExamples: any = {}
 accountIdExamples['Custom Account ID'] = { value: '' }
 
+const queueTypeExamples: any = {}
+queueTypeExamples['Default (not specified)'] = {
+	value: undefined,
+}
+
 const searchKeyExamples: any = {}
 searchKeyExamples['Custom searchKey'] = { value: '' }
 
 const summonerIdExamples: any = {}
 summonerIdExamples['Custom Summoner ID'] = { value: '' }
+
+// TODO - add support for all queues
+Object.keys(COMMON_QUEUE_TYPES).forEach(
+	(queueType: keyof typeof COMMON_QUEUE_TYPES) => {
+		const { id } = COMMON_QUEUE_TYPES[queueType]
+		const queue = ALL_QUEUES.find(({ queueId }) => queueId === id)
+
+		queueTypeExamples[`${queue?.description} - ${queueType}`] = {
+			value: queueType,
+		}
+	},
+)
 
 usersJsonData.forEach((user) => {
 	accountIdExamples[`Account ID for ${user.name}`] = {
@@ -55,4 +83,9 @@ usersJsonData.forEach((user) => {
 	}
 })
 
-export { accountIdExamples, summonerIdExamples, searchKeyExamples }
+export {
+	accountIdExamples,
+	queueTypeExamples,
+	searchKeyExamples,
+	summonerIdExamples,
+}

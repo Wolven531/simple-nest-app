@@ -1,7 +1,12 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { firstValueFrom } from 'rxjs'
-import { MAX_NUM_MATCHES, MIN_NUM_MATCHES, REGION } from '../constants'
+import {
+	COMMON_QUEUE_TYPES,
+	MAX_NUM_MATCHES,
+	MIN_NUM_MATCHES,
+	REGION,
+} from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
@@ -52,7 +57,11 @@ export class MatchlistService {
 			})
 			.catch((err) => {
 				this.logger.error(
-					`Error while fetching game!\n\n${JSON.stringify(err, null, 4)}`,
+					`Error while fetching game!\n\n${JSON.stringify(
+						err,
+						null,
+						4,
+					)}`,
 					' getGame | match-svc ',
 				)
 
@@ -67,12 +76,15 @@ export class MatchlistService {
 	 * @param getLastX number Defaults to 10; number of matches to retrieve
 	 * @param includeGameData boolean Defaults to false; retrieves individual game data if true;
 	 *     otherwise, returns simple match data
+	 * @param queueType string Defaults to undefined; can be specified as a key from COMMON_QUEUE_TYPES
+	 *     to filter which matches to request
 	 * @returns A collection of either Match objects (default) or Game objects (includeGameData=true)
 	 */
 	v4GetMatchlist(
 		accountId: string,
 		getLastX = 10,
 		includeGameData = false,
+		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
 	): Promise<Match[] | Game[]> {
 		const apiKey = this.appService.getRiotToken()
 
@@ -85,9 +97,14 @@ export class MatchlistService {
 			getLastX = MAX_NUM_MATCHES
 		}
 
+		const filterQueue =
+			queueType === undefined
+				? ''
+				: `&queue=${COMMON_QUEUE_TYPES[queueType].id}`
+
 		return firstValueFrom(
 			this.httpService.get(
-				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}?endIndex=${getLastX}`,
+				`https://${REGION}.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}?endIndex=${getLastX}${filterQueue}`,
 				{
 					headers: {
 						'Accept-Charset':
@@ -120,7 +137,9 @@ export class MatchlistService {
 
 				return includeGameData
 					? Promise.all(
-							allMatches.map((match) => this.v4GetGame(match.gameId)),
+							allMatches.map((match) =>
+								this.v4GetGame(match.gameId),
+							),
 							// could also be expressed (less efficiently) as below
 							// more info -
 							// https://www.freecodecamp.org/news/beware-of-chaining-array-methods-in-javascript-ef3983b60fbc
@@ -130,7 +149,11 @@ export class MatchlistService {
 			})
 			.catch((err) => {
 				this.logger.error(
-					`Error while fetching matches!\n\n${JSON.stringify(err, null, 4)}`,
+					`Error while fetching matches!\n\n${JSON.stringify(
+						err,
+						null,
+						4,
+					)}`,
 					' getMatchlist | match-svc ',
 				)
 
