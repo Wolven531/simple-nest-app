@@ -2,6 +2,7 @@ import { HttpModule } from '@nestjs/axios'
 import { BadRequestException, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { COMMON_QUEUE_TYPES } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
@@ -9,15 +10,28 @@ import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
 
 describe('StatsController', () => {
-	const fakeGame: Game = {} as Game
+	// constants for testing
+	const fakeAccountId = 'someAccountId'
+	// const fakeGame: Game = {} as Game
+	const fakeGames: Game[] = []
+	const fakeKDA = 3.14
+	const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
+
+	// standard testing setup
 	let controller: StatsController
 	let testModule: TestingModule
-	let mockGetGame: jest.Mock
+
+	// mocks for testing
+	let mockCalculateGeneralStats: jest.Mock
+	// let mockGetGame: jest.Mock
 	let mockGetMatchlist: jest.Mock
 
 	beforeEach(async () => {
-		mockGetGame = jest.fn().mockResolvedValue(fakeGame)
-		mockGetMatchlist = jest.fn().mockResolvedValue([])
+		mockCalculateGeneralStats = jest
+			.fn()
+			.mockReturnValue({ kDA: fakeKDA } as CalculatedStats)
+		// mockGetGame = jest.fn().mockResolvedValue(fakeGame)
+		mockGetMatchlist = jest.fn().mockResolvedValue(fakeGames)
 
 		testModule = await Test.createTestingModule({
 			controllers: [StatsController],
@@ -27,11 +41,17 @@ describe('StatsController', () => {
 					provide: MatchlistService,
 					useFactory: () =>
 						({
-							v4GetGame: mockGetGame,
+							// v4GetGame: mockGetGame,
 							v4GetMatchlist: mockGetMatchlist,
 						} as unknown as MatchlistService),
 				},
-				StatsService,
+				{
+					provide: StatsService,
+					useFactory: () =>
+						({
+							calculateGeneralStats: mockCalculateGeneralStats,
+						} as unknown as StatsService),
+				},
 				Logger,
 			],
 		}).compile()
@@ -58,7 +78,11 @@ describe('StatsController', () => {
 
 			beforeEach(async () => {
 				try {
-					resp = await controller.getSummaryForAccountId('', undefined)
+					resp = await controller.getSummaryForAccountId(
+						'',
+						undefined,
+						undefined,
+					)
 				} catch (err) {
 					capturedError = err
 				}
@@ -81,25 +105,16 @@ describe('StatsController', () => {
 			})
 		})
 
-		describe('invoke getSummaryForAccountId("someAccountId", undefined)', () => {
-			const fakeKDA = 3.14
+		describe(`invoke getSummaryForAccountId("${fakeAccountId}", undefined, "${fakeQueueFilter}")`, () => {
 			let capturedError: Error
-			let mockCalculateGeneralStats: jest.Mock
 			let resp: CalculatedStats
 
 			beforeEach(async () => {
-				mockCalculateGeneralStats = jest.fn(
-					(targetAccountKey, games) => ({ kDA: fakeKDA } as CalculatedStats),
-				)
-
-				jest
-					.spyOn(testModule.get(StatsService), 'calculateGeneralStats')
-					.mockImplementationOnce(mockCalculateGeneralStats)
-
 				try {
 					resp = await controller.getSummaryForAccountId(
-						'someAccountId',
+						fakeAccountId,
 						undefined,
+						fakeQueueFilter,
 					)
 				} catch (err) {
 					capturedError = err
@@ -109,7 +124,17 @@ describe('StatsController', () => {
 			it('invokes MatchlistSvc.getMatchlist() and StatsSvc.calculateGeneralStats(), does NOT throw error', () => {
 				expect(capturedError).toBeUndefined()
 				expect(mockCalculateGeneralStats).toHaveBeenCalledTimes(1)
+				expect(mockCalculateGeneralStats).toHaveBeenLastCalledWith(
+					fakeAccountId,
+					fakeGames,
+				)
 				expect(mockGetMatchlist).toHaveBeenCalledTimes(1)
+				expect(mockGetMatchlist).toHaveBeenLastCalledWith(
+					fakeAccountId,
+					10, // from endpoint default
+					true,
+					fakeQueueFilter,
+				)
 				expect(resp).toMatchObject({ kDA: fakeKDA } as CalculatedStats)
 			})
 		})

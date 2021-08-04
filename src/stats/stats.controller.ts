@@ -15,7 +15,11 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
-import { accountIdExamples } from '../constants'
+import {
+	accountIdExamples,
+	COMMON_QUEUE_TYPES,
+	queueTypeExamples,
+} from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
@@ -73,22 +77,25 @@ export class StatsController {
 		style: 'simple',
 		type: 'number',
 	})
-	// @ApiQuery({
-	// 	allowEmptyValue: false,
-	// 	description: 'accountId to search for when parsing game data',
-	// 	examples: accountIdExamples,
-	// 	name: 'accountId',
-	// 	required: false,
-	// 	style: 'simple',
-	// 	type: 'boolean',
-	// })
+	@ApiQuery({
+		allowEmptyValue: false,
+		description:
+			'Optional filter to return only matches w/ a certain queue',
+		enum: Object.keys(COMMON_QUEUE_TYPES),
+		examples: queueTypeExamples,
+		name: 'queueType',
+		required: false,
+		style: 'simple',
+		type: 'string',
+	})
 	@ApiTags('summary')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getSummaryForAccountId(
 		@Query('accountId') accountId: string,
 		@Query('getLastX') getLastX = 10,
-		// @Query('includeGameData') includeGameData = false,
+		@Query('queueType')
+		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
 	): Promise<CalculatedStats> {
 		if (accountId.length < 1) {
 			throw new BadRequestException({
@@ -104,7 +111,7 @@ export class StatsController {
 		}
 
 		this.logger.log(
-			`accountId=${accountId} getLastX=${getLastX}`,
+			`accountId=${accountId} getLastX=${getLastX} queueType="${queueType}"`,
 			' getSummaryForAccountId | StatsCtrl ',
 		)
 
@@ -112,6 +119,7 @@ export class StatsController {
 			accountId,
 			getLastX,
 			true,
+			queueType,
 		)) as Game[]
 
 		return this.statsService.calculateGeneralStats(accountId, games)
