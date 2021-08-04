@@ -54,7 +54,10 @@ export class SummonerService {
 			)
 
 			if (getResp.status === HttpStatus.NOT_FOUND) {
-				this.logger.debug('Summoner was not found, returning null...', ctx)
+				this.logger.debug(
+					'Summoner was not found, returning null...',
+					ctx,
+				)
 				return null
 			}
 
@@ -95,7 +98,10 @@ export class SummonerService {
 			)
 
 			if (getResp.status === HttpStatus.NOT_FOUND) {
-				this.logger.debug('Summoner was not found, returning null...', ctx)
+				this.logger.debug(
+					'Summoner was not found, returning null...',
+					ctx,
+				)
 				return null
 			}
 
