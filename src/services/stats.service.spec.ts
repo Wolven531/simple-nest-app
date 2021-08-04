@@ -45,7 +45,18 @@ describe('Stats Service', () => {
 					visionScore: 2,
 					win: true,
 				} as Stats,
-				new Timeline(1, {}, {}, {}, {}, {}, {}, {}, 'SUPPORT', 'BOTTOM'),
+				new Timeline(
+					1,
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					{},
+					'SUPPORT',
+					'BOTTOM',
+				),
 			),
 			new Participant(
 				2,
@@ -228,9 +239,10 @@ describe('Stats Service', () => {
 			paramGames: [
 				{
 					...fakeGame,
-					participantIdentities: fakeGame.participantIdentities.concat(
-						generateParticipantIdentity(3),
-					),
+					participantIdentities:
+						fakeGame.participantIdentities.concat(
+							generateParticipantIdentity(3),
+						),
 				},
 			],
 		},
@@ -262,7 +274,12 @@ describe('Stats Service', () => {
 		})
 
 		testCases_CalculateGeneralStats.forEach(
-			({ expectedResult, paramAccountKey, paramGames, testDescription }) => {
+			({
+				expectedResult,
+				paramAccountKey,
+				paramGames,
+				testDescription,
+			}) => {
 				describe(`invoke calculateGeneralStats("${paramAccountKey}", ${paramGames.length} games) [${testDescription}]`, () => {
 					let actualResult: CalculatedStats
 

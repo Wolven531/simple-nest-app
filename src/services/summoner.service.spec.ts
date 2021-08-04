@@ -101,13 +101,17 @@ describe('Summoner Service', () => {
 			}) => {
 				describe(`w/ mocked HTTP Get (${descriptionMockedBehavior})`, () => {
 					beforeEach(() => {
-						jest
-							.spyOn(testModule.get(HttpService), 'get')
-							.mockImplementation(mockHttpGet)
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockImplementation(mockHttpGet)
 					})
 
 					afterEach(() => {
-						jest.spyOn(testModule.get(HttpService), 'get').mockRestore()
+						jest.spyOn(
+							testModule.get(HttpService),
+							'get',
+						).mockRestore()
 					})
 
 					describe('invoke searchByName()', () => {
@@ -118,7 +122,9 @@ describe('Summoner Service', () => {
 						})
 
 						it('invokes get() correctly and returns expected result', () => {
-							expect(mockHttpGet).toHaveBeenCalledTimes(expectedCountGet)
+							expect(mockHttpGet).toHaveBeenCalledTimes(
+								expectedCountGet,
+							)
 
 							if (expectedCountGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
