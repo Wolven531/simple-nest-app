@@ -5,25 +5,31 @@ import { toggleMockedLogger } from '../../test/utils'
 import { COMMON_QUEUE_TYPES } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
 import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
 
 describe('StatsController', () => {
 	// constants for testing
-	const fakeGame: Game = {} as Game
+	const fakeAccountId = 'someAccountId'
+	// const fakeGame: Game = {} as Game
 	const fakeGames: Game[] = []
+	const fakeKDA = 3.14
+	const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
 
 	// standard testing setup
 	let controller: StatsController
 	let testModule: TestingModule
 
 	// mocks for testing
+	let mockCalculateGeneralStats: jest.Mock
 	// let mockGetGame: jest.Mock
 	let mockGetMatchlist: jest.Mock
 
 	beforeEach(async () => {
+		mockCalculateGeneralStats = jest
+			.fn()
+			.mockReturnValue({ kDA: fakeKDA } as CalculatedStats)
 		// mockGetGame = jest.fn().mockResolvedValue(fakeGame)
 		mockGetMatchlist = jest.fn().mockResolvedValue(fakeGames)
 
@@ -39,15 +45,13 @@ describe('StatsController', () => {
 							v4GetMatchlist: mockGetMatchlist,
 						} as unknown as MatchlistService),
 				},
-				// {
-				// 	provide: MatchlistService,
-				// 	useFactory: () =>
-				// 		({
-				// 			// v4GetGame: mockGetGame,
-				// 			v4GetMatchlist: mockGetMatchlist,
-				// 		} as unknown as MatchlistService),
-				// },
-				StatsService, // using actual service
+				{
+					provide: StatsService,
+					useFactory: () =>
+						({
+							calculateGeneralStats: mockCalculateGeneralStats,
+						} as unknown as StatsService),
+				},
 				Logger,
 			],
 		}).compile()
@@ -101,25 +105,11 @@ describe('StatsController', () => {
 			})
 		})
 
-		describe('invoke getSummaryForAccountId("someAccountId", undefined)', () => {
-			const fakeAccountId = 'someAccountId'
-			const fakeKDA = 3.14
-			const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
+		describe(`invoke getSummaryForAccountId("${fakeAccountId}", undefined, "${fakeQueueFilter}")`, () => {
 			let capturedError: Error
-			let mockCalculateGeneralStats: jest.Mock
 			let resp: CalculatedStats
 
 			beforeEach(async () => {
-				mockCalculateGeneralStats = jest.fn(
-					(targetAccountKey, games) =>
-						({ kDA: fakeKDA } as CalculatedStats),
-				)
-
-				jest.spyOn(
-					testModule.get(StatsService),
-					'calculateGeneralStats',
-				).mockImplementationOnce(mockCalculateGeneralStats)
-
 				try {
 					resp = await controller.getSummaryForAccountId(
 						fakeAccountId,
