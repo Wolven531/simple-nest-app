@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { AxiosResponse } from 'axios'
 import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
+import { REGION } from '../constants'
 import { Summoner } from '../models/summoner.model'
 import { AppService } from './app.service'
 import { SummonerService } from './summoner.service'
@@ -18,6 +19,7 @@ type TestCase_SearchByName = {
 
 describe('Summoner Service', () => {
 	const fakeAPIKey = 'some-api-key'
+	const fakeSummonerId = 'some-someer-id'
 	const testCases_searchByName: TestCase_SearchByName[] = [
 		{
 			descriptionMockedBehavior: 'request fails',
@@ -91,6 +93,54 @@ describe('Summoner Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
+		describe('invoke getSummonerById()', () => {
+			const fakeSummoner = { name: 'summ-name-1' } as Summoner
+			let capturedError: Error
+			let resp: Summoner
+			let mockHttpGet: jest.Mock
+
+			beforeEach(async () => {
+				mockHttpGet = jest.fn().mockReturnValue(
+					from(
+						Promise.resolve({
+							data: fakeSummoner,
+							status: HttpStatus.OK,
+						} as AxiosResponse<Summoner>),
+					),
+				)
+
+				jest.spyOn(
+					testModule.get(HttpService),
+					'get',
+				).mockImplementation(mockHttpGet)
+
+				try {
+					resp = await service.getSummonerById(fakeSummonerId)
+				} catch (err) {
+					capturedError = err
+				}
+			})
+
+			it('invokes Http get() properly, and returns Summoner, does NOT throw error', () => {
+				expect(capturedError).toBeUndefined()
+
+				expect(mockHttpGet).toHaveBeenCalledTimes(1)
+				expect(mockHttpGet).toHaveBeenLastCalledWith(
+					`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/${fakeSummonerId}`,
+					{
+						headers: {
+							'Accept-Charset':
+								'application/x-www-form-urlencoded; charset=UTF-8',
+							'Accept-Language': 'en-US,en;q=0.9',
+							'X-Riot-Token': fakeAPIKey,
+						},
+					},
+				)
+
+				expect(resp).toEqual(fakeSummoner)
+			})
+		})
+
 		testCases_searchByName.forEach(
 			({
 				descriptionMockedBehavior,
@@ -105,13 +155,6 @@ describe('Summoner Service', () => {
 							testModule.get(HttpService),
 							'get',
 						).mockImplementation(mockHttpGet)
-					})
-
-					afterEach(() => {
-						jest.spyOn(
-							testModule.get(HttpService),
-							'get',
-						).mockRestore()
 					})
 
 					describe('invoke searchByName()', () => {
