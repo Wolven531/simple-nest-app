@@ -2,28 +2,28 @@ import { ApiProperty } from '@nestjs/swagger'
 
 class Player {
 	@ApiProperty()
-	platformId: string
-
-	@ApiProperty()
 	accountId: string
-
-	@ApiProperty()
-	summonerName: string
-
-	@ApiProperty()
-	summonerId: string
-
-	@ApiProperty()
-	currentPlatformId: string
 
 	@ApiProperty()
 	currentAccountId: string
 
 	@ApiProperty()
+	currentPlatformId: string
+
+	@ApiProperty()
 	matchHistoryUri: string
 
 	@ApiProperty()
+	platformId: string
+
+	@ApiProperty()
 	profileIcon: number
+
+	@ApiProperty()
+	summonerId: string
+
+	@ApiProperty()
+	summonerName: string
 
 	/**
 	 * @param platformId - Original region player exists in (e.g. 'NA')

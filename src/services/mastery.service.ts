@@ -1,8 +1,10 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { AxiosResponse } from 'axios'
 import { firstValueFrom } from 'rxjs'
 // import { utc } from 'moment'
 import { DEFAULT_TOTAL_MASTERY_SCORE, REGION } from '../constants'
+import { ChampionMastery } from '../models/champion-mastery.model'
 import { AppService } from './app.service'
 
 @Injectable()
@@ -15,6 +17,55 @@ export class MasteryService {
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
+
+	/**
+	 * This method retrieves all champion masteries for a User, either from the cache
+	 * or from the Riot API (across HTTP)
+	 *
+	 * @param summonerId String value to use to select User (from Users file)
+	 *
+	 * @returns Promise<ChampionMastery[]> If fetch is successful, the masteries for each champion
+	 *   for the User w/ the given summonerId; otherwise, empty array
+	 */
+	getAllChampionMasteries(summonerId: string): Promise<ChampionMastery[]> {
+		const apiKey = this.appService.getRiotToken()
+
+		return firstValueFrom(
+			this.httpService.get(
+				`https://${REGION}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/${summonerId}`,
+				{
+					headers: {
+						'Accept-Charset':
+							'application/x-www-form-urlencoded; charset=UTF-8',
+						'Accept-Language': 'en-US,en;q=0.9',
+						'X-Riot-Token': apiKey,
+					},
+				},
+			),
+		)
+			.then((resp: AxiosResponse<ChampionMastery[]>) => {
+				const championMasteries = resp.data
+
+				this.logger.log(
+					`fetched all champion masteries (${championMasteries.length}) over HTTP for summonerId="${summonerId}"`,
+					' getAllChampionMasteries | match-svc ',
+				)
+
+				return championMasteries
+			})
+			.catch((err) => {
+				this.logger.error(
+					`Error while fetching all champion masteries!\n\n${JSON.stringify(
+						err,
+						null,
+						4,
+					)}`,
+					' getAllChampionMasteries | match-svc ',
+				)
+
+				return []
+			})
+	}
 
 	/**
 	 * This method retrieves the total mastery score for a User, either from the cache
@@ -68,8 +119,8 @@ export class MasteryService {
 				},
 			),
 		)
-			.then((resp) => {
-				const masteryTotalScore = parseInt(resp.data, 10)
+			.then((resp: AxiosResponse<number>) => {
+				const masteryTotalScore = resp.data
 
 				this.logger.log(
 					`fetched total mastery over HTTP masteryTotalScore=${masteryTotalScore}`,

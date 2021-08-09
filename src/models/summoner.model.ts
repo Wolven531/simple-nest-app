@@ -34,7 +34,8 @@ class Summoner {
 	puuid: string
 
 	@ApiProperty({
-		description: 'Date summoner was last modified specified as epoch milliseconds. The following events will update this timestamp: summoner name change, summoner level change, or profile icon change',
+		description:
+			'Date summoner was last modified specified as epoch milliseconds. The following events will update this timestamp: summoner name change, summoner level change, or profile icon change',
 	})
 	revisionDate: number
 

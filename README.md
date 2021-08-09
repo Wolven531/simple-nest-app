@@ -23,6 +23,7 @@ $env:SERVER_SECRET="YOUR_SERVER_SECRET_HERE"
 
 - [ ] add GHA that runs e2e tests
 - [ ] add rate limiting for requests that would exceed Riot API rate limit
+- [x] add endpoint to get all champion masteries for a summoner
 - [x] add queue type param for stats (filter by queue)
 - [x] add examples to swagger docs
 - [x] improve query and param swagger docs

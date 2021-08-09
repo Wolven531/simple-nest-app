@@ -2,17 +2,6 @@ import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { CreateConfigDto } from './create-config.dto'
 
 export class UpdateConfigDto extends PartialType(CreateConfigDto) {
-	/**
-	 * @param secret - string
-	 * @param token - string
-	 */
-	constructor(secret: string, token: string) {
-		super()
-
-		this.secret = secret
-		this.token = token
-	}
-
 	@ApiProperty({
 		description:
 			'Value used to authenticate the request; should match $env:SERVER_SECRET',
@@ -32,4 +21,15 @@ export class UpdateConfigDto extends PartialType(CreateConfigDto) {
 		type: String,
 	})
 	token: string
+
+	/**
+	 * @param secret - string
+	 * @param token - string
+	 */
+	constructor(secret: string, token: string) {
+		super()
+
+		this.secret = secret
+		this.token = token
+	}
 }

@@ -2,34 +2,34 @@ import { ApiProperty } from '@nestjs/swagger'
 
 class Timeline {
 	@ApiProperty()
-	participantId: number
-
-	@ApiProperty()
 	creepsPerMinDeltas: any
-
-	@ApiProperty()
-	xpPerMinDeltas: any
-
-	@ApiProperty()
-	goldPerMinDeltas: any
 
 	@ApiProperty()
 	csDiffPerMinDeltas: any
 
 	@ApiProperty()
-	xpDiffPerMinDeltas: any
+	damageTakenDiffPerMinDeltas: any
 
 	@ApiProperty()
 	damageTakenPerMinDeltas: any
 
 	@ApiProperty()
-	damageTakenDiffPerMinDeltas: any
+	goldPerMinDeltas: any
+
+	@ApiProperty()
+	lane: string
+
+	@ApiProperty()
+	participantId: number
 
 	@ApiProperty()
 	role: string
 
 	@ApiProperty()
-	lane: string
+	xpDiffPerMinDeltas: any
+
+	@ApiProperty()
+	xpPerMinDeltas: any
 
 	/**
 	 * @param participantId - In-game identifier of the player to which this timeline pertains
@@ -54,7 +54,6 @@ class Timeline {
 		damageTakenDiffPerMinDeltas: any,
 		role: string,
 		lane: string,
-
 	) {
 		this.participantId = participantId
 		this.creepsPerMinDeltas = creepsPerMinDeltas

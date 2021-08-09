@@ -1,6 +1,22 @@
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger'
 import { Match } from './match.model'
 
+@ApiExtraModels(Match)
 class Matchlist {
+	@ApiProperty()
+	endIndex: number
+
+	@ApiProperty({
+		type: [Match],
+	})
+	matches: Match[]
+
+	@ApiProperty()
+	startIndex: number
+
+	@ApiProperty()
+	totalGames: number
+
 	/**
 	 * @param endIndex - Last index of matches available
 	 * @param matches - Array of match objects
@@ -8,11 +24,16 @@ class Matchlist {
 	 * @param totalGames - Total number of games
 	 */
 	constructor(
-		public endIndex: number,
-		public matches: Match[],
-		public startIndex: number,
-		public totalGames: number,
-	) {}
+		endIndex: number,
+		matches: Match[],
+		startIndex: number,
+		totalGames: number,
+	) {
+		this.endIndex = endIndex
+		this.matches = matches
+		this.startIndex = startIndex
+		this.totalGames = totalGames
+	}
 }
 
 export { Matchlist }
