@@ -119,8 +119,8 @@ export class MasteryService {
 				},
 			),
 		)
-			.then((resp) => {
-				const masteryTotalScore = parseInt(resp.data, 10)
+			.then((resp: AxiosResponse<number>) => {
+				const masteryTotalScore = resp.data
 
 				this.logger.log(
 					`fetched total mastery over HTTP masteryTotalScore=${masteryTotalScore}`,
