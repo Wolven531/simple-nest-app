@@ -4,6 +4,31 @@ import { Timeline } from './timeline.model'
 
 @ApiExtraModels(Stats, Timeline)
 class Participant {
+	@ApiProperty()
+	championId: number
+
+	@ApiProperty()
+	participantId: number
+
+	@ApiProperty()
+	spell1Id: number
+
+	@ApiProperty()
+	spell2Id: number
+
+	@ApiProperty({
+		type: Stats,
+	})
+	stats: Stats
+
+	@ApiProperty()
+	teamId: number
+
+	@ApiProperty({
+		type: Timeline,
+	})
+	timeline: Timeline
+
 	/**
 	 * @param participantId - Number of user the user in game (i.e. 1 - 10)
 	 * @param teamId - Number representing the in game team for the user (e.g. 100, 200)
@@ -30,27 +55,6 @@ class Participant {
 		this.stats = stats
 		this.timeline = timeline
 	}
-
-	@ApiProperty()
-	participantId: number
-
-	@ApiProperty()
-	teamId: number
-
-	@ApiProperty()
-	championId: number
-
-	@ApiProperty()
-	spell1Id: number
-
-	@ApiProperty()
-	spell2Id: number
-
-	@ApiProperty()
-	stats: Stats
-
-	@ApiProperty()
-	timeline: Timeline
 }
 
 export { Participant }

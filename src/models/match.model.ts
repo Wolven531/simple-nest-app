@@ -1,6 +1,30 @@
 import { ApiProperty } from '@nestjs/swagger'
 
 class Match {
+	@ApiProperty()
+	champion: number
+
+	@ApiProperty()
+	gameId: number
+
+	@ApiProperty()
+	lane: string
+
+	@ApiProperty()
+	platformId: string
+
+	@ApiProperty()
+	queue: number
+
+	@ApiProperty()
+	role: string
+
+	@ApiProperty()
+	season: number
+
+	@ApiProperty()
+	timestamp: number
+
 	/**
 	 * For more specific information on constants and values, please
 	 * visit https://developer.riotgames.com/docs/lol#general_game-constants
@@ -33,30 +57,6 @@ class Match {
 		this.lane = lane
 		this.timestamp = timestamp
 	}
-
-	@ApiProperty()
-	champion: number
-
-	@ApiProperty()
-	gameId: number
-
-	@ApiProperty()
-	lane: string
-
-	@ApiProperty()
-	platformId: string
-
-	@ApiProperty()
-	queue: number
-
-	@ApiProperty()
-	role: string
-
-	@ApiProperty()
-	season: number
-
-	@ApiProperty()
-	timestamp: number
 }
 
 export { Match }

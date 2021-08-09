@@ -5,6 +5,51 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger'
 
 @ApiExtraModels(Participant, ParticipantIdentity, Team)
 class Game {
+	@ApiProperty()
+	gameCreation: number
+
+	@ApiProperty()
+	gameDuration: number
+
+	@ApiProperty()
+	gameId: number
+
+	@ApiProperty()
+	gameMode: string
+
+	@ApiProperty()
+	gameType: string
+
+	@ApiProperty()
+	gameVersion: string
+
+	@ApiProperty()
+	mapId: number
+
+	@ApiProperty({
+		type: [ParticipantIdentity],
+	})
+	participantIdentities: ParticipantIdentity[]
+
+	@ApiProperty({
+		type: [Participant],
+	})
+	participants: Participant[]
+
+	@ApiProperty()
+	platformId: string
+
+	@ApiProperty()
+	queueId: number
+
+	@ApiProperty()
+	seasonId: number
+
+	@ApiProperty({
+		type: [Team],
+	})
+	teams: Team[]
+
 	/**
 	 * @param gameCreation - Timestamp of when game was created
 	 * @param gameDuration - Length of game in seconds
@@ -49,49 +94,6 @@ class Game {
 		this.seasonId = seasonId
 		this.teams = teams
 	}
-
-	@ApiProperty()
-	gameCreation: number
-
-	@ApiProperty()
-	gameDuration: number
-
-	@ApiProperty()
-	gameId: number
-
-	@ApiProperty()
-	gameMode: string
-
-	@ApiProperty()
-	gameType: string
-
-	@ApiProperty()
-	gameVersion: string
-
-	@ApiProperty()
-	mapId: number
-
-	@ApiProperty({
-		type: [ParticipantIdentity]
-	})
-	participantIdentities: ParticipantIdentity[]
-
-	@ApiProperty({
-		type: [Participant]
-	})
-	participants: Participant[]
-
-	@ApiProperty()
-	platformId: string
-
-	@ApiProperty()
-	queueId: number
-
-	@ApiProperty()
-	seasonId: number
-
-	@ApiProperty()
-	teams: Team[]
 }
 
 export { Game }

@@ -1,10 +1,23 @@
+import { ApiProperty } from '@nestjs/swagger'
+import moment, { utc } from 'moment'
 import { TIME_MILLIS_IN_DAY } from '../constants'
 
-import { utc } from 'moment'
-
-import moment from 'moment'
-
 class User {
+	@ApiProperty()
+	accountId: string
+
+	@ApiProperty()
+	lastUpdated: number
+
+	@ApiProperty()
+	masteryTotal: number
+
+	@ApiProperty()
+	name: string
+
+	@ApiProperty()
+	summonerId: string
+
 	/**
 	 * @param accountId - Encrypted account ID for the user
 	 * @param lastUpdated - UTC Timestamp of the last update run time for the user
@@ -13,12 +26,18 @@ class User {
 	 * @param summonerId - Simple summoner ID for the user
 	 */
 	constructor(
-		public accountId: string,
-		public lastUpdated: number,
-		public masteryTotal: number,
-		public name: string,
-		public summonerId: string,
-	) {}
+		accountId: string,
+		lastUpdated: number,
+		masteryTotal: number,
+		name: string,
+		summonerId: string,
+	) {
+		this.accountId = accountId
+		this.lastUpdated = lastUpdated
+		this.masteryTotal = masteryTotal
+		this.name = name
+		this.summonerId = summonerId
+	}
 
 	/**
 	 * @returns True if user model has been updated within the last day; false otherwise
