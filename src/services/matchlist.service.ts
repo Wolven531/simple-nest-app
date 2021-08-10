@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { RateLimiterMemory } from 'rate-limiter-flexible'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
@@ -14,6 +15,10 @@ import { AppService } from './app.service'
 
 @Injectable()
 export class MatchlistService {
+	private appLongRateLimiter: RateLimiterMemory
+	private appShortRateLimiter: RateLimiterMemory
+	private gameRateLimiter: RateLimiterMemory
+
 	constructor(
 		@Inject(AppService)
 		private readonly appService: AppService,
@@ -21,7 +26,30 @@ export class MatchlistService {
 		private readonly httpService: HttpService,
 		@Inject(Logger)
 		private readonly logger: Logger,
-	) {}
+	) {
+		// copied from response headers
+		// "X-App-Rate-Limit": "20:1,100:120"
+		// "X-Method-Rate-Limit": "1000:10"
+
+		// limit is 100 requests per 2 minutes
+		this.appLongRateLimiter = new RateLimiterMemory({
+			duration: 120,
+			keyPrefix: 'app-long-term',
+			points: 100,
+		})
+		// limit is 20 requests per second
+		this.appShortRateLimiter = new RateLimiterMemory({
+			duration: 1,
+			keyPrefix: 'app-short-term',
+			points: 20,
+		})
+		// limit is 1000 requests per 10 seconds
+		this.gameRateLimiter = new RateLimiterMemory({
+			duration: 10,
+			keyPrefix: 'method-get-game',
+			points: 1000,
+		})
+	}
 
 	/**
 	 * This method uses the Riot Match API v4 to retrieve a Game
