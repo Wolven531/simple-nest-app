@@ -61,60 +61,100 @@ export class MatchlistService {
 	 * @param gameId number Identifier for game to retrieve
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
-	v4GetGame(gameId: number): Promise<Game | null> {
+	async v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
-		// ensure we can use this method by attempting to consume from the rate limit
-		return this.gameRateLimiter
-			.consume(KEY_RATE_METHOD_GAME, 1)
-			.then((methodRate: RateLimiterRes) => {
-				// this block runs if we were able to consume
+		let firstRateLimitErrorKey = ''
+
+		const [errAppLong, errAppShort, errMethod] = await Promise.all([
+			this.appLongRateLimiter
+				.consume(KEY_RATE_APP_LONG, 1)
+				.then((rateAppLong: RateLimiterRes) => {
+					this.logger.log(
+						`rateAppLong = ${JSON.stringify(rateAppLong)}`,
+						' getGame | match-svc ',
+					)
+					return null
+				})
+				.catch((err: RateLimiterRes) => {
+					if (firstRateLimitErrorKey === '') {
+						firstRateLimitErrorKey = KEY_RATE_APP_LONG
+					}
+					return err
+				}),
+			this.appShortRateLimiter
+				.consume(KEY_RATE_APP_SHORT, 1)
+				.then((rateAppShort: RateLimiterRes) => {
+					this.logger.log(
+						`rateAppShort = ${JSON.stringify(rateAppShort)}`,
+						' getGame | match-svc ',
+					)
+					return null
+				})
+				.catch((err: RateLimiterRes) => {
+					if (firstRateLimitErrorKey === '') {
+						firstRateLimitErrorKey = KEY_RATE_APP_SHORT
+					}
+					return err
+				}),
+			this.gameRateLimiter
+				.consume(KEY_RATE_METHOD_GAME, 1)
+				.then((rateMethod: RateLimiterRes) => {
+					this.logger.log(
+						`methodRate = ${JSON.stringify(rateMethod)}`,
+						' getGame | match-svc ',
+					)
+					return null
+				})
+				.catch((err: RateLimiterRes) => {
+					if (firstRateLimitErrorKey === '') {
+						firstRateLimitErrorKey = KEY_RATE_METHOD_GAME
+					}
+					return err
+				}),
+		])
+
+		if (firstRateLimitErrorKey !== '') {
+			this.logger.error(
+				`Could not fetch game due to first rate limit hit - "${firstRateLimitErrorKey}"; all limits = ${JSON.stringify(
+					[errAppLong, errAppShort, errMethod],
+				)}`,
+				' getGame | match-svc ',
+			)
+
+			return null
+		}
+
+		// able to retrieve result from Riot API
+		return firstValueFrom(
+			this.httpService.get(
+				`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
+				{
+					headers: {
+						'Accept-Charset':
+							'application/x-www-form-urlencoded; charset=UTF-8',
+						'Accept-Language': 'en-US,en;q=0.9',
+						'X-Riot-Token': apiKey,
+					},
+				},
+			),
+		)
+			.then((resp: AxiosResponse<Game>) => {
+				const gameInfo: Game = resp.data
+
 				this.logger.log(
-					`methodRate = ${JSON.stringify(methodRate)}`,
+					`Fetched game (id = ${gameId})! Created = ${gameInfo.gameCreation} Duration = ${gameInfo.gameDuration}`,
 					' getGame | match-svc ',
 				)
 
-				// now return result from Riot API
-				return firstValueFrom(
-					this.httpService.get(
-						`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
-						{
-							headers: {
-								'Accept-Charset':
-									'application/x-www-form-urlencoded; charset=UTF-8',
-								'Accept-Language': 'en-US,en;q=0.9',
-								'X-Riot-Token': apiKey,
-							},
-						},
-					),
-				)
-					.then((resp: AxiosResponse<Game>) => {
-						const gameInfo: Game = resp.data
-
-						this.logger.log(
-							`Fetched game (id = ${gameId})! Created = ${gameInfo.gameCreation} Duration = ${gameInfo.gameDuration}`,
-							' getGame | match-svc ',
-						)
-
-						return gameInfo
-					})
-					.catch((err) => {
-						this.logger.error(
-							`Error while fetching game!\n\n${JSON.stringify(
-								err,
-								null,
-								4,
-							)}`,
-							' getGame | match-svc ',
-						)
-
-						return null
-					})
+				return gameInfo
 			})
-			.catch((rateLimit: RateLimiterRes) => {
+			.catch((err) => {
 				this.logger.error(
-					`Could not fetch game due to rate limit = ${JSON.stringify(
-						rateLimit,
+					`Error while fetching game!\n\n${JSON.stringify(
+						err,
+						null,
+						4,
 					)}`,
 					' getGame | match-svc ',
 				)
