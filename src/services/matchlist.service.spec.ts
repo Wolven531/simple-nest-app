@@ -415,6 +415,13 @@ describe('Matchlist Service', () => {
 	})
 
 	describe('w/ mocked logger functions [ debug, error, log, verbose ]', () => {
+		const fakeGameId = 123
+		const fakeGame: Game = {
+			gameCreation: 333,
+			gameDuration: 444,
+			gameId: fakeGameId,
+		} as Game
+
 		beforeEach(() => {
 			toggleMockedLogger(testModule)
 		})
@@ -424,12 +431,6 @@ describe('Matchlist Service', () => {
 		})
 
 		describe('invoke getGame() enough to hit app short rate limit', () => {
-			const fakeGameId = 123
-			const fakeGame: Game = {
-				gameCreation: 333,
-				gameDuration: 444,
-				gameId: fakeGameId,
-			} as Game
 			const appShortRateLimit = 20 // requests
 			const appShortTimeLimit = 1 // seconds
 			let result: Game | null
@@ -499,13 +500,89 @@ describe('Matchlist Service', () => {
 			})
 		})
 
+		describe('invoke getGame() enough to hit app long rate limit, w/o hitting short limit', () => {
+			const appLongRateLimit = 100 // requests
+			const appLongTimeLimit = 120 // seconds
+			const timeBetweenBursts =
+				(appLongTimeLimit * 1000) / appLongRateLimit // millis
+			let result: Game | null
+			let mockHttpGet: jest.Mock
+
+			beforeEach(async () => {
+				mockHttpGet = jest.fn(() =>
+					from(
+						Promise.resolve({
+							data: fakeGame,
+						}),
+					),
+				)
+
+				jest.spyOn(
+					testModule.get(HttpService),
+					'get',
+				).mockImplementation(mockHttpGet)
+
+				jest.useFakeTimers()
+
+				const callsToMake = []
+
+				for (
+					let consecutiveCall = 0;
+					consecutiveCall < appLongRateLimit;
+					consecutiveCall++
+				) {
+					callsToMake.push(service.v4GetGame(fakeGameId))
+
+					// every 20th call, advance time (based on short rate limit)
+					if (consecutiveCall % 20 === 0) {
+						callsToMake.push(
+							new Promise((resolve) => {
+								jest.advanceTimersByTime(timeBetweenBursts) // advance to avoid short rate limit, just enough to hit long rate limit
+								resolve(undefined)
+							}),
+						)
+					}
+				}
+
+				await Promise.all(callsToMake)
+			})
+
+			it('invokes HttpService.get() at rate limit', () => {
+				expect(mockHttpGet).toHaveBeenCalledTimes(appLongRateLimit)
+			})
+
+			describe('invoke getGame() once more to exceed rate limit', () => {
+				beforeEach(async () => {
+					// attempt one additional call to trigger rate limit
+					result = await service.v4GetGame(fakeGameId)
+				})
+
+				it('returns null (rate limit breach), only invokes HttpService.get() at rate limit', () => {
+					expect(mockHttpGet).toHaveBeenCalledTimes(appLongRateLimit)
+
+					expect(result).toBeNull()
+				})
+			})
+
+			describe('invoke getGame() after rate limit recovers', () => {
+				beforeEach(async () => {
+					jest.advanceTimersByTime(appLongTimeLimit * 1000)
+
+					// attempt one additional call, which should work since time has passed
+					result = await service.v4GetGame(fakeGameId)
+				})
+
+				it('returns Game (rate limit recovered), invokes HttpService.get() every time', () => {
+					expect(mockHttpGet).toHaveBeenCalledTimes(
+						appLongRateLimit + 1,
+					)
+
+					expect(result).toEqual(fakeGame)
+				})
+			})
+		})
+
 		xdescribe('invoke getGame() enough to hit method rate limit', () => {
-			const fakeGameId = 123
-			const fakeGame: Game = {
-				gameCreation: 333,
-				gameDuration: 444,
-				gameId: fakeGameId,
-			} as Game
 			const methodRateLimit = 1000 // requests
 			const methodTimeLimit = 10 // seconds
 			let result: Game | null
