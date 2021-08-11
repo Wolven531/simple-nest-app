@@ -423,9 +423,15 @@ describe('Matchlist Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
-		describe('invoke getGame() enough to exceed rate limit', () => {
+		describe('invoke getGame() enough to hit rate limit', () => {
 			const fakeGameId = 123
+			const fakeGame: Game = {
+				gameCreation: 333,
+				gameDuration: 444,
+				gameId: fakeGameId,
+			} as Game
 			const methodRateLimit = 1000
+			const methodTimeLimit = 10 // seconds
 			let result: Game | null
 			let mockHttpGet: jest.Mock
 
@@ -433,11 +439,7 @@ describe('Matchlist Service', () => {
 				mockHttpGet = jest.fn(() =>
 					from(
 						Promise.resolve({
-							data: {
-								gameCreation: 333,
-								gameDuration: 444,
-								gameId: fakeGameId,
-							} as Game,
+							data: fakeGame,
 						}),
 					),
 				)
@@ -460,17 +462,40 @@ describe('Matchlist Service', () => {
 				}
 
 				await Promise.all(callsToMake)
-
-				// attempt one additional call to trigger rate limit
-				result = await service.v4GetGame(fakeGameId)
-
-				jest.useRealTimers()
 			})
 
-			it('returns null (rate limit breach), only invokes HttpService.get() at rate limit', () => {
+			it('invokes HttpService.get() at rate limit', () => {
 				expect(mockHttpGet).toHaveBeenCalledTimes(methodRateLimit)
+			})
 
-				expect(result).toBeNull()
+			describe('invoke getGame() once more to exceed rate limit', () => {
+				beforeEach(async () => {
+					// attempt one additional call to trigger rate limit
+					result = await service.v4GetGame(fakeGameId)
+				})
+
+				it('returns null (rate limit breach), only invokes HttpService.get() at rate limit', () => {
+					expect(mockHttpGet).toHaveBeenCalledTimes(methodRateLimit)
+
+					expect(result).toBeNull()
+				})
+			})
+
+			describe('invoke getGame() after rate limit recovers', () => {
+				beforeEach(async () => {
+					jest.advanceTimersByTime(methodTimeLimit * 1000)
+
+					// attempt one additional call, which should work since time has passed
+					result = await service.v4GetGame(fakeGameId)
+				})
+
+				it('returns Game (rate limit recovered), invokes HttpService.get() every time', () => {
+					expect(mockHttpGet).toHaveBeenCalledTimes(
+						methodRateLimit + 1,
+					)
+
+					expect(result).toEqual(fakeGame)
+				})
 			})
 		})
 
