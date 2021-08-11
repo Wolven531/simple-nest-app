@@ -5,6 +5,9 @@ import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
+	KEY_RATE_APP_LONG,
+	KEY_RATE_APP_SHORT,
+	KEY_RATE_METHOD_GAME,
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
 	REGION,
@@ -35,19 +38,19 @@ export class MatchlistService {
 		// limit is 100 requests per 2 minutes
 		this.appLongRateLimiter = new RateLimiterMemory({
 			duration: 120,
-			keyPrefix: 'app-long-term',
+			keyPrefix: KEY_RATE_APP_LONG,
 			points: 100,
 		})
 		// limit is 20 requests per second
 		this.appShortRateLimiter = new RateLimiterMemory({
 			duration: 1,
-			keyPrefix: 'app-short-term',
+			keyPrefix: KEY_RATE_APP_SHORT,
 			points: 20,
 		})
 		// limit is 1000 requests per 10 seconds
 		this.gameRateLimiter = new RateLimiterMemory({
 			duration: 10,
-			keyPrefix: 'method-get-game',
+			keyPrefix: KEY_RATE_METHOD_GAME,
 			points: 1000,
 		})
 	}
@@ -63,11 +66,11 @@ export class MatchlistService {
 
 		// ensure we can use this method by attempting to consume from the rate limit
 		return this.gameRateLimiter
-			.consume('method-get-game', 1)
-			.then((rateLimit: RateLimiterRes) => {
+			.consume(KEY_RATE_METHOD_GAME, 1)
+			.then((methodRate: RateLimiterRes) => {
 				// this block runs if we were able to consume
 				this.logger.log(
-					`rateLimit = ${JSON.stringify(rateLimit)}`,
+					`methodRate = ${JSON.stringify(methodRate)}`,
 					' getGame | match-svc ',
 				)
 
