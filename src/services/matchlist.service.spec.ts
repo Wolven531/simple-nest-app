@@ -423,6 +423,57 @@ describe('Matchlist Service', () => {
 			toggleMockedLogger(testModule, false)
 		})
 
+		describe('invoke getGame() enough to exceed rate limit', () => {
+			const fakeGameId = 123
+			const methodRateLimit = 1000
+			let result: Game | null
+			let mockHttpGet: jest.Mock
+
+			beforeEach(async () => {
+				mockHttpGet = jest.fn(() =>
+					from(
+						Promise.resolve({
+							data: {
+								gameCreation: 333,
+								gameDuration: 444,
+								gameId: fakeGameId,
+							} as Game,
+						}),
+					),
+				)
+
+				jest.spyOn(
+					testModule.get(HttpService),
+					'get',
+				).mockImplementation(mockHttpGet)
+
+				jest.useFakeTimers()
+
+				const callsToMake = []
+
+				for (
+					let consecutiveCall = 0;
+					consecutiveCall < methodRateLimit;
+					consecutiveCall++
+				) {
+					callsToMake.push(service.v4GetGame(fakeGameId))
+				}
+
+				await Promise.all(callsToMake)
+
+				// attempt one additional call to trigger rate limit
+				result = await service.v4GetGame(fakeGameId)
+
+				jest.useRealTimers()
+			})
+
+			it('returns null (rate limit breach), only invokes HttpService.get() at rate limit', () => {
+				expect(mockHttpGet).toHaveBeenCalledTimes(methodRateLimit)
+
+				expect(result).toBeNull()
+			})
+		})
+
 		testCases_getGame.forEach(
 			({
 				description,
