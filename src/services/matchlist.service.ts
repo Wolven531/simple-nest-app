@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { RateLimiterMemory } from 'rate-limiter-flexible'
+import { AxiosResponse } from 'axios'
+import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
@@ -60,35 +61,57 @@ export class MatchlistService {
 	v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
-		return firstValueFrom(
-			this.httpService.get(
-				`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
-				{
-					headers: {
-						'Accept-Charset':
-							'application/x-www-form-urlencoded; charset=UTF-8',
-						'Accept-Language': 'en-US,en;q=0.9',
-						'X-Riot-Token': apiKey,
-					},
-				},
-			),
-		)
-			.then((resp) => {
-				const gameInfo: Game = resp.data
-
+		// ensure we can use this method by attempting to consume from the rate limit
+		return this.gameRateLimiter
+			.consume('method-get-game', 1)
+			.then((rateLimit: RateLimiterRes) => {
+				// this block runs if we were able to consume
 				this.logger.log(
-					`Fetched game (id = ${gameId})! Created = ${gameInfo.gameCreation} Duration = ${gameInfo.gameDuration}`,
+					`rateLimit = ${JSON.stringify(rateLimit)}`,
 					' getGame | match-svc ',
 				)
 
-				return gameInfo
+				// now return result from Riot API
+				return firstValueFrom(
+					this.httpService.get(
+						`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
+						{
+							headers: {
+								'Accept-Charset':
+									'application/x-www-form-urlencoded; charset=UTF-8',
+								'Accept-Language': 'en-US,en;q=0.9',
+								'X-Riot-Token': apiKey,
+							},
+						},
+					),
+				)
+					.then((resp: AxiosResponse<Game>) => {
+						const gameInfo: Game = resp.data
+
+						this.logger.log(
+							`Fetched game (id = ${gameId})! Created = ${gameInfo.gameCreation} Duration = ${gameInfo.gameDuration}`,
+							' getGame | match-svc ',
+						)
+
+						return gameInfo
+					})
+					.catch((err) => {
+						this.logger.error(
+							`Error while fetching game!\n\n${JSON.stringify(
+								err,
+								null,
+								4,
+							)}`,
+							' getGame | match-svc ',
+						)
+
+						return null
+					})
 			})
-			.catch((err) => {
+			.catch((rateLimit: RateLimiterRes) => {
 				this.logger.error(
-					`Error while fetching game!\n\n${JSON.stringify(
-						err,
-						null,
-						4,
+					`Could not fetch game due to rate limit = ${JSON.stringify(
+						rateLimit,
 					)}`,
 					' getGame | match-svc ',
 				)
