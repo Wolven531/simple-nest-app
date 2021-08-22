@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { from } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
 import { RateLimitService } from './rate-limit.service'
 
@@ -89,86 +88,70 @@ describe('RateLimitService', () => {
 			})
 		})
 
-		// describe('invoke consumeAppLimit() enough to hit app long rate limit, w/o hitting short limit', () => {
-		// 	const appLongRateLimit = 100 // requests
-		// 	const appLongTimeLimit = 120 // seconds
-		// 	const timeBetweenBursts =
-		// 		(appLongTimeLimit * 1000) / appLongRateLimit // millis
-		// 	let result: Game | null
-		// 	let mockHttpGet: jest.Mock
+		describe('invoke consumeAppLimit() enough to hit app long rate limit, w/o hitting short limit', () => {
+			const appLongRateLimit = 100 // requests
+			const appLongTimeLimit = 120 // seconds
+			const timeBetweenBursts =
+				(appLongTimeLimit * 1000) / appLongRateLimit // millis
+			let result: boolean
 
-		// 	beforeEach(async () => {
-		// 		mockHttpGet = jest.fn(() =>
-		// 			from(
-		// 				Promise.resolve({
-		// 					data: fakeGame,
-		// 				}),
-		// 			),
-		// 		)
+			beforeEach(async () => {
+				jest.useFakeTimers()
 
-		// 		jest.spyOn(
-		// 			testModule.get(HttpService),
-		// 			'get',
-		// 		).mockImplementation(mockHttpGet)
+				const callsToMake = []
 
-		// 		jest.useFakeTimers()
+				for (
+					let consecutiveCall = 0;
+					consecutiveCall < appLongRateLimit;
+					consecutiveCall++
+				) {
+					callsToMake.push(
+						(async () => {
+							result = await service.consumeAppLimit()
+						})(),
+					)
 
-		// 		const callsToMake = []
+					// every 20th call, advance time (based on short rate limit)
+					if (consecutiveCall % 20 === 0) {
+						callsToMake.push(
+							new Promise((resolve) => {
+								jest.advanceTimersByTime(timeBetweenBursts) // advance to avoid short rate limit, just enough to hit long rate limit
+								resolve(undefined)
+							}),
+						)
+					}
+				}
 
-		// 		for (
-		// 			let consecutiveCall = 0;
-		// 			consecutiveCall < appLongRateLimit;
-		// 			consecutiveCall++
-		// 		) {
-		// 			callsToMake.push(service.v4consumeAppLimit(fakeGameId))
+				await Promise.all(callsToMake)
+			})
 
-		// 			// every 20th call, advance time (based on short rate limit)
-		// 			if (consecutiveCall % 20 === 0) {
-		// 				callsToMake.push(
-		// 					new Promise((resolve) => {
-		// 						jest.advanceTimersByTime(timeBetweenBursts) // advance to avoid short rate limit, just enough to hit long rate limit
-		// 						resolve(undefined)
-		// 					}),
-		// 				)
-		// 			}
-		// 		}
+			it('returns true (at rate limit)', () => {
+				expect(result).toBe(true)
+			})
 
-		// 		await Promise.all(callsToMake)
-		// 	})
+			describe('invoke consumeAppLimit() once more to exceed rate limit', () => {
+				beforeEach(async () => {
+					// attempt one additional call to trigger rate limit
+					result = await service.consumeAppLimit()
+				})
 
-		// 	it('invokes HttpService.get() at rate limit', () => {
-		// 		expect(mockHttpGet).toHaveBeenCalledTimes(appLongRateLimit)
-		// 	})
+				it('returns false (rate limit breach)', () => {
+					expect(result).toBe(false)
+				})
+			})
 
-		// 	describe('invoke consumeAppLimit() once more to exceed rate limit', () => {
-		// 		beforeEach(async () => {
-		// 			// attempt one additional call to trigger rate limit
-		// 			result = await service.v4consumeAppLimit(fakeGameId)
-		// 		})
+			describe('invoke consumeAppLimit() after rate limit recovers', () => {
+				beforeEach(async () => {
+					jest.advanceTimersByTime(appLongTimeLimit * 1000)
 
-		// 		it('returns null (rate limit breach), only invokes HttpService.get() at rate limit', () => {
-		// 			expect(mockHttpGet).toHaveBeenCalledTimes(appLongRateLimit)
+					// attempt one additional call, which should work since time has passed
+					result = await service.consumeAppLimit()
+				})
 
-		// 			expect(result).toBeNull()
-		// 		})
-		// 	})
-
-		// 	describe('invoke consumeAppLimit() after rate limit recovers', () => {
-		// 		beforeEach(async () => {
-		// 			jest.advanceTimersByTime(appLongTimeLimit * 1000)
-
-		// 			// attempt one additional call, which should work since time has passed
-		// 			result = await service.v4consumeAppLimit(fakeGameId)
-		// 		})
-
-		// 		it('returns Game (rate limit recovered), invokes HttpService.get() every time', () => {
-		// 			expect(mockHttpGet).toHaveBeenCalledTimes(
-		// 				appLongRateLimit + 1,
-		// 			)
-
-		// 			expect(result).toEqual(fakeGame)
-		// 		})
-		// 	})
-		// })
+				it('returns true (rate limit recovered)', () => {
+					expect(result).toBe(true)
+				})
+			})
+		})
 	})
 })
