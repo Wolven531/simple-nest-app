@@ -49,7 +49,7 @@ export class MatchlistService {
 
 		let firstRateLimitErrorKey = ''
 
-		const [isAppLimitHit, errMethod] = await Promise.all([
+		const [isAppLimitClear, errMethod] = await Promise.all([
 			this.rateLimitService.consumeAppLimit(),
 			this.gameRateLimiter
 				.consume(KEY_RATE_METHOD_GAME, 1)
@@ -68,10 +68,10 @@ export class MatchlistService {
 				}),
 		])
 
-		if (isAppLimitHit || firstRateLimitErrorKey !== '') {
+		if (!isAppLimitClear || firstRateLimitErrorKey !== '') {
 			this.logger.error(
 				`Could not fetch game due to rate limit hit - "${
-					isAppLimitHit ? 'app' : firstRateLimitErrorKey
+					isAppLimitClear ? 'app' : firstRateLimitErrorKey
 				}"; method limit = ${JSON.stringify(errMethod)}`,
 				' getGame | match-svc ',
 			)
