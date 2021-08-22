@@ -5,8 +5,6 @@ import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
-	KEY_RATE_APP_LONG,
-	KEY_RATE_APP_SHORT,
 	KEY_RATE_METHOD_GAME,
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
@@ -16,37 +14,22 @@ import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
 import { AppService } from './app.service'
+import { RateLimitService } from './rate-limit.service'
 
 @Injectable()
 export class MatchlistService {
-	private appLongRateLimiter: RateLimiterMemory
-	private appShortRateLimiter: RateLimiterMemory
 	private gameRateLimiter: RateLimiterMemory
 
 	constructor(
 		@Inject(AppService)
 		private readonly appService: AppService,
+		@Inject(RateLimitService)
+		private readonly rateLimitService: RateLimitService,
 		@Inject(HttpService)
 		private readonly httpService: HttpService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {
-		// copied from response headers
-		// "X-App-Rate-Limit": "20:1,100:120"
-		// "X-Method-Rate-Limit": "1000:10"
-
-		// limit is 100 requests per 2 minutes
-		this.appLongRateLimiter = new RateLimiterMemory({
-			duration: 120,
-			keyPrefix: KEY_RATE_APP_LONG,
-			points: 100,
-		})
-		// limit is 20 requests per second
-		this.appShortRateLimiter = new RateLimiterMemory({
-			duration: 1,
-			keyPrefix: KEY_RATE_APP_SHORT,
-			points: 20,
-		})
 		// limit is 1000 requests per 10 seconds
 		this.gameRateLimiter = new RateLimiterMemory({
 			duration: 10,
@@ -66,37 +49,8 @@ export class MatchlistService {
 
 		let firstRateLimitErrorKey = ''
 
-		const [errAppLong, errAppShort, errMethod] = await Promise.all([
-			this.appLongRateLimiter
-				.consume(KEY_RATE_APP_LONG, 1)
-				.then((rateAppLong: RateLimiterRes) => {
-					this.logger.log(
-						`rateAppLong = ${JSON.stringify(rateAppLong)}`,
-						' getGame | match-svc ',
-					)
-					return null
-				})
-				.catch((err: RateLimiterRes) => {
-					if (firstRateLimitErrorKey === '') {
-						firstRateLimitErrorKey = KEY_RATE_APP_LONG
-					}
-					return err
-				}),
-			this.appShortRateLimiter
-				.consume(KEY_RATE_APP_SHORT, 1)
-				.then((rateAppShort: RateLimiterRes) => {
-					this.logger.log(
-						`rateAppShort = ${JSON.stringify(rateAppShort)}`,
-						' getGame | match-svc ',
-					)
-					return null
-				})
-				.catch((err: RateLimiterRes) => {
-					if (firstRateLimitErrorKey === '') {
-						firstRateLimitErrorKey = KEY_RATE_APP_SHORT
-					}
-					return err
-				}),
+		const [isAppLimitHit, errMethod] = await Promise.all([
+			this.rateLimitService.consumeAppLimit(),
 			this.gameRateLimiter
 				.consume(KEY_RATE_METHOD_GAME, 1)
 				.then((rateMethod: RateLimiterRes) => {
@@ -114,11 +68,11 @@ export class MatchlistService {
 				}),
 		])
 
-		if (firstRateLimitErrorKey !== '') {
+		if (isAppLimitHit || firstRateLimitErrorKey !== '') {
 			this.logger.error(
-				`Could not fetch game due to first rate limit hit - "${firstRateLimitErrorKey}"; all limits = ${JSON.stringify(
-					[errAppLong, errAppShort, errMethod],
-				)}`,
+				`Could not fetch game due to rate limit hit - "${
+					isAppLimitHit ? 'app' : firstRateLimitErrorKey
+				}"; method limit = ${JSON.stringify(errMethod)}`,
 				' getGame | match-svc ',
 			)
 
