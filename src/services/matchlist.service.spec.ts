@@ -589,7 +589,7 @@ describe('Matchlist Service', () => {
 		// 	})
 		// })
 
-		xdescribe('invoke getGame() enough to hit method rate limit', () => {
+		describe('invoke getGame() enough to hit method rate limit', () => {
 			const methodRateLimit = 1000 // requests
 			const methodTimeLimit = 10 // seconds
 			let result: Game | null
