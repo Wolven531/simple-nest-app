@@ -38,6 +38,11 @@ export const ENCODING_UTF8 = 'utf8'
 export const READ_AND_WRITE = 'r+'
 export const WRITE_CREATE_OR_TRUNCATE = 'w'
 
+// Key constants
+export const KEY_RATE_APP_LONG = 'app-long-term'
+export const KEY_RATE_APP_SHORT = 'app-short-term'
+export const KEY_RATE_METHOD_GAME = 'method-get-game'
+
 // Calculated constants
 export const TIME_MILLIS_IN_DAY =
 	TIME_MILLIS_IN_SECOND *

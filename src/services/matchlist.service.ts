@@ -1,8 +1,11 @@
 import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { AxiosResponse } from 'axios'
+import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
+	KEY_RATE_METHOD_GAME,
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
 	REGION,
@@ -11,17 +14,29 @@ import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
 import { AppService } from './app.service'
+import { RateLimitService } from './rate-limit.service'
 
 @Injectable()
 export class MatchlistService {
+	private gameRateLimiter: RateLimiterMemory
+
 	constructor(
 		@Inject(AppService)
 		private readonly appService: AppService,
+		@Inject(RateLimitService)
+		private readonly rateLimitService: RateLimitService,
 		@Inject(HttpService)
 		private readonly httpService: HttpService,
 		@Inject(Logger)
 		private readonly logger: Logger,
-	) {}
+	) {
+		// limit is 1000 requests per 10 seconds
+		this.gameRateLimiter = new RateLimiterMemory({
+			duration: 10,
+			keyPrefix: KEY_RATE_METHOD_GAME,
+			points: 1000,
+		})
+	}
 
 	/**
 	 * This method uses the Riot Match API v4 to retrieve a Game
@@ -29,9 +44,42 @@ export class MatchlistService {
 	 * @param gameId number Identifier for game to retrieve
 	 * @returns Promise<Game> if successful; Promise<null> otherwise
 	 */
-	v4GetGame(gameId: number): Promise<Game | null> {
+	async v4GetGame(gameId: number): Promise<Game | null> {
 		const apiKey = this.appService.getRiotToken()
 
+		let firstRateLimitErrorKey = ''
+
+		const [isAppLimitClear, errMethod] = await Promise.all([
+			this.rateLimitService.consumeAppLimit(),
+			this.gameRateLimiter
+				.consume(KEY_RATE_METHOD_GAME, 1)
+				.then((rateMethod: RateLimiterRes) => {
+					this.logger.log(
+						`methodRate = ${JSON.stringify(rateMethod)}`,
+						' getGame | match-svc ',
+					)
+					return null
+				})
+				.catch((err: RateLimiterRes) => {
+					if (firstRateLimitErrorKey === '') {
+						firstRateLimitErrorKey = KEY_RATE_METHOD_GAME
+					}
+					return err
+				}),
+		])
+
+		if (!isAppLimitClear || firstRateLimitErrorKey !== '') {
+			this.logger.error(
+				`Could not fetch game due to rate limit hit - "${
+					isAppLimitClear ? 'app' : firstRateLimitErrorKey
+				}"; method limit = ${JSON.stringify(errMethod)}`,
+				' getGame | match-svc ',
+			)
+
+			return null
+		}
+
+		// able to retrieve result from Riot API
 		return firstValueFrom(
 			this.httpService.get(
 				`https://${REGION}.api.riotgames.com/lol/match/v4/matches/${gameId}`,
@@ -45,7 +93,7 @@ export class MatchlistService {
 				},
 			),
 		)
-			.then((resp) => {
+			.then((resp: AxiosResponse<Game>) => {
 				const gameInfo: Game = resp.data
 
 				this.logger.log(
