@@ -8,14 +8,14 @@ import {
 	Logger,
 	Param,
 	Post,
-	Query,
+	Query
 } from '@nestjs/common'
 import {
 	ApiExtraModels,
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger'
 import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
@@ -198,7 +198,7 @@ export class UserController {
 	// 		' refreshUserData | user-ctrl ',
 	// 	)
 
-	// 	execFileSync('npm', ['run', 'copy:users:windows'], {
+	// 	execFileSync('yarn', ['copy:users:windows'], {
 	// 		cwd: dirContainingPackage,
 	// 		shell: true,
 	// 	})

@@ -4,7 +4,7 @@ This is a NestJS app that acts as the "go between" for frontend apps that want d
 
 # Running
 
-From repository root directory - `npm run start:dev`
+From repository root directory - `yarn start:dev`
 
 # Notes
 
