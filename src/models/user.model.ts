@@ -1,20 +1,27 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { ApiProperty } from '@nestjs/swagger'
 import moment, { utc } from 'moment'
 import { TIME_MILLIS_IN_DAY } from '../constants'
 
-class User {
+@ObjectType()
+export class User {
+	@Field()
 	@ApiProperty()
 	accountId: string
 
+	@Field((type) => Int)
 	@ApiProperty()
 	lastUpdated: number
 
+	@Field((type) => Int)
 	@ApiProperty()
 	masteryTotal: number
 
+	@Field()
 	@ApiProperty()
 	name: string
 
+	@Field()
 	@ApiProperty()
 	summonerId: string
 
@@ -50,5 +57,3 @@ class User {
 		return diff <= TIME_MILLIS_IN_DAY
 	}
 }
-
-export { User }
