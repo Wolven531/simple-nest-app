@@ -1,8 +1,11 @@
-import { Logger } from '@nestjs/common'
+import { HttpServer, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
+// import { GraphQLSchemaFactory } from '@nestjs/graphql'
+// import { GraphQLSchemaBuilder } from '@nestjs/graphql/dist/graphql-schema.builder'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { NextFunction, Request, Response } from 'express'
+// import { GraphQLSchema } from 'graphql'
 // import { readFileSync } from 'fs'
 // import { join, resolve } from 'path'
 // import compression from 'compression'
@@ -60,7 +63,10 @@ async function bootstrap() {
 		.build()
 	const document = SwaggerModule.createDocument(app, swaggerOptions)
 
-	logger.log(`Enabling Swagger documentation at "/${swaggerEndpoint}"...`, ctx)
+	logger.log(
+		`Enabling Swagger documentation at "/${swaggerEndpoint}"...`,
+		ctx,
+	)
 
 	SwaggerModule.setup(swaggerEndpoint, app, document)
 
@@ -109,6 +115,19 @@ async function bootstrap() {
 
 	logger.log(`Listening for NestJS app on port ${port}...`, ctx)
 
-	await app.listen(port)
+	const server: HttpServer = await app.listen(port)
+
+	// server.middl
+
+	// const apolloServer = new ApolloServer({
+	// schema: new GraphQLSchema({
+	// })
+	// schema: new GraphQLSchemaFactory()
+	// typeDefs,
+	// resolvers,
+	// plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+	// })
+
+	// await apolloServer.start()
 }
 bootstrap()
