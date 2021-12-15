@@ -1,0 +1,15 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  users: [User!]!
+}
+
+type User {
+  accountId: String!
+  lastUpdated: Int!
+  masteryTotal: Int!
+  name: String!
+  summonerId: String!
+}
