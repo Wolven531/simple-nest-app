@@ -1,11 +1,11 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql'
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql'
 import { ApiProperty } from '@nestjs/swagger'
 import moment, { utc } from 'moment'
 import { TIME_MILLIS_IN_DAY } from '../constants'
 
-@ObjectType()
+@ObjectType({ description: 'user ' })
 export class User {
-	@Field()
+	@Field((type) => ID)
 	@ApiProperty()
 	accountId: string
 
