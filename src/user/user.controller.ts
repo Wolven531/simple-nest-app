@@ -8,14 +8,14 @@ import {
 	Logger,
 	Param,
 	Post,
-	Query
+	Query,
 } from '@nestjs/common'
 import {
 	ApiExtraModels,
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
-	ApiTags
+	ApiTags,
 } from '@nestjs/swagger'
 import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
@@ -67,7 +67,9 @@ export class UserController {
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
 		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | addUser ')
 
-		if (this.userService.users.map((u) => u.summonerId).includes(summonerId)) {
+		if (
+			this.userService.users.map((u) => u.summonerId).includes(summonerId)
+		) {
 			this.logger.debug(
 				'user already in collection, not adding again',
 				' User-Ctrl | addUser ',
@@ -80,7 +82,7 @@ export class UserController {
 
 		this.userService.addUser({
 			accountId: summ.accountId,
-			lastUpdated: summ.revisionDate,
+			lastUpdated: new Date(summ.revisionDate),
 			// TODO - grab value from service
 			masteryTotal: 0,
 			name: summ.name,
@@ -99,7 +101,8 @@ export class UserController {
 			description: 'Riot API User Search Endpoint Docs',
 			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getSummonerById',
 		},
-		summary: 'Get user details by searching for them using their summoner ID',
+		summary:
+			'Get user details by searching for them using their summoner ID',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
@@ -140,7 +143,7 @@ export class UserController {
 				const masteryTotal = await this.masteryService.getMasteryTotal(
 					user.summonerId,
 				)
-				user.lastUpdated = Date.now()
+
 				user.masteryTotal = masteryTotal
 
 				return user
