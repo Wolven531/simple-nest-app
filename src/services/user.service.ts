@@ -93,12 +93,27 @@ export class UserService {
 				JSON.stringify(usersJsonData),
 			)
 
+			const serverNow = new Date(Date.now())
+
+			const updatedUsers = users.map((user) => {
+				user.lastUpdated = new Date(
+					serverNow.getUTCFullYear(),
+					serverNow.getUTCMonth(),
+					serverNow.getUTCDate(),
+					serverNow.getUTCHours(),
+					serverNow.getUTCMinutes(),
+					serverNow.getUTCSeconds(),
+				)
+
+				return user
+			})
+
 			this.logger.log(
-				`${users.length} users loaded from file`,
+				`${updatedUsers.length} users loaded from file`,
 				' loadUsersFromFile | user-svc ',
 			)
 
-			return users
+			return updatedUsers
 		} catch (e) {
 			this.logger.error(
 				`Failed to load users file; err=\n\n${e}\n`,
