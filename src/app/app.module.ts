@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { APP_INTERCEPTOR } from '@nestjs/core'
+import { GraphQLModule } from '@nestjs/graphql'
 // import { GraphQLModule } from '@nestjs/graphql'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
@@ -26,19 +27,20 @@ import { AppController } from './app.controller'
 		MatchlistModule, // contains matchlist endpoints
 		StatsModule, // contains stats endpoints
 		UserModule, // contains user endpoints
-		// GraphQLModule.forRoot({
-		// 	autoSchemaFile: join(__dirname, 'schema.gql'),
-		// 	// autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-		// 	debug: false,
-		// 	installSubscriptionHandlers: true,
-		// 	// path: 'gql',
-		// 	// playground: true,
-		// 	// resolver is provided through UserModule
-		// 	// resolvers: [UsersResolver],
-		// 	sortSchema: true,
-		// 	// plugins: [
-		// 	// ],
-		// }),
+		GraphQLModule.forRoot({
+			autoSchemaFile: 'schema.gql',
+			// 	autoSchemaFile: join(__dirname, 'schema.gql'),
+			// 	// autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+			// 	debug: false,
+			installSubscriptionHandlers: true,
+			// 	// path: 'gql',
+			// 	// playground: true,
+			// 	// resolver is provided through UserModule
+			// 	// resolvers: [UsersResolver],
+			// 	sortSchema: true,
+			// 	// plugins: [
+			// 	// ],
+		}),
 	],
 	providers: [
 		{
