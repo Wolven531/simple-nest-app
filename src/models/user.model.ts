@@ -9,9 +9,8 @@ export class User {
 	@ApiProperty()
 	accountId: string
 
-	@Field((type) => Int)
 	@ApiProperty()
-	lastUpdated: number
+	lastUpdated: Date
 
 	@Field((type) => Int)
 	@ApiProperty()
@@ -27,14 +26,14 @@ export class User {
 
 	/**
 	 * @param accountId - Encrypted account ID for the user
-	 * @param lastUpdated - UTC Timestamp of the last update run time for the user
+	 * @param lastUpdated - Date instance of the last update time for the user
 	 * @param masteryTotal - Total mastery points the user has earned
 	 * @param name - Friendly name of the user
 	 * @param summonerId - Simple summoner ID for the user
 	 */
 	constructor(
 		accountId: string,
-		lastUpdated: number,
+		lastUpdated: Date,
 		masteryTotal: number,
 		name: string,
 		summonerId: string,
