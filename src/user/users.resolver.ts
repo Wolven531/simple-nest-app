@@ -8,7 +8,7 @@ export class UsersResolver {
 	constructor(@Inject(UserService) private userService: UserService) {}
 
 	@Query((returns) => [User])
-	async users() {
+	async users(): Promise<User[]> {
 		return this.userService.users
 	}
 
