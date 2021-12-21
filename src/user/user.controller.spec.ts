@@ -13,7 +13,15 @@ import { UserController } from './user.controller'
 
 describe('UserController', () => {
 	const fakeMasteryTotal = 7
-	const fakeUpdated = new Date(2021, 7, 29).getTime()
+	const fakeUpdated = new Date(2021, 7, 29)
+	const fakeUtcUpdated = new Date(
+		fakeUpdated.getUTCFullYear(),
+		fakeUpdated.getUTCMonth(),
+		fakeUpdated.getUTCDate(),
+		fakeUpdated.getUTCHours(),
+		fakeUpdated.getUTCMinutes(),
+		fakeUpdated.getUTCSeconds(),
+	)
 
 	let controller: UserController
 	let testModule: TestingModule
@@ -23,7 +31,7 @@ describe('UserController', () => {
 	let userService: UserService
 
 	beforeEach(async () => {
-		jest.spyOn(Date, 'now').mockReturnValue(fakeUpdated)
+		jest.spyOn(Date, 'now').mockReturnValue(fakeUpdated.getTime())
 
 		testModule = await Test.createTestingModule({
 			controllers: [UserController],
@@ -32,7 +40,9 @@ describe('UserController', () => {
 				{
 					provide: MasteryService,
 					useFactory: () => ({
-						getMasteryTotal: jest.fn().mockResolvedValue(fakeMasteryTotal),
+						getMasteryTotal: jest
+							.fn()
+							.mockResolvedValue(fakeMasteryTotal),
 					}),
 				},
 				{
@@ -44,12 +54,7 @@ describe('UserController', () => {
 				},
 				{
 					provide: UserService,
-					useFactory: () => ({
-						addUser: jest.fn(),
-						getUserByFriendlyName: jest.fn(() => undefined),
-						loadUsersFromFile: jest.fn(() => []),
-						users: [],
-					}),
+					useClass: UserService, // instance has spies configured below
 				},
 				Logger,
 			],
@@ -59,6 +64,25 @@ describe('UserController', () => {
 		masteryService = testModule.get(MasteryService)
 		summonerService = testModule.get(SummonerService)
 		userService = testModule.get(UserService)
+
+		jest.spyOn(userService, 'addUser').mockImplementation(jest.fn())
+		jest.spyOn(userService, 'getUserByFriendlyName').mockReturnValue(
+			undefined,
+		)
+		jest.spyOn(userService as any, 'loadUsersFromFile').mockReturnValue([
+			{
+				accountId: 'asdf-1234-qwer',
+				lastUpdated: fakeUpdated,
+				summonerId: 'some-summoner-id',
+			},
+		] as User[])
+		jest.spyOn(userService, 'users', 'get').mockReturnValue([
+			{
+				accountId: 'asdf-1234-qwer',
+				lastUpdated: fakeUtcUpdated,
+				summonerId: 'some-summoner-id',
+			},
+		] as User[])
 	})
 
 	afterEach(async () => {
@@ -94,8 +118,9 @@ describe('UserController', () => {
 		// 	})
 
 		// 	it('invokes execFileSync(), does NOT throw error', () => {
-		// 		expect(mockExecFileSync).toHaveBeenCalledTimes(1)
 		// 		expect(capturedError).toBeUndefined()
+
+		// 		expect(mockExecFileSync).toHaveBeenCalledTimes(1)
 		// 		expect(resp).toBe('OK')
 		// 	})
 		// })
@@ -106,10 +131,6 @@ describe('UserController', () => {
 
 			beforeEach(async () => {
 				try {
-					;(userService as any)['users'] = [
-						{ summonerId: 'some-summoner-id' } as User,
-					]
-
 					resp = await controller.getUsers()
 				} catch (err) {
 					capturedError = err
@@ -117,11 +138,13 @@ describe('UserController', () => {
 			})
 
 			it('gets users from service w/ updated masteryTotal, does NOT throw error', () => {
-				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(1)
 				expect(capturedError).toBeUndefined()
+
+				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(1)
 				expect(resp).toEqual([
 					{
-						lastUpdated: fakeUpdated,
+						accountId: 'asdf-1234-qwer',
+						lastUpdated: fakeUtcUpdated,
 						masteryTotal: fakeMasteryTotal,
 						summonerId: 'some-summoner-id',
 					} as User,
@@ -151,22 +174,26 @@ describe('UserController', () => {
 				try {
 					// jest.spyOn(testModule.get(HttpService), 'get')
 					// 	.mockImplementation(mockHttpServiceGet)
-					jest
-						.spyOn(summonerService, 'searchByName')
-						.mockImplementation(mockSearchByName)
+					jest.spyOn(
+						summonerService,
+						'searchByName',
+					).mockImplementation(mockSearchByName)
 
-					resp = await controller.searchSummoners('nameForWhichToSearch')
+					resp = await controller.searchSummoners(
+						'nameForWhichToSearch',
+					)
 				} catch (err) {
 					capturedError = err
 				}
 			})
 
 			it('invokes SummonerService.searchByName(), does NOT throw error', () => {
+				expect(capturedError).toBeUndefined()
+
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)
 				expect(mockSearchByName).toHaveBeenLastCalledWith(
 					'nameForWhichToSearch',
 				)
-				expect(capturedError).toBeUndefined()
 				expect(resp).toEqual({
 					masteryTotal: fakeMasteryTotal,
 					name: 'nameForWhichToSearch',
@@ -185,9 +212,10 @@ describe('UserController', () => {
 				)
 
 				try {
-					jest
-						.spyOn(summonerService, 'searchByName')
-						.mockImplementation(mockSearchByName)
+					jest.spyOn(
+						summonerService,
+						'searchByName',
+					).mockImplementation(mockSearchByName)
 
 					resp = await controller.searchSummoners('Míyukí')
 				} catch (err) {
@@ -196,9 +224,12 @@ describe('UserController', () => {
 			})
 
 			it('invokes SummonerService.searchByName() w/ encoded value, does NOT throw error', () => {
-				expect(mockSearchByName).toHaveBeenCalledTimes(1)
-				expect(mockSearchByName).toHaveBeenLastCalledWith('M%C3%ADyuk%C3%AD')
 				expect(capturedError).toBeUndefined()
+
+				expect(mockSearchByName).toHaveBeenCalledTimes(1)
+				expect(mockSearchByName).toHaveBeenLastCalledWith(
+					'M%C3%ADyuk%C3%AD',
+				)
 				expect(resp).toEqual({ name: 'Míyukí' } as Summoner)
 			})
 		})
@@ -209,27 +240,31 @@ describe('UserController', () => {
 			let resp: Summoner | null
 
 			beforeEach(async () => {
-				mockGetSummonerById = jest
-					.fn()
-					.mockResolvedValue({ id: 'id-that-was-searched' } as Summoner)
+				mockGetSummonerById = jest.fn().mockResolvedValue({
+					id: 'id-that-was-searched',
+				} as Summoner)
 
 				try {
-					jest
-						.spyOn(summonerService, 'getSummonerById')
-						.mockImplementation(mockGetSummonerById)
+					jest.spyOn(
+						summonerService,
+						'getSummonerById',
+					).mockImplementation(mockGetSummonerById)
 
-					resp = await controller.getSummonerById('id-that-was-searched')
+					resp = await controller.getSummonerById(
+						'id-that-was-searched',
+					)
 				} catch (err) {
 					capturedError = err
 				}
 			})
 
 			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
+				expect(capturedError).toBeUndefined()
+
 				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
 				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
 					'id-that-was-searched',
 				)
-				expect(capturedError).toBeUndefined()
 				expect(resp).toEqual({ id: 'id-that-was-searched' } as Summoner)
 			})
 		})
@@ -241,13 +276,14 @@ describe('UserController', () => {
 			let resp: User[]
 
 			beforeEach(async () => {
-				mockGetSummonerById = jest
-					.fn()
-					.mockResolvedValue({ id: 'user-that-is-being-added' } as Summoner)
+				mockGetSummonerById = jest.fn().mockResolvedValue({
+					id: 'user-that-is-being-added',
+				} as Summoner)
 
-				jest
-					.spyOn(summonerService, 'getSummonerById')
-					.mockImplementation(mockGetSummonerById)
+				jest.spyOn(
+					summonerService,
+					'getSummonerById',
+				).mockImplementation(mockGetSummonerById)
 
 				spyAddUser = jest.spyOn(userService, 'addUser')
 
@@ -259,14 +295,14 @@ describe('UserController', () => {
 			})
 
 			it('invokes SummonerService.getSummonerById(), does NOT throw error', () => {
+				expect(capturedError).toBeUndefined()
+
 				expect(mockGetSummonerById).toHaveBeenCalledTimes(1)
 				expect(mockGetSummonerById).toHaveBeenLastCalledWith(
 					'user-that-is-being-added',
 				)
 
 				expect(spyAddUser).toHaveBeenCalledTimes(1)
-
-				expect(capturedError).toBeUndefined()
 			})
 		})
 	})
