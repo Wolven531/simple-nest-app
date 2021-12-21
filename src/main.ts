@@ -1,4 +1,4 @@
-import { HttpServer, Logger } from '@nestjs/common'
+import { HttpServer, Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 // import { GraphQLSchemaFactory } from '@nestjs/graphql'
@@ -46,6 +46,8 @@ async function bootstrap() {
 
 		next()
 	})
+
+	app.useGlobalPipes(new ValidationPipe())
 
 	logger.log('Creating OpenAPI Document...', ctx)
 
@@ -130,4 +132,5 @@ async function bootstrap() {
 
 	// await apolloServer.start()
 }
+
 bootstrap()
