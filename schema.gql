@@ -2,14 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Query {
-  users: [User!]!
-}
-
+"""user """
 type User {
-  accountId: String!
+  accountId: ID!
   lastUpdated: Int!
   masteryTotal: Int!
   name: String!
   summonerId: String!
+}
+
+type Query {
+  users: [User!]!
 }
