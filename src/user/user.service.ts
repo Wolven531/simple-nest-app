@@ -15,8 +15,9 @@ export class UserService {
 	constructor(
 		@Inject(Logger)
 		private readonly logger: Logger,
+		initialData?: User[],
 	) {
-		this._users = this.loadUsersFromFile()
+		this._users = initialData ?? this.loadUsersFromFile()
 	}
 
 	get users(): User[] {
