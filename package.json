@@ -2,6 +2,9 @@
 	"name": "simple-nest-app",
 	"version": "0.3.0",
 	"description": "",
+	"engines": {
+		"node": ">=16.12.0"
+	},
 	"author": {
 		"email": "anthony.williams.cs@gmail.com",
 		"name": "Anthony Williams",
