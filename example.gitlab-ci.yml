@@ -1,0 +1,60 @@
+# Inspiration - https://gitlab.com/jhechtf/fastify-esm-autoload/-/blob/master/.gitlab-ci.yml
+
+image: node:12-alpine
+stages:
+    - lint
+    - test
+    - release
+    - publish
+
+cache:
+    paths:
+        - node_modules/
+
+before_script:
+    - yarn --frozen-lockfile
+
+Lint:
+    stage: lint
+    only:
+        - branches
+    except:
+        - master
+    script:
+        - yarn lint
+
+Test:
+    stage: test
+    only:
+        - branches
+    except:
+        - master
+    script:
+        - yarn test
+
+Release:
+    stage: release
+    when: manual
+    only:
+        - master
+    except:
+        - tags
+    before_script:
+        - apk add --update git && yarn --frozen-lockfile
+    script:
+        - git config user.email $GITLAB_USER_EMAIL
+        - git config user.name $GITLAB_USER_NAME
+        - yarn release
+        - CUR_REVISION=$(git rev-parse HEAD)
+        - git checkout master && git merge $CUR_REVISION
+        - git push --follow-tags "https://${GITLAB_USER_LOGIN}:${GL_PAT}@gitlab.com/jhechtf/fastify-esm-autoload.git" HEAD:master
+
+Deploy:
+    stage: publish
+    only:
+        - tags
+    script:
+        - npm set "//registry.npmjs.org/:_authToken" ${NPM_TOKEN}
+        - npm config set strict-ssl false
+        - npm publish
+    when: manual
