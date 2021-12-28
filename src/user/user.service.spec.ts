@@ -196,7 +196,13 @@ describe('User Service', () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [],
-			providers: [UserService, Logger],
+			providers: [
+				{
+					provide: UserService,
+					useFactory: () => new UserService(new Logger()),
+				},
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(UserService)

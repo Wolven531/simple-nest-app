@@ -14,14 +14,25 @@ import { UserController } from './user.controller'
 describe('UserController', () => {
 	const fakeMasteryTotal = 7
 	const fakeUpdated = new Date(2021, 7, 29)
-	const fakeUtcUpdated = new Date(
-		fakeUpdated.getUTCFullYear(),
-		fakeUpdated.getUTCMonth(),
-		fakeUpdated.getUTCDate(),
-		fakeUpdated.getUTCHours(),
-		fakeUpdated.getUTCMinutes(),
-		fakeUpdated.getUTCSeconds(),
-	)
+	// TODO - use fakeUtcUpdated value for UTC testing
+	// const fakeUtcUpdated = new Date(
+	// 	fakeUpdated.getUTCFullYear(),
+	// 	fakeUpdated.getUTCMonth(),
+	// 	fakeUpdated.getUTCDate(),
+	// 	fakeUpdated.getUTCHours(),
+	// 	fakeUpdated.getUTCMinutes(),
+	// 	fakeUpdated.getUTCSeconds(),
+	// )
+	const fakeUsers: User[] = [
+		{
+			accountId: 'asdf-1234-qwer',
+			isFresh: true,
+			lastUpdated: fakeUpdated,
+			masteryTotal: 17,
+			name: 'some user',
+			summonerId: 'some-summoner-id',
+		},
+	]
 
 	let controller: UserController
 	let testModule: TestingModule
@@ -54,7 +65,7 @@ describe('UserController', () => {
 				},
 				{
 					provide: UserService,
-					useClass: UserService, // instance has spies configured below
+					useFactory: () => new UserService(new Logger(), fakeUsers),
 				},
 				Logger,
 			],
@@ -69,20 +80,6 @@ describe('UserController', () => {
 		jest.spyOn(userService, 'getUserByFriendlyName').mockReturnValue(
 			undefined,
 		)
-		jest.spyOn(userService as any, 'loadUsersFromFile').mockReturnValue([
-			{
-				accountId: 'asdf-1234-qwer',
-				lastUpdated: fakeUpdated,
-				summonerId: 'some-summoner-id',
-			},
-		] as User[])
-		jest.spyOn(userService, 'users', 'get').mockReturnValue([
-			{
-				accountId: 'asdf-1234-qwer',
-				lastUpdated: fakeUtcUpdated,
-				summonerId: 'some-summoner-id',
-			},
-		] as User[])
 	})
 
 	afterEach(async () => {
@@ -129,26 +126,35 @@ describe('UserController', () => {
 			let capturedError: Error
 			let resp: User[]
 
-			beforeEach(async () => {
-				try {
-					resp = await controller.getUsers()
-				} catch (err) {
-					capturedError = err
-				}
+			beforeEach((done) => {
+				controller
+					.getUsers()
+					.then((users) => {
+						resp = users
+					})
+					.catch((err) => {
+						capturedError = err
+					})
+					.finally(() => {
+						done()
+					})
 			})
 
 			it('gets users from service w/ updated masteryTotal, does NOT throw error', () => {
 				expect(capturedError).toBeUndefined()
 
-				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(1)
-				expect(resp).toEqual([
-					{
-						accountId: 'asdf-1234-qwer',
-						lastUpdated: fakeUtcUpdated,
+				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(
+					fakeUsers.length,
+				)
+
+				expect(resp).toEqual(
+					fakeUsers.map((u) => ({
+						...u,
+						// TODO - ensure User.lastUpdated gets updated
+						// lastUpdated: fakeUtcUpdated,
 						masteryTotal: fakeMasteryTotal,
-						summonerId: 'some-summoner-id',
-					} as User,
-				])
+					})),
+				)
 			})
 		})
 
