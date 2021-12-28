@@ -31,8 +31,8 @@ import { AppController } from './app.controller'
 			// path: 'graphql',
 			// playground: { endpoint: 'playground' },
 			// plugins: [],
-			// resolvers are provided through modules (e.g. UsersResolver in UserModule)
-			// resolvers: [UsersResolver],
+			// resolvers are provided through modules (e.g. UserResolver in UserModule)
+			// resolvers: [UserResolver],
 			sortSchema: true,
 		}),
 	],

@@ -3,10 +3,10 @@ import { Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { UserService } from '../services/user.service'
+import { UserService } from './user.service'
 import { SharedModule } from '../shared'
 import { UserController } from './user.controller'
-import { UsersResolver } from './users.resolver'
+import { UserResolver } from './user.resolver'
 
 @Module({
 	controllers: [UserController],
@@ -15,7 +15,7 @@ import { UsersResolver } from './users.resolver'
 		ConfigService,
 		MasteryService,
 		SummonerService,
-		UsersResolver,
+		UserResolver,
 		UserService,
 		Logger,
 	],

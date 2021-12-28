@@ -8,7 +8,7 @@ import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { UserService } from '../services/user.service'
+import { UserService } from './user.service'
 import { UserController } from './user.controller'
 
 describe('UserController', () => {
