@@ -15,9 +15,8 @@ export class UserService {
 	constructor(
 		@Inject(Logger)
 		private readonly logger: Logger,
-		initialData?: User[],
 	) {
-		this._users = initialData ?? this.loadUsersFromFile()
+		this.setup()
 	}
 
 	get users(): User[] {
@@ -53,6 +52,16 @@ export class UserService {
 		)
 
 		return this.users.find((u) => u.name.toLowerCase() === searchKey)
+	}
+
+	/**
+	 * This method uses either optional provided data or the loadUsersFromFile method to populate the service;
+	 * NOTE - overwrites current users value
+	 *
+	 * @param data Collection of users to use for this service
+	 */
+	setup(data?: User[]) {
+		this._users = data ?? this.loadUsersFromFile()
 	}
 
 	/**
