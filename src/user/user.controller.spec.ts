@@ -63,10 +63,7 @@ describe('UserController', () => {
 						searchByName: jest.fn().mockResolvedValue(undefined),
 					}),
 				},
-				{
-					provide: UserService,
-					useFactory: () => new UserService(new Logger(), fakeUsers),
-				},
+				UserService,
 				Logger,
 			],
 		}).compile()
@@ -75,6 +72,8 @@ describe('UserController', () => {
 		masteryService = testModule.get(MasteryService)
 		summonerService = testModule.get(SummonerService)
 		userService = testModule.get(UserService)
+
+		userService.setup(fakeUsers)
 
 		jest.spyOn(userService, 'addUser').mockImplementation(jest.fn())
 		jest.spyOn(userService, 'getUserByFriendlyName').mockReturnValue(

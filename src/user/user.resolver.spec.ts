@@ -24,18 +24,13 @@ describe('UserResolver', () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [],
-			providers: [
-				UserResolver,
-				{
-					provide: UserService,
-					useFactory: () => new UserService(new Logger(), fakeUsers),
-				},
-				Logger,
-			],
+			providers: [UserResolver, UserService, Logger],
 		}).compile()
 
 		service = testModule.get(UserService)
 		resolver = testModule.get(UserResolver)
+
+		service.setup(fakeUsers)
 	})
 
 	afterEach(async () => {
