@@ -1,10 +1,12 @@
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { User } from '../models/user.model'
+import { MasteryService } from '../services/mastery.service'
 import { UserResolver } from './user.resolver'
 import { UserService } from './user.service'
 
 describe('UserResolver', () => {
+	const fakeMasteryTotal = 7
 	const fakeUpdated = new Date(2021, 7, 29)
 	const fakeUsers: User[] = [
 		{
@@ -24,7 +26,19 @@ describe('UserResolver', () => {
 		testModule = await Test.createTestingModule({
 			controllers: [],
 			imports: [],
-			providers: [UserResolver, UserService, Logger],
+			providers: [
+				UserResolver,
+				{
+					provide: MasteryService,
+					useFactory: () => ({
+						getMasteryTotal: jest
+							.fn()
+							.mockResolvedValue(fakeMasteryTotal),
+					}),
+				},
+				UserService,
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(UserService)
@@ -58,7 +72,12 @@ describe('UserResolver', () => {
 		it('returns expected collection of user objects w/o error', () => {
 			expect(error).toBeUndefined()
 
-			expect(result).toEqual(fakeUsers)
+			expect(result).toEqual(
+				fakeUsers.map((user) => ({
+					...user,
+					masteryTotal: fakeMasteryTotal,
+				})),
+			)
 		})
 	})
 })
