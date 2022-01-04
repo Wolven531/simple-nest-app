@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { GraphQLModule } from '@nestjs/graphql'
+import { CompositeModule } from '../composite/composite.module'
 import { ConfigurationModule } from '../config'
 import { HealthModule } from '../health'
 import { HttpRequestInterceptor } from '../http-request.interceptor'
@@ -24,6 +25,7 @@ import { AppController } from './app.controller'
 		MatchlistModule, // contains matchlist endpoints
 		StatsModule, // contains stats endpoints
 		UserModule, // contains user endpoints
+		CompositeModule,
 		GraphQLModule.forRoot({
 			autoSchemaFile: 'schema.gql',
 			// debug: false,
