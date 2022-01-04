@@ -1,5 +1,6 @@
 import { Inject, Logger } from '@nestjs/common'
 import { Query, Resolver } from '@nestjs/graphql'
+import { UserMasteryService } from '../composite/user-mastery.service'
 import { User } from '../models/user.model'
 import { MasteryService } from '../services/mastery.service'
 import { UserService } from './user.service'
@@ -7,31 +8,17 @@ import { UserService } from './user.service'
 @Resolver((of) => User)
 export class UserResolver {
 	constructor(
-		@Inject(MasteryService)
-		private readonly masteryService: MasteryService,
-		@Inject(UserService)
-		private readonly userService: UserService,
+		@Inject(UserMasteryService)
+		private readonly userMasteryService: UserMasteryService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
 
 	@Query((returns) => [User])
 	async users(): Promise<User[]> {
-		this.logger.debug('', ' User-Resolver | getUsers ')
+		this.logger.debug('', ' User-Resolver | users ')
 
-		const updatedUsers = Promise.all(
-			this.userService.users.map(async (user) => {
-				const masteryTotal = await this.masteryService.getMasteryTotal(
-					user.summonerId,
-				)
-
-				user.masteryTotal = masteryTotal
-
-				return user
-			}),
-		)
-
-		return updatedUsers
+		return this.userMasteryService.getUsersWithMastery()
 	}
 
 	//   @Query(returns => User)
