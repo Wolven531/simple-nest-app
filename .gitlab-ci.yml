@@ -13,41 +13,47 @@ image: node:16.12.0
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ee/ci/yaml/README.html#cache
-cache:
-    paths:
-        - node_modules/
+# cache:
+#     paths:
+#         - coverage/
+#         - dist/
+#         - node_modules/
 
 stages:
     - build
     - test
-    - run
+    # - run
 
-# build_app:
-#   stage: build
-#   script:
-#     - yarn
-#     - yarn prebuild
-#     - yarn build
-
-run_unit_tests:
-    stage: test
+build_app:
+    artifacts:
+        - dist/
+        - node_modules/
+    stage: build
     script:
         - yarn
+        - yarn prebuild
+        - yarn build
+
+run_unit_tests:
+    artifacts:
+        - coverage/
+    dependencies: 'build_app'
+    stage: test
+    script:
         # - node ./specs/start.js ./specs/async.spec.js
         - yarn test
-
 # run_app:
 #   stage: run
 #   script:
 #     - yarn start:prod
 
-build_and_run_app:
-    stage: run
-    script:
-        - yarn
-        - yarn prebuild
-        - yarn build
-        - yarn start:prod
+# build_and_run_app:
+#     stage: run
+#     script:
+#         - yarn
+#         - yarn prebuild
+#         - yarn build
+#         - yarn start:prod
 # test_db:
 #   script:
 #     - yarn
