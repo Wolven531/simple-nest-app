@@ -7,6 +7,7 @@ import { UserService } from './user.service'
 import { SharedModule } from '../shared'
 import { UserController } from './user.controller'
 import { UserResolver } from './user.resolver'
+import { UserMasteryService } from '../composite/user-mastery.service'
 
 @Module({
 	controllers: [UserController],
@@ -17,6 +18,7 @@ import { UserResolver } from './user.resolver'
 		SummonerService,
 		UserResolver,
 		UserService,
+		UserMasteryService,
 		Logger,
 	],
 })
