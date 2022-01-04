@@ -26,8 +26,10 @@ stages:
 
 build_app:
     artifacts:
-        - 'dist/'
-        - 'node_modules/'
+        paths:
+            - dist/
+            - node_modules/
+        expire_in: 1 week
     stage: build
     script:
         - yarn
@@ -36,9 +38,11 @@ build_app:
 
 run_unit_tests:
     artifacts:
-        - 'coverage/'
+        paths:
+            - coverage/
+        expire_in: 1 week
     dependencies:
-        - 'build_app'
+        - build_app
     stage: test
     script:
         # - node ./specs/start.js ./specs/async.spec.js
