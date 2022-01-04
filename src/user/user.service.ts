@@ -5,9 +5,10 @@ import { deserializeArray } from 'class-transformer'
 // import { ENCODING_UTF8 } from '../constants'
 import * as usersJsonData from '../data/users.json'
 import { User } from '../models/user.model'
+import { IUserService } from '../types'
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
 	// private readonly DIRECTORY_DATA = 'data'
 	// private readonly FILENAME_USERS = 'users.json'
 	private _users: User[]
@@ -17,10 +18,6 @@ export class UserService {
 		private readonly logger: Logger,
 	) {
 		this.setup()
-	}
-
-	get users(): User[] {
-		return this._users
 	}
 
 	/**
@@ -43,7 +40,7 @@ export class UserService {
 	 * @param friendlyName String value (case insensitive) to use when searching for a User
 	 * @returns The User instance whose name property matches `friendlyName`; undefined if there are no matches
 	 */
-	getUserByFriendlyName(friendlyName: string): User | undefined {
+	getUserByFriendlyName(friendlyName: string): Promise<User | undefined> {
 		const searchKey = friendlyName.toLowerCase()
 
 		this.logger.log(
@@ -51,7 +48,13 @@ export class UserService {
 			' getUserByFriendlyName | user-svc ',
 		)
 
-		return this.users.find((u) => u.name.toLowerCase() === searchKey)
+		return Promise.resolve(
+			this._users.find((u) => u.name.toLowerCase() === searchKey),
+		)
+	}
+
+	getUsers(): Promise<User[]> {
+		return Promise.resolve(this._users)
 	}
 
 	/**

@@ -223,14 +223,16 @@ describe('User Service', () => {
 				name: 'name 1',
 				summonerId: 'summ-id',
 			} as User
+			let actualResult: User[]
 
-			beforeEach(() => {
+			beforeEach(async () => {
 				jest.spyOn(
 					service as any,
 					'loadUsersFromFile',
 				).mockImplementation(() => jest.fn().mockReturnValue([]))
 
 				service.addUser(fakeUser)
+				actualResult = await service.getUsers()
 			})
 
 			afterEach(() => {
@@ -238,7 +240,7 @@ describe('User Service', () => {
 			})
 
 			it('adds user to collection of users in service', () => {
-				expect(service.users).toContain(fakeUser)
+				expect(actualResult).toContain(fakeUser)
 			})
 		})
 
@@ -246,34 +248,18 @@ describe('User Service', () => {
 			({ expectedResult, mockLoadedUsers, name, param }) => {
 				describe(`w/ mockLoadedUsers (${name})`, () => {
 					beforeEach(() => {
-						jest.spyOn(
-							service as any,
-							'users',
-							'get',
-						).mockReturnValue(mockLoadedUsers)
-
-						// TODO - not sure why below does not work...
-						// jest
-						// 	.spyOn(service as any, 'loadUsersFromFile')
-						// 	.mockReturnValue(mockLoadedUsers)
-					})
-
-					afterEach(() => {
-						jest.spyOn(
-							service as any,
-							'loadUsersFromFile',
-						).mockRestore()
+						service.setup(mockLoadedUsers)
 					})
 
 					describe(`invoke getUserByFriendlyName("${param}")`, () => {
-						let actualResult: User | undefined
+						let result: User | undefined
 
-						beforeEach(() => {
-							actualResult = service.getUserByFriendlyName(param)
+						beforeEach(async () => {
+							result = await service.getUserByFriendlyName(param)
 						})
 
 						it('invokes log, error correctly and returns expected result', () => {
-							expect(actualResult).toEqual(expectedResult)
+							expect(result).toEqual(expectedResult)
 						})
 					})
 				})
