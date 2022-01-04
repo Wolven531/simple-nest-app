@@ -26,8 +26,8 @@ stages:
 
 build_app:
     artifacts:
-        - dist/
-        - node_modules/
+        - 'dist/'
+        - 'node_modules/'
     stage: build
     script:
         - yarn
@@ -36,8 +36,9 @@ build_app:
 
 run_unit_tests:
     artifacts:
-        - coverage/
-    dependencies: 'build_app'
+        - 'coverage/'
+    dependencies:
+        - 'build_app'
     stage: test
     script:
         # - node ./specs/start.js ./specs/async.spec.js
