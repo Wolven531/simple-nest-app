@@ -18,7 +18,6 @@ cache:
         - node_modules/
         # - coverage/
         # - dist/
-    expire_in: 1 day
 
 stages:
     - build
