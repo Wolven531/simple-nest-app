@@ -6,10 +6,9 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
-import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { UserService } from './user.service'
 import { UserController } from './user.controller'
+import { UserMasteryService } from '../composite/user-mastery.service'
 
 describe('UserController', () => {
 	const fakeMasteryTotal = 7
@@ -37,9 +36,8 @@ describe('UserController', () => {
 	let controller: UserController
 	let testModule: TestingModule
 
-	let masteryService: MasteryService
 	let summonerService: SummonerService
-	let userService: UserService
+	let userMasteryService: UserMasteryService
 
 	beforeEach(async () => {
 		jest.spyOn(Date, 'now').mockReturnValue(fakeUpdated.getTime())
@@ -49,36 +47,36 @@ describe('UserController', () => {
 			imports: [HttpModule],
 			providers: [
 				{
-					provide: MasteryService,
-					useFactory: () => ({
-						getMasteryTotal: jest
-							.fn()
-							.mockResolvedValue(fakeMasteryTotal),
-					}),
-				},
-				{
 					provide: SummonerService,
 					useFactory: () => ({
 						getSummonerById: jest.fn().mockResolvedValue(undefined),
 						searchByName: jest.fn().mockResolvedValue(undefined),
 					}),
 				},
-				UserService,
+				{
+					provide: UserMasteryService,
+					useFactory: () =>
+						({
+							addUser: jest.fn(),
+							getUserByFriendlyName: jest
+								.fn()
+								.mockResolvedValue(undefined),
+							getUsers: jest.fn().mockResolvedValue(fakeUsers),
+							getUsersWithMastery: jest.fn().mockResolvedValue(
+								fakeUsers.map((user) => ({
+									...user,
+									masteryTotal: fakeMasteryTotal,
+								})),
+							),
+						} as Partial<UserMasteryService>),
+				},
 				Logger,
 			],
 		}).compile()
 
 		controller = testModule.get(UserController)
-		masteryService = testModule.get(MasteryService)
 		summonerService = testModule.get(SummonerService)
-		userService = testModule.get(UserService)
-
-		userService.setup(fakeUsers)
-
-		jest.spyOn(userService, 'addUser').mockImplementation(jest.fn())
-		jest.spyOn(userService, 'getUserByFriendlyName').mockReturnValue(
-			undefined,
-		)
+		userMasteryService = testModule.get(UserMasteryService)
 	})
 
 	afterEach(async () => {
@@ -142,9 +140,9 @@ describe('UserController', () => {
 			it('gets users from service w/ updated masteryTotal, does NOT throw error', () => {
 				expect(capturedError).toBeUndefined()
 
-				expect(masteryService.getMasteryTotal).toHaveBeenCalledTimes(
-					fakeUsers.length,
-				)
+				expect(
+					userMasteryService.getUsersWithMastery,
+				).toHaveBeenCalledTimes(1)
 
 				expect(resp).toEqual(
 					fakeUsers.map((u) => ({
@@ -290,7 +288,7 @@ describe('UserController', () => {
 					'getSummonerById',
 				).mockImplementation(mockGetSummonerById)
 
-				spyAddUser = jest.spyOn(userService, 'addUser')
+				spyAddUser = jest.spyOn(userMasteryService, 'addUser')
 
 				try {
 					resp = await controller.addUser('user-that-is-being-added')

@@ -17,6 +17,7 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger'
+import { UserMasteryService } from '../composite/user-mastery.service'
 import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
@@ -31,12 +32,10 @@ import { UserService } from './user.service'
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject(MasteryService)
-		private readonly masteryService: MasteryService,
 		@Inject(SummonerService)
 		private readonly summonerService: SummonerService,
-		@Inject(UserService)
-		private readonly userService: UserService,
+		@Inject(UserMasteryService)
+		private readonly userMasteryService: UserMasteryService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -67,20 +66,20 @@ export class UserController {
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
 		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | addUser ')
 
-		if (
-			this.userService.users.map((u) => u.summonerId).includes(summonerId)
-		) {
+		const users = await this.userMasteryService.getUsers()
+
+		if (users.map((u) => u.summonerId).includes(summonerId)) {
 			this.logger.debug(
 				'user already in collection, not adding again',
 				' User-Ctrl | addUser ',
 			)
 
-			return this.userService.users
+			return users
 		}
 
 		const summ = await this.summonerService.getSummonerById(summonerId)
 
-		this.userService.addUser({
+		this.userMasteryService.addUser({
 			accountId: summ.accountId,
 			lastUpdated: new Date(summ.revisionDate),
 			// TODO - grab value from service
@@ -91,7 +90,7 @@ export class UserController {
 
 		this.logger.debug('added user to collection', ' User-Ctrl | addUser ')
 
-		return this.userService.users
+		return this.userMasteryService.getUsers()
 	}
 
 	@Get('get/:summonerId')
@@ -138,19 +137,7 @@ export class UserController {
 	getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		const updatedUsers = Promise.all(
-			this.userService.users.map(async (user) => {
-				const masteryTotal = await this.masteryService.getMasteryTotal(
-					user.summonerId,
-				)
-
-				user.masteryTotal = masteryTotal
-
-				return user
-			}),
-		)
-
-		return updatedUsers
+		return this.userMasteryService.getUsersWithMastery()
 	}
 
 	@Get('search')
