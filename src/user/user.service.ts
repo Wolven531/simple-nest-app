@@ -73,11 +73,11 @@ export class UserService implements IUserService {
 	): Promise<Summoner | undefined> {
 		const apiKey = this.appService.getRiotToken()
 
-		const searchKey = friendlyName.toLowerCase()
+		const encodedSearchKey = encodeURI(friendlyName)
 
 		return firstValueFrom(
 			this.httpService.get(
-				`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${searchKey}`,
+				`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${encodedSearchKey}`,
 				{
 					headers: {
 						'Accept-Charset':
