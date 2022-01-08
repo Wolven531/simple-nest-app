@@ -226,17 +226,10 @@ describe('User Service', () => {
 			let actualResult: User[]
 
 			beforeEach(async () => {
-				jest.spyOn(
-					service as any,
-					'loadUsersFromFile',
-				).mockImplementation(() => jest.fn().mockReturnValue([]))
+				service.setup([])
 
 				service.addUser(fakeUser)
 				actualResult = await service.getUsers()
-			})
-
-			afterEach(() => {
-				jest.spyOn(service as any, 'loadUsersFromFile').mockRestore()
 			})
 
 			it('adds user to collection of users in service', () => {

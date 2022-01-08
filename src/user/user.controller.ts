@@ -23,9 +23,7 @@ import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
-import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { UserService } from './user.service'
 
 @ApiTags('user')
 @ApiExtraModels(Summoner, User)
@@ -60,7 +58,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('add', 'server')
+	@ApiTags('addUser')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
@@ -112,7 +110,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('summoner')
+	@ApiTags('getSummonerById')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getSummonerById(
@@ -131,7 +129,7 @@ export class UserController {
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
 	})
-	@ApiTags('server')
+	@ApiTags('getUsers')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getUsers(): Promise<User[]> {
@@ -160,7 +158,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('name', 'summoner')
+	@ApiTags('searchSummoners')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	searchSummoners(

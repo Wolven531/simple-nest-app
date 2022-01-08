@@ -51,7 +51,7 @@ describe('UserResolver', () => {
 
 	describe('invoke users()', () => {
 		let result: User[]
-		let error: any
+		let error: Error
 
 		beforeEach((done) => {
 			resolver
@@ -69,6 +69,8 @@ describe('UserResolver', () => {
 
 		it('returns expected collection of user objects w/o error', () => {
 			expect(error).toBeUndefined()
+
+			expect(service.getUsersWithMastery).toBeCalledTimes(1)
 
 			expect(result).toEqual(fakeUsers)
 		})
