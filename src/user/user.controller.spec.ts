@@ -68,6 +68,9 @@ describe('UserController', () => {
 									masteryTotal: fakeMasteryTotal,
 								})),
 							),
+							lookupSummonerByFriendlyName: jest
+								.fn()
+								.mockResolvedValue({ ...fakeUsers[0] }),
 						} as Partial<UserMasteryService>),
 				},
 				Logger,
@@ -178,8 +181,8 @@ describe('UserController', () => {
 					// jest.spyOn(testModule.get(HttpService), 'get')
 					// 	.mockImplementation(mockHttpServiceGet)
 					jest.spyOn(
-						summonerService,
-						'searchByName',
+						userMasteryService,
+						'lookupSummonerByFriendlyName',
 					).mockImplementation(mockSearchByName)
 
 					resp = await controller.searchSummoners(
@@ -190,7 +193,7 @@ describe('UserController', () => {
 				}
 			})
 
-			it('invokes SummonerService.searchByName(), does NOT throw error', () => {
+			it('invokes UserMasteryService.lookupSummonerByFriendlyName(), does NOT throw error', () => {
 				expect(capturedError).toBeUndefined()
 
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)
@@ -216,8 +219,8 @@ describe('UserController', () => {
 
 				try {
 					jest.spyOn(
-						summonerService,
-						'searchByName',
+						userMasteryService,
+						'lookupSummonerByFriendlyName',
 					).mockImplementation(mockSearchByName)
 
 					resp = await controller.searchSummoners('Míyukí')
@@ -226,7 +229,7 @@ describe('UserController', () => {
 				}
 			})
 
-			it('invokes SummonerService.searchByName() w/ encoded value, does NOT throw error', () => {
+			it('invokes UserMasteryService.lookupSummonerByFriendlyName() w/ encoded value, does NOT throw error', () => {
 				expect(capturedError).toBeUndefined()
 
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)

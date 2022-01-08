@@ -8,6 +8,7 @@ import { AppService } from '../services/app.service'
 import { UserService } from './user.service'
 import { AxiosResponse } from '@nestjs/common/node_modules/axios'
 import { REGION } from '../constants'
+import { Summoner } from '../models/summoner.model'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
@@ -197,11 +198,21 @@ describe('User Service', () => {
 	const fakeAPIKey = 'some-api-key'
 	const fakeUser: User = {
 		accountId: 'account-id',
+		isFresh: true,
 		lastUpdated: new Date(2021, 7, 1),
 		masteryTotal: 1,
 		name: 'name 1',
 		summonerId: 'summ-id',
-	} as User
+	}
+	const fakeSummoner: Summoner = {
+		accountId: 'account-id-2',
+		id: 'id2',
+		name: 'some summoner',
+		profileIconId: 13,
+		puuid: 'puuid-2',
+		revisionDate: 1,
+		summonerLevel: 1,
+	}
 	let service: UserService
 	let testModule: TestingModule
 	let mockGetRiotToken: jest.Mock
@@ -213,10 +224,10 @@ describe('User Service', () => {
 			() =>
 				from(
 					Promise.resolve({
-						data: fakeUser,
+						data: fakeSummoner,
 						status: HttpStatus.OK,
 					}),
-				) as Observable<AxiosResponse<User>>,
+				) as Observable<AxiosResponse<Summoner>>,
 		)
 
 		testModule = await Test.createTestingModule({
@@ -269,12 +280,12 @@ describe('User Service', () => {
 			})
 		})
 
-		describe('invoke lookupUserByFriendlyName() w/ capitalized version of name', () => {
-			let actualResult: User | undefined
+		describe('invoke lookupSummonerByFriendlyName() w/ capitalized version of name', () => {
+			let actualResult: Summoner | undefined
 
 			beforeEach(async () => {
-				actualResult = await service.lookupUserByFriendlyName(
-					fakeUser.name.toUpperCase(),
+				actualResult = await service.lookupSummonerByFriendlyName(
+					fakeSummoner.name.toUpperCase(),
 				)
 			})
 
@@ -283,10 +294,10 @@ describe('User Service', () => {
 
 				const urlPassed = mockHttpServiceGet.mock.calls[0][0]
 				expect(urlPassed).toEqual(
-					`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${fakeUser.name.toLowerCase()}`,
+					`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${fakeSummoner.name.toLowerCase()}`,
 				)
 
-				expect(actualResult).toEqual(fakeUser)
+				expect(actualResult).toEqual(fakeSummoner)
 			})
 		})
 
