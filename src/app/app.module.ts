@@ -30,7 +30,9 @@ import { AppController } from './app.controller'
 			autoSchemaFile: 'schema.gql',
 			// debug: false,
 			installSubscriptionHandlers: true,
+			introspection: true,
 			// path: 'graphql',
+			playground: true,
 			// playground: { endpoint: 'playground' },
 			// plugins: [],
 			// resolvers are provided through modules (e.g. UserResolver in UserModule)
