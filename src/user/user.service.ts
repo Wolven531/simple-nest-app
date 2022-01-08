@@ -88,20 +88,20 @@ export class UserService implements IUserService {
 				},
 			),
 		)
-			.then<User>((resp) => {
+			.then<Summoner>((resp) => {
 				if (resp.status === 404) {
 					this.logger.log(
-						`Could not find user with name = "${friendlyName}"`,
+						`Could not find summoner with name = "${friendlyName}"`,
 						' lookupSummonerByFriendlyName | user-svc ',
 					)
 
 					return undefined
 				}
 
-				const user: User = resp.data
+				const user: Summoner = resp.data
 
 				this.logger.log(
-					`Found user ${JSON.stringify(user, null, 4)}`,
+					`Found summoner ${JSON.stringify(user, null, 4)}`,
 					' lookupSummonerByFriendlyName | user-svc ',
 				)
 
@@ -109,7 +109,7 @@ export class UserService implements IUserService {
 			})
 			.catch((err) => {
 				this.logger.error(
-					`Error while looking up user!\n\n${JSON.stringify(
+					`Error while looking up summoner!\n\n${JSON.stringify(
 						err,
 						null,
 						4,

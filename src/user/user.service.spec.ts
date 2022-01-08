@@ -195,6 +195,16 @@ describe('User Service', () => {
 	// 	},
 	// ]
 
+	const fakeServerDatetime = new Date(Date.now())
+	const fakeUTC = new Date(
+		fakeServerDatetime.getUTCFullYear(),
+		fakeServerDatetime.getUTCMonth(),
+		fakeServerDatetime.getUTCDate(),
+		fakeServerDatetime.getUTCHours(),
+		fakeServerDatetime.getUTCMinutes(),
+		fakeServerDatetime.getUTCSeconds(),
+	)
+
 	const fakeAPIKey = 'some-api-key'
 	const fakeUser: User = {
 		accountId: 'account-id',
@@ -224,7 +234,10 @@ describe('User Service', () => {
 			() =>
 				from(
 					Promise.resolve({
-						data: fakeSummoner,
+						data: {
+							...fakeSummoner,
+							revisionDate: fakeUTC.getTime(),
+						} as Summoner,
 						status: HttpStatus.OK,
 					}),
 				) as Observable<AxiosResponse<Summoner>>,
@@ -299,7 +312,10 @@ describe('User Service', () => {
 					)}`,
 				)
 
-				expect(actualResult).toEqual(fakeSummoner)
+				expect(actualResult).toEqual({
+					...fakeSummoner,
+					revisionDate: fakeUTC.getTime(),
+				})
 			})
 		})
 
