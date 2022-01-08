@@ -1,7 +1,7 @@
-import { User } from '../models/user.model'
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
+import { User } from '../models/user.model'
 import { UserService } from './user.service'
 
 type TestCase_GetUserByFriendlyName = {
@@ -40,7 +40,7 @@ describe('User Service', () => {
 		{
 			expectedResult: new User(
 				'account-id-1',
-				new Date(1990, 11, 15).getTime(),
+				new Date(1990, 11, 15),
 				9,
 				'name 1',
 				'summ-id-1',
@@ -48,18 +48,12 @@ describe('User Service', () => {
 			mockLoadedUsers: [
 				new User(
 					'account-id-1',
-					new Date(1990, 11, 15).getTime(),
+					new Date(1990, 11, 15),
 					9,
 					'name 1',
 					'summ-id-1',
 				),
-				new User(
-					'account-id-2',
-					new Date().getTime(),
-					12,
-					'name 2',
-					'summ-id-2',
-				),
+				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
 			],
 			name: 'multiple users, one name matches exactly',
 			param: 'name 1',
@@ -67,7 +61,7 @@ describe('User Service', () => {
 		{
 			expectedResult: new User(
 				'account-id-1',
-				new Date(1990, 11, 15).getTime(),
+				new Date(1990, 11, 15),
 				9,
 				'name 1',
 				'summ-id-1',
@@ -75,18 +69,12 @@ describe('User Service', () => {
 			mockLoadedUsers: [
 				new User(
 					'account-id-1',
-					new Date(1990, 11, 15).getTime(),
+					new Date(1990, 11, 15),
 					9,
 					'name 1',
 					'summ-id-1',
 				),
-				new User(
-					'account-id-2',
-					new Date().getTime(),
-					12,
-					'name 2',
-					'summ-id-2',
-				),
+				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
 			],
 			name: 'multiple users, one name matches w/ different casing',
 			param: 'nAmE 1',
@@ -94,20 +82,8 @@ describe('User Service', () => {
 		{
 			expectedResult: undefined,
 			mockLoadedUsers: [
-				new User(
-					'account-id-1',
-					new Date().getTime(),
-					9,
-					'name 1',
-					'summ-id-1',
-				),
-				new User(
-					'account-id-2',
-					new Date().getTime(),
-					12,
-					'name 2',
-					'summ-id-2',
-				),
+				new User('account-id-1', new Date(), 9, 'name 1', 'summ-id-1'),
+				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
 			],
 			name: 'multiple users, none match',
 			param: 'non-matching name',
@@ -242,26 +218,22 @@ describe('User Service', () => {
 		describe('invoke addUser()', () => {
 			const fakeUser: User = {
 				accountId: 'account-id',
-				lastUpdated: new Date(2021, 7, 1).getTime(),
+				lastUpdated: new Date(2021, 7, 1),
 				masteryTotal: 1,
 				name: 'name 1',
 				summonerId: 'summ-id',
 			} as User
+			let actualResult: User[]
 
-			beforeEach(() => {
-				jest
-					.spyOn(service as any, 'loadUsersFromFile')
-					.mockImplementation(() => jest.fn().mockReturnValue([]))
+			beforeEach(async () => {
+				service.setup([])
 
 				service.addUser(fakeUser)
-			})
-
-			afterEach(() => {
-				jest.spyOn(service as any, 'loadUsersFromFile').mockRestore()
+				actualResult = await service.getUsers()
 			})
 
 			it('adds user to collection of users in service', () => {
-				expect(service.users).toContain(fakeUser)
+				expect(actualResult).toContain(fakeUser)
 			})
 		})
 
@@ -269,29 +241,18 @@ describe('User Service', () => {
 			({ expectedResult, mockLoadedUsers, name, param }) => {
 				describe(`w/ mockLoadedUsers (${name})`, () => {
 					beforeEach(() => {
-						jest
-							.spyOn(service as any, 'users', 'get')
-							.mockReturnValue(mockLoadedUsers)
-
-						// TODO - not sure why below does not work...
-						// jest
-						// 	.spyOn(service as any, 'loadUsersFromFile')
-						// 	.mockReturnValue(mockLoadedUsers)
-					})
-
-					afterEach(() => {
-						jest.spyOn(service as any, 'loadUsersFromFile').mockRestore()
+						service.setup(mockLoadedUsers)
 					})
 
 					describe(`invoke getUserByFriendlyName("${param}")`, () => {
-						let actualResult: User | undefined
+						let result: User | undefined
 
-						beforeEach(() => {
-							actualResult = service.getUserByFriendlyName(param)
+						beforeEach(async () => {
+							result = await service.getUserByFriendlyName(param)
 						})
 
 						it('invokes log, error correctly and returns expected result', () => {
-							expect(actualResult).toEqual(expectedResult)
+							expect(result).toEqual(expectedResult)
 						})
 					})
 				})

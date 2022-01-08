@@ -8,35 +8,32 @@ import {
 	Logger,
 	Param,
 	Post,
-	Query
+	Query,
 } from '@nestjs/common'
 import {
 	ApiExtraModels,
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
-	ApiTags
+	ApiTags,
 } from '@nestjs/swagger'
+import { UserMasteryService } from '../composite/user-mastery.service'
 import { searchKeyExamples, summonerIdExamples } from '../constants'
 // import { execFileSync } from 'child_process'
 // import { join } from 'path'
 import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
-import { MasteryService } from '../services/mastery.service'
 import { SummonerService } from '../services/summoner.service'
-import { UserService } from '../services/user.service'
 
 @ApiTags('user')
 @ApiExtraModels(Summoner, User)
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject(MasteryService)
-		private readonly masteryService: MasteryService,
 		@Inject(SummonerService)
 		private readonly summonerService: SummonerService,
-		@Inject(UserService)
-		private readonly userService: UserService,
+		@Inject(UserMasteryService)
+		private readonly userMasteryService: UserMasteryService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {}
@@ -61,26 +58,28 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('add', 'server')
+	@ApiTags('addUser')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async addUser(@Param('summonerId') summonerId: string): Promise<User[]> {
 		this.logger.debug(`summonerId="${summonerId}"`, ' User-Ctrl | addUser ')
 
-		if (this.userService.users.map((u) => u.summonerId).includes(summonerId)) {
+		const users = await this.userMasteryService.getUsers()
+
+		if (users.map((u) => u.summonerId).includes(summonerId)) {
 			this.logger.debug(
 				'user already in collection, not adding again',
 				' User-Ctrl | addUser ',
 			)
 
-			return this.userService.users
+			return users
 		}
 
 		const summ = await this.summonerService.getSummonerById(summonerId)
 
-		this.userService.addUser({
+		this.userMasteryService.addUser({
 			accountId: summ.accountId,
-			lastUpdated: summ.revisionDate,
+			lastUpdated: new Date(summ.revisionDate),
 			// TODO - grab value from service
 			masteryTotal: 0,
 			name: summ.name,
@@ -89,7 +88,7 @@ export class UserController {
 
 		this.logger.debug('added user to collection', ' User-Ctrl | addUser ')
 
-		return this.userService.users
+		return this.userMasteryService.getUsers()
 	}
 
 	@Get('get/:summonerId')
@@ -99,7 +98,8 @@ export class UserController {
 			description: 'Riot API User Search Endpoint Docs',
 			url: 'https://developer.riotgames.com/apis#summoner-v4/GET_getSummonerById',
 		},
-		summary: 'Get user details by searching for them using their summoner ID',
+		summary:
+			'Get user details by searching for them using their summoner ID',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
@@ -110,7 +110,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('summoner')
+	@ApiTags('getSummonerById')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getSummonerById(
@@ -129,25 +129,13 @@ export class UserController {
 		description: 'Get the current list of users from the server',
 		summary: 'Get the current list of users from the server',
 	})
-	@ApiTags('server')
+	@ApiTags('getUsers')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getUsers(): Promise<User[]> {
 		this.logger.debug('', ' User-Ctrl | getUsers ')
 
-		const updatedUsers = Promise.all(
-			this.userService.users.map(async (user) => {
-				const masteryTotal = await this.masteryService.getMasteryTotal(
-					user.summonerId,
-				)
-				user.lastUpdated = Date.now()
-				user.masteryTotal = masteryTotal
-
-				return user
-			}),
-		)
-
-		return updatedUsers
+		return this.userMasteryService.getUsersWithMastery()
 	}
 
 	@Get('search')
@@ -170,7 +158,7 @@ export class UserController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('name', 'summoner')
+	@ApiTags('searchSummoners')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	searchSummoners(

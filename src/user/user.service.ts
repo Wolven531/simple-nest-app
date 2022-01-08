@@ -5,9 +5,10 @@ import { deserializeArray } from 'class-transformer'
 // import { ENCODING_UTF8 } from '../constants'
 import * as usersJsonData from '../data/users.json'
 import { User } from '../models/user.model'
+import { IUserService } from '../types'
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
 	// private readonly DIRECTORY_DATA = 'data'
 	// private readonly FILENAME_USERS = 'users.json'
 	private _users: User[]
@@ -16,11 +17,7 @@ export class UserService {
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {
-		this._users = this.loadUsersFromFile()
-	}
-
-	get users(): User[] {
-		return this._users
+		this.setup()
 	}
 
 	/**
@@ -43,7 +40,7 @@ export class UserService {
 	 * @param friendlyName String value (case insensitive) to use when searching for a User
 	 * @returns The User instance whose name property matches `friendlyName`; undefined if there are no matches
 	 */
-	getUserByFriendlyName(friendlyName: string): User | undefined {
+	getUserByFriendlyName(friendlyName: string): Promise<User | undefined> {
 		const searchKey = friendlyName.toLowerCase()
 
 		this.logger.log(
@@ -51,7 +48,23 @@ export class UserService {
 			' getUserByFriendlyName | user-svc ',
 		)
 
-		return this.users.find((u) => u.name.toLowerCase() === searchKey)
+		return Promise.resolve(
+			this._users.find((u) => u.name.toLowerCase() === searchKey),
+		)
+	}
+
+	getUsers(): Promise<User[]> {
+		return Promise.resolve(this._users)
+	}
+
+	/**
+	 * This method uses either optional provided data or the loadUsersFromFile method to populate the service;
+	 * NOTE - overwrites current users value
+	 *
+	 * @param data Collection of users to use for this service
+	 */
+	setup(data?: User[]) {
+		this._users = data ?? this.loadUsersFromFile()
 	}
 
 	/**
@@ -93,12 +106,27 @@ export class UserService {
 				JSON.stringify(usersJsonData),
 			)
 
+			const serverNow = new Date(Date.now())
+
+			const updatedUsers = users.map((user) => {
+				user.lastUpdated = new Date(
+					serverNow.getUTCFullYear(),
+					serverNow.getUTCMonth(),
+					serverNow.getUTCDate(),
+					serverNow.getUTCHours(),
+					serverNow.getUTCMinutes(),
+					serverNow.getUTCSeconds(),
+				)
+
+				return user
+			})
+
 			this.logger.log(
-				`${users.length} users loaded from file`,
+				`${updatedUsers.length} users loaded from file`,
 				' loadUsersFromFile | user-svc ',
 			)
 
-			return users
+			return updatedUsers
 		} catch (e) {
 			this.logger.error(
 				`Failed to load users file; err=\n\n${e}\n`,

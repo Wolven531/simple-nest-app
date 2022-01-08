@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { APP_INTERCEPTOR } from '@nestjs/core'
-import { ServeStaticModule } from '@nestjs/serve-static'
-import { join } from 'path'
+import { GraphQLModule } from '@nestjs/graphql'
+import { CompositeModule } from '../composite/composite.module'
 import { ConfigurationModule } from '../config'
 import { HealthModule } from '../health'
 import { HttpRequestInterceptor } from '../http-request.interceptor'
@@ -15,9 +15,9 @@ import { AppController } from './app.controller'
 @Module({
 	controllers: [AppController],
 	imports: [
-		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', '..', 'public'), // <-- path to the static files
-		}),
+		// ServeStaticModule.forRoot({
+		// 	rootPath: join(__dirname, '..', '..', 'public'), // <-- path to the static files
+		// }),
 		SharedModule, // contains 'boilerplate' stuff (e.g. Http, Logger, etc.)
 		ConfigurationModule, // contains config endpoints
 		HealthModule, // contains health endpoints
@@ -25,6 +25,18 @@ import { AppController } from './app.controller'
 		MatchlistModule, // contains matchlist endpoints
 		StatsModule, // contains stats endpoints
 		UserModule, // contains user endpoints
+		CompositeModule,
+		GraphQLModule.forRoot({
+			autoSchemaFile: 'schema.gql',
+			// debug: false,
+			installSubscriptionHandlers: true,
+			// path: 'graphql',
+			// playground: { endpoint: 'playground' },
+			// plugins: [],
+			// resolvers are provided through modules (e.g. UserResolver in UserModule)
+			// resolvers: [UserResolver],
+			sortSchema: true,
+		}),
 	],
 	providers: [
 		{

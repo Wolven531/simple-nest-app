@@ -1,6 +1,7 @@
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: node:latest
+# image: node:latest
+image: node:16.12.0
 
 # # Pick zero or more services to be used on all builds.
 # # Only needed when using a docker container to run your tests in.
@@ -13,41 +14,53 @@ image: node:latest
 # This folder is cached between builds
 # http://docs.gitlab.com/ee/ci/yaml/README.html#cache
 cache:
-  paths:
-    - node_modules/
+    paths:
+        - node_modules/
+        # - coverage/
+        # - dist/
 
 stages:
-  - build
-  - test
-  - run
+    - build
+    - test
+    # - run
 
-# build_app:
-#   stage: build
-#   script:
-#     - yarn
-#     - yarn prebuild
-#     - yarn build
+build_app:
+    artifacts:
+        paths:
+            - dist/
+        expire_in: never
+    stage: build
+    script:
+        - yarn
+        # below line /should not/ be needed, as prebuild /should/ run prior to build on its own
+        # - yarn prebuild
+        - yarn build
 
 run_unit_tests:
-  stage: test
-  script:
-    - yarn
-    # - node ./specs/start.js ./specs/async.spec.js
-    - yarn test
-
+    artifacts:
+        paths:
+            - coverage/
+        expire_in: never
+    # deps in this file should only be used to pass directly between jobs, caching is used otherwise
+    # dependencies:
+    #     - build_app
+    stage: test
+    script:
+        - yarn
+        - yarn test
+        # - node ./specs/start.js ./specs/async.spec.js
 # run_app:
 #   stage: run
 #   script:
 #     - yarn start:prod
 
-build_and_run_app:
-  stage: run
-  script:
-    - yarn
-    - yarn prebuild
-    - yarn build
-    - yarn start:prod
-
+# build_and_run_app:
+#     stage: run
+#     script:
+#         - yarn
+#         - yarn prebuild
+#         - yarn build
+#         - yarn start:prod
 # test_db:
 #   script:
 #     - yarn
