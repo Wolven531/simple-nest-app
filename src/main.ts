@@ -11,8 +11,13 @@ import { NextFunction, Request, Response } from 'express'
 // import compression from 'compression'
 import 'reflect-metadata'
 import { AppModule } from './app'
+import { UserMasteryService } from './composite/user-mastery.service'
 import { ENV_API_PORT, ENV_API_PORT_DEFAULT } from './constants'
 import { AppService } from './services/app.service'
+import usernames from './data/usernames.json'
+import { Summoner } from './models/summoner.model'
+import { MasteryService } from './services/mastery.service'
+import { User } from './models/user.model'
 
 async function bootstrap() {
 	const ctx = ' bootstrap | main '
@@ -30,6 +35,8 @@ async function bootstrap() {
 	const appService = app.get(AppService)
 	const configService = app.get(ConfigService)
 	// const userService = app.get(UserService)
+	const userMasteryService = app.get(UserMasteryService)
+	const masteryService = app.get(MasteryService)
 	const logger = app.get(Logger)
 	// const masteryService = app.get(MasteryService)
 
@@ -86,7 +93,30 @@ async function bootstrap() {
 		logger.warn('Riot API token is invalid...', ctx)
 	}
 
-	// TODO - potentially update users on app start
+	// update users on app start
+	const rawSummoners: Summoner[] = await Promise.all(
+		usernames.map((name) =>
+			userMasteryService.lookupSummonerByFriendlyName(name),
+		),
+	)
+	const summoners = rawSummoners.filter((summoner) => !!summoner)
+	const users = await Promise.all(
+		summoners.map(async (summoner) => {
+			const totalMastery = await masteryService.getMasteryTotal(
+				summoner.id,
+			)
+
+			return new User(
+				summoner.accountId,
+				// TODO - convert to UTC
+				new Date(),
+				totalMastery,
+				summoner.name,
+				summoner.id,
+			)
+		}),
+	)
+	userMasteryService.setup(users)
 	// const isFresh = userService.isUsersFileFresh()
 
 	// if (isFresh) {
