@@ -19,7 +19,7 @@
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
 		"prebuild": "yarn && rimraf dist",
-		"prestart": "yarn build",
+		"//prestart": "yarn build",
 		"start": "node dist/main",
 		"start:debug": "yarn prestart && nest start --debug --watch",
 		"start:dev": "yarn prestart && nest start --watch",
