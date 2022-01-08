@@ -7,6 +7,7 @@ import { REGION } from '../constants'
 // import { join } from 'path'
 // import { ENCODING_UTF8 } from '../constants'
 import * as usersJsonData from '../data/users.json'
+import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 import { AppService } from '../services/app.service'
 import { IUserService } from '../types'
@@ -67,9 +68,9 @@ export class UserService implements IUserService {
 		return Promise.resolve(this._users)
 	}
 
-	async lookupUserByFriendlyName(
+	async lookupSummonerByFriendlyName(
 		friendlyName: string,
-	): Promise<User | undefined> {
+	): Promise<Summoner | undefined> {
 		const apiKey = this.appService.getRiotToken()
 
 		const searchKey = friendlyName.toLowerCase()
@@ -91,7 +92,7 @@ export class UserService implements IUserService {
 				if (resp.status === 404) {
 					this.logger.log(
 						`Could not find user with name = "${friendlyName}"`,
-						' lookupUserByFriendlyName | user-svc ',
+						' lookupSummonerByFriendlyName | user-svc ',
 					)
 
 					return undefined
@@ -101,7 +102,7 @@ export class UserService implements IUserService {
 
 				this.logger.log(
 					`Found user ${JSON.stringify(user, null, 4)}`,
-					' lookupUserByFriendlyName | user-svc ',
+					' lookupSummonerByFriendlyName | user-svc ',
 				)
 
 				return user
@@ -113,7 +114,7 @@ export class UserService implements IUserService {
 						null,
 						4,
 					)}`,
-					' lookupUserByFriendlyName | user-svc ',
+					' lookupSummonerByFriendlyName | user-svc ',
 				)
 
 				return undefined
