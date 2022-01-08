@@ -164,16 +164,12 @@ export class UserController {
 	searchSummoners(
 		@Query('searchKey') searchKey: string,
 	): Promise<Summoner | null> {
-		const encodedSearchKey = encodeURI(searchKey)
-
 		this.logger.debug(
-			`searchKey="${searchKey}" searchKey encoded="${encodedSearchKey}"`,
+			`searchKey="${searchKey}"`,
 			' User-Ctrl | searchSummoners ',
 		)
 
-		return this.userMasteryService.lookupSummonerByFriendlyName(
-			encodedSearchKey,
-		)
+		return this.userMasteryService.lookupSummonerByFriendlyName(searchKey)
 	}
 
 	// @Get('refresh')
