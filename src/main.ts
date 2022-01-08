@@ -14,7 +14,7 @@ import { AppModule } from './app'
 import { UserMasteryService } from './composite/user-mastery.service'
 import { ENV_API_PORT, ENV_API_PORT_DEFAULT } from './constants'
 import { AppService } from './services/app.service'
-import usernames from './data/usernames.json'
+import * as usernameJson from './data/usernames.json'
 import { Summoner } from './models/summoner.model'
 import { MasteryService } from './services/mastery.service'
 import { User } from './models/user.model'
@@ -95,7 +95,7 @@ async function bootstrap() {
 
 	// update users on app start
 	const rawSummoners: Summoner[] = await Promise.all(
-		usernames.map((name) =>
+		usernameJson.map((name) =>
 			userMasteryService.lookupSummonerByFriendlyName(name),
 		),
 	)
