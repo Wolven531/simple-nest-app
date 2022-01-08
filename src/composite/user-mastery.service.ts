@@ -65,6 +65,12 @@ export class UserMasteryService implements IUserService {
 		return updatedUsers
 	}
 
+	async lookupUserByFriendlyName(
+		friendlyName: string,
+	): Promise<User | undefined> {
+		return this.userService.lookupUserByFriendlyName(friendlyName)
+	}
+
 	setup(data?: User[]) {
 		return this.userService.setup(data)
 	}
