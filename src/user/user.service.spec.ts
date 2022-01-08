@@ -7,6 +7,7 @@ import { User } from '../models/user.model'
 import { AppService } from '../services/app.service'
 import { UserService } from './user.service'
 import { AxiosResponse } from '@nestjs/common/node_modules/axios'
+import { REGION } from '../constants'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
@@ -277,7 +278,14 @@ describe('User Service', () => {
 				)
 			})
 
-			it('invokes http service get to proper endpoint, returns correct User', () => {
+			it('invokes http service get w/ proper endpoint + query params, returns correct User', () => {
+				expect(mockHttpServiceGet).toHaveBeenCalledTimes(1)
+
+				const urlPassed = mockHttpServiceGet.mock.calls[0][0]
+				expect(urlPassed).toEqual(
+					`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${fakeUser.name.toLowerCase()}`,
+				)
+
 				expect(actualResult).toEqual(fakeUser)
 			})
 		})
