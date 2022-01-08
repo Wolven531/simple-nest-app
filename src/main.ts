@@ -100,6 +100,8 @@ async function bootstrap() {
 		),
 	)
 	const summoners = rawSummoners.filter((summoner) => !!summoner)
+	const serverNow = new Date(Date.now())
+
 	const users = await Promise.all(
 		summoners.map(async (summoner) => {
 			const totalMastery = await masteryService.getMasteryTotal(
@@ -108,8 +110,14 @@ async function bootstrap() {
 
 			return new User(
 				summoner.accountId,
-				// TODO - convert to UTC
-				new Date(),
+				new Date(
+					serverNow.getUTCFullYear(),
+					serverNow.getUTCMonth(),
+					serverNow.getUTCDate(),
+					serverNow.getUTCHours(),
+					serverNow.getUTCMinutes(),
+					serverNow.getUTCSeconds(),
+				),
 				totalMastery,
 				summoner.name,
 				summoner.id,
