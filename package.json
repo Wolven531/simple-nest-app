@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"engines": {
-		"node": ">=16.12.0"
+		"node": ">=16.12.0 <17.0"
 	},
 	"author": {
 		"email": "anthony.williams.cs@gmail.com",
