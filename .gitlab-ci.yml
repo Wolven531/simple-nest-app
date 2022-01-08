@@ -31,7 +31,7 @@ build_app:
         expire_in: never
     stage: build
     script:
-        - yarn
+        - yarn --frozen-lockfile
         # below line /should not/ be needed, as prebuild /should/ run prior to build on its own
         # - yarn prebuild
         - yarn build
@@ -46,7 +46,7 @@ run_unit_tests:
     #     - build_app
     stage: test
     script:
-        - yarn
+        - yarn --frozen-lockfile
         - yarn test
         # - node ./specs/start.js ./specs/async.spec.js
 # run_app:
