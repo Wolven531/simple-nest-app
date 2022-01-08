@@ -1,3 +1,4 @@
+import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 
 export interface IUserService {
@@ -5,9 +6,9 @@ export interface IUserService {
 	addUser: (newUser: User) => void
 	getUserByFriendlyName: (friendlyName: string) => Promise<User | undefined>
 	getUsers: () => Promise<User[]>
-	lookupUserByFriendlyName: (
+	lookupSummonerByFriendlyName: (
 		friendlyName: string,
-	) => Promise<User | undefined>
+	) => Promise<Summoner | undefined>
 	setup: (data?: User[]) => void
 
 	// NOTE - future / async methods
