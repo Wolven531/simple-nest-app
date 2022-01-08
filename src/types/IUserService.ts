@@ -5,6 +5,9 @@ export interface IUserService {
 	addUser: (newUser: User) => void
 	getUserByFriendlyName: (friendlyName: string) => Promise<User | undefined>
 	getUsers: () => Promise<User[]>
+	lookupUserByFriendlyName: (
+		friendlyName: string,
+	) => Promise<User | undefined>
 	setup: (data?: User[]) => void
 
 	// NOTE - future / async methods
