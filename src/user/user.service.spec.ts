@@ -1,8 +1,14 @@
-import { Logger } from '@nestjs/common'
+import { HttpModule, HttpService } from '@nestjs/axios'
+import { HttpStatus, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { from, Observable } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
 import { User } from '../models/user.model'
+import { AppService } from '../services/app.service'
 import { UserService } from './user.service'
+import { AxiosResponse } from '@nestjs/common/node_modules/axios'
+import { REGION } from '../constants'
+import { Summoner } from '../models/summoner.model'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
@@ -189,17 +195,74 @@ describe('User Service', () => {
 	// 	},
 	// ]
 
+	const fakeServerDatetime = new Date(Date.now())
+	const fakeUTC = new Date(
+		fakeServerDatetime.getUTCFullYear(),
+		fakeServerDatetime.getUTCMonth(),
+		fakeServerDatetime.getUTCDate(),
+		fakeServerDatetime.getUTCHours(),
+		fakeServerDatetime.getUTCMinutes(),
+		fakeServerDatetime.getUTCSeconds(),
+	)
+
+	const fakeAPIKey = 'some-api-key'
+	const fakeUser: User = {
+		accountId: 'account-id',
+		isFresh: true,
+		lastUpdated: new Date(2021, 7, 1),
+		masteryTotal: 1,
+		name: 'name 1',
+		summonerId: 'summ-id',
+	}
+	const fakeSummoner: Summoner = {
+		accountId: 'account-id-2',
+		id: 'id2',
+		name: 'Míyukí',
+		profileIconId: 13,
+		puuid: 'puuid-2',
+		revisionDate: 1,
+		summonerLevel: 1,
+	}
 	let service: UserService
 	let testModule: TestingModule
+	let mockGetRiotToken: jest.Mock
+	let mockHttpServiceGet: jest.Mock
 
 	beforeEach(async () => {
+		mockGetRiotToken = jest.fn().mockReturnValue(fakeAPIKey)
+		mockHttpServiceGet = jest.fn(
+			() =>
+				from(
+					Promise.resolve({
+						data: {
+							...fakeSummoner,
+							revisionDate: fakeUTC.getTime(),
+						} as Summoner,
+						status: HttpStatus.OK,
+					}),
+				) as Observable<AxiosResponse<Summoner>>,
+		)
+
 		testModule = await Test.createTestingModule({
 			controllers: [],
-			imports: [],
-			providers: [UserService, Logger],
+			imports: [HttpModule],
+			providers: [
+				{
+					provide: AppService,
+					useFactory: () => ({
+						getRiotToken: mockGetRiotToken,
+					}),
+				},
+				UserService,
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(UserService)
+
+		jest.spyOn(testModule.get(HttpService), 'get').mockImplementation(
+			mockHttpServiceGet,
+		)
 	})
 
 	afterEach(async () => {
@@ -216,13 +279,6 @@ describe('User Service', () => {
 		})
 
 		describe('invoke addUser()', () => {
-			const fakeUser: User = {
-				accountId: 'account-id',
-				lastUpdated: new Date(2021, 7, 1),
-				masteryTotal: 1,
-				name: 'name 1',
-				summonerId: 'summ-id',
-			} as User
 			let actualResult: User[]
 
 			beforeEach(async () => {
@@ -234,6 +290,32 @@ describe('User Service', () => {
 
 			it('adds user to collection of users in service', () => {
 				expect(actualResult).toContain(fakeUser)
+			})
+		})
+
+		describe('invoke lookupSummonerByFriendlyName() w/ capitalized version of name', () => {
+			let actualResult: Summoner | undefined
+
+			beforeEach(async () => {
+				actualResult = await service.lookupSummonerByFriendlyName(
+					fakeSummoner.name.toUpperCase(),
+				)
+			})
+
+			it('invokes http service get w/ proper endpoint + query params, returns correct User', () => {
+				expect(mockHttpServiceGet).toHaveBeenCalledTimes(1)
+
+				const urlPassed = mockHttpServiceGet.mock.calls[0][0]
+				expect(urlPassed).toEqual(
+					`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${encodeURI(
+						fakeSummoner.name.toUpperCase(),
+					)}`,
+				)
+
+				expect(actualResult).toEqual({
+					...fakeSummoner,
+					revisionDate: fakeUTC.getTime(),
+				})
 			})
 		})
 

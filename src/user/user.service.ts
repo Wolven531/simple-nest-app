@@ -1,10 +1,15 @@
+import { HttpService } from '@nestjs/axios'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { deserializeArray } from 'class-transformer'
+import { firstValueFrom } from 'rxjs'
+import { REGION } from '../constants'
 // import { readFileSync } from 'fs'
 // import { join } from 'path'
 // import { ENCODING_UTF8 } from '../constants'
 import * as usersJsonData from '../data/users.json'
+import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
+import { AppService } from '../services/app.service'
 import { IUserService } from '../types'
 
 @Injectable()
@@ -14,6 +19,10 @@ export class UserService implements IUserService {
 	private _users: User[]
 
 	constructor(
+		@Inject(AppService)
+		private readonly appService: AppService,
+		@Inject(HttpService)
+		private readonly httpService: HttpService,
 		@Inject(Logger)
 		private readonly logger: Logger,
 	) {
@@ -40,7 +49,9 @@ export class UserService implements IUserService {
 	 * @param friendlyName String value (case insensitive) to use when searching for a User
 	 * @returns The User instance whose name property matches `friendlyName`; undefined if there are no matches
 	 */
-	getUserByFriendlyName(friendlyName: string): Promise<User | undefined> {
+	async getUserByFriendlyName(
+		friendlyName: string,
+	): Promise<User | undefined> {
 		const searchKey = friendlyName.toLowerCase()
 
 		this.logger.log(
@@ -53,8 +64,61 @@ export class UserService implements IUserService {
 		)
 	}
 
-	getUsers(): Promise<User[]> {
+	async getUsers(): Promise<User[]> {
 		return Promise.resolve(this._users)
+	}
+
+	async lookupSummonerByFriendlyName(
+		friendlyName: string,
+	): Promise<Summoner | undefined> {
+		const apiKey = this.appService.getRiotToken()
+
+		const encodedSearchKey = encodeURI(friendlyName)
+
+		return firstValueFrom(
+			this.httpService.get(
+				`https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${encodedSearchKey}`,
+				{
+					headers: {
+						'Accept-Charset':
+							'application/x-www-form-urlencoded; charset=UTF-8',
+						'Accept-Language': 'en-US,en;q=0.9',
+						'X-Riot-Token': apiKey,
+					},
+				},
+			),
+		)
+			.then<Summoner>((resp) => {
+				if (resp.status === 404) {
+					this.logger.log(
+						`Could not find summoner with name = "${friendlyName}"`,
+						' lookupSummonerByFriendlyName | user-svc ',
+					)
+
+					return undefined
+				}
+
+				const user: Summoner = resp.data
+
+				this.logger.log(
+					`Found summoner ${JSON.stringify(user, null, 4)}`,
+					' lookupSummonerByFriendlyName | user-svc ',
+				)
+
+				return user
+			})
+			.catch((err) => {
+				this.logger.error(
+					`Error while looking up summoner!\n\n${JSON.stringify(
+						err,
+						null,
+						4,
+					)}`,
+					' lookupSummonerByFriendlyName | user-svc ',
+				)
+
+				return undefined
+			})
 	}
 
 	/**

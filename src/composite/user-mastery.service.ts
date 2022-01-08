@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Summoner } from '../models/summoner.model'
 import { User } from '../models/user.model'
 import { MasteryService } from '../services/mastery.service'
 import { IUserService } from '../types'
@@ -63,6 +64,12 @@ export class UserMasteryService implements IUserService {
 		)
 
 		return updatedUsers
+	}
+
+	async lookupSummonerByFriendlyName(
+		friendlyName: string,
+	): Promise<Summoner | undefined> {
+		return this.userService.lookupSummonerByFriendlyName(friendlyName)
 	}
 
 	setup(data?: User[]) {
