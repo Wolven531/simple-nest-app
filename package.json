@@ -49,6 +49,7 @@
 		"class-transformer": "^0.4.0",
 		"class-validator": "^0.13.2",
 		"compression": "^1.7.4",
+		"express": "^4.17.2",
 		"graphql": "^15.8.0",
 		"graphql-query-complexity": "0.11.0",
 		"graphql-subscriptions": "2.0.0",
@@ -78,7 +79,8 @@
 		"jest": "^27.4.5",
 		"prettier": "^2.3.2",
 		"supertest": "^6.1.4",
-		"ts-jest": "^27.1.2"
+		"ts-jest": "^27.1.2",
+		"webpack": "^5.65.0"
 	},
 	"jest": {
 		"moduleFileExtensions": [
