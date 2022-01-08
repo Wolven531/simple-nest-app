@@ -171,7 +171,9 @@ export class UserController {
 			' User-Ctrl | searchSummoners ',
 		)
 
-		return this.summonerService.searchByName(encodedSearchKey)
+		return this.userMasteryService.lookupSummonerByFriendlyName(
+			encodedSearchKey,
+		)
 	}
 
 	// @Get('refresh')
