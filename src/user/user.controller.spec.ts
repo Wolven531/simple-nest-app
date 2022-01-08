@@ -233,9 +233,7 @@ describe('UserController', () => {
 				expect(capturedError).toBeUndefined()
 
 				expect(mockSearchByName).toHaveBeenCalledTimes(1)
-				expect(mockSearchByName).toHaveBeenLastCalledWith(
-					'M%C3%ADyuk%C3%AD',
-				)
+				expect(mockSearchByName).toHaveBeenLastCalledWith('Míyukí')
 				expect(resp).toEqual({ name: 'Míyukí' } as Summoner)
 			})
 		})
