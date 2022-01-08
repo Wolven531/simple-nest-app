@@ -1,8 +1,12 @@
-import { Logger } from '@nestjs/common'
+import { HttpModule, HttpService } from '@nestjs/axios'
+import { HttpStatus, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { from, Observable } from 'rxjs'
 import { toggleMockedLogger } from '../../test/utils'
 import { User } from '../models/user.model'
+import { AppService } from '../services/app.service'
 import { UserService } from './user.service'
+import { AxiosResponse } from '@nestjs/common/node_modules/axios'
 
 type TestCase_GetUserByFriendlyName = {
 	expectedResult: User | undefined
@@ -189,17 +193,51 @@ describe('User Service', () => {
 	// 	},
 	// ]
 
+	const fakeAPIKey = 'some-api-key'
+	const fakeUser: User = {
+		accountId: 'account-id',
+		lastUpdated: new Date(2021, 7, 1),
+		masteryTotal: 1,
+		name: 'name 1',
+		summonerId: 'summ-id',
+	} as User
 	let service: UserService
 	let testModule: TestingModule
+	let mockGetRiotToken: jest.Mock
+	let mockHttpServiceGet: jest.Mock
 
 	beforeEach(async () => {
+		mockGetRiotToken = jest.fn().mockReturnValue(fakeAPIKey)
+		mockHttpServiceGet = jest.fn(
+			() =>
+				from(
+					Promise.resolve({
+						data: fakeUser,
+						status: HttpStatus.OK,
+					}),
+				) as Observable<AxiosResponse<User>>,
+		)
+
 		testModule = await Test.createTestingModule({
 			controllers: [],
-			imports: [],
-			providers: [UserService, Logger],
+			imports: [HttpModule],
+			providers: [
+				{
+					provide: AppService,
+					useFactory: () => ({
+						getRiotToken: mockGetRiotToken,
+					}),
+				},
+				UserService,
+				Logger,
+			],
 		}).compile()
 
 		service = testModule.get(UserService)
+
+		jest.spyOn(testModule.get(HttpService), 'get').mockImplementation(
+			mockHttpServiceGet,
+		)
 	})
 
 	afterEach(async () => {
@@ -216,13 +254,6 @@ describe('User Service', () => {
 		})
 
 		describe('invoke addUser()', () => {
-			const fakeUser: User = {
-				accountId: 'account-id',
-				lastUpdated: new Date(2021, 7, 1),
-				masteryTotal: 1,
-				name: 'name 1',
-				summonerId: 'summ-id',
-			} as User
 			let actualResult: User[]
 
 			beforeEach(async () => {
@@ -234,6 +265,20 @@ describe('User Service', () => {
 
 			it('adds user to collection of users in service', () => {
 				expect(actualResult).toContain(fakeUser)
+			})
+		})
+
+		describe('invoke lookupUserByFriendlyName() w/ capitalized version of name', () => {
+			let actualResult: User | undefined
+
+			beforeEach(async () => {
+				actualResult = await service.lookupUserByFriendlyName(
+					fakeUser.name.toUpperCase(),
+				)
+			})
+
+			it('invokes http service get to proper endpoint, returns correct User', () => {
+				expect(actualResult).toEqual(fakeUser)
 			})
 		})
 
