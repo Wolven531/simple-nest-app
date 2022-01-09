@@ -22,6 +22,10 @@ export class User {
 
 	@Field()
 	@ApiProperty()
+	puuid: string
+
+	@Field()
+	@ApiProperty()
 	summonerId: string
 
 	/**
@@ -29,6 +33,7 @@ export class User {
 	 * @param lastUpdated - Date instance of the last update time for the user
 	 * @param masteryTotal - Total mastery points the user has earned
 	 * @param name - Friendly name of the user
+	 * @param puuid - PUUID for the user
 	 * @param summonerId - Simple summoner ID for the user
 	 */
 	constructor(
@@ -36,12 +41,14 @@ export class User {
 		lastUpdated: Date,
 		masteryTotal: number,
 		name: string,
+		puuid: string,
 		summonerId: string,
 	) {
 		this.accountId = accountId
 		this.lastUpdated = lastUpdated
 		this.masteryTotal = masteryTotal
 		this.name = name
+		this.puuid = puuid
 		this.summonerId = summonerId
 	}
 
