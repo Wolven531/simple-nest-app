@@ -27,6 +27,7 @@ export const COMMON_QUEUE_TYPES = {
 export const MAX_NUM_MATCHES = 19 // need soft cap here until rate limit is in place
 export const MIN_NUM_MATCHES = 1
 export const REGION = 'na1'
+export const REGION_V5 = 'americas'
 
 // Time constants
 export const TIME_HOURS_IN_DAY = 24
