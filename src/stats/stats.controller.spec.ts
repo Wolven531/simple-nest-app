@@ -41,8 +41,6 @@ describe('StatsController', () => {
 					provide: MatchlistService,
 					useFactory: () =>
 						({
-							// v4GetGame: mockGetGame,
-							// v4GetMatchlist: mockGetMatchlist,
 							v5GetMatchlist: mockGetMatchlist,
 						} as unknown as MatchlistService),
 				},
