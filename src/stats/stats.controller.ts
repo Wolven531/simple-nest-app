@@ -21,7 +21,7 @@ import {
 	queueTypeExamples,
 } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { GameV5 } from '../models/game-v5.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
@@ -112,7 +112,7 @@ export class StatsController {
 
 		this.logger.log(
 			`puuid=${puuid} getLastX=${getLastX} queueType="${queueType}"`,
-			' getSummaryForpuuid | StatsCtrl ',
+			' getSummaryForAccountId | StatsCtrl ',
 		)
 
 		const games: GameV5[] = (await this.matchlistService.v5GetMatchlist(

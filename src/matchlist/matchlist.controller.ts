@@ -23,7 +23,7 @@ import {
 	MIN_NUM_MATCHES,
 	queueTypeExamples,
 } from '../constants'
-import { GameV5 } from '../models/game-v5.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 

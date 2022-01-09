@@ -1,5 +1,5 @@
 import { COMMON_QUEUE_TYPES } from '../src/constants'
-import { GameV5 } from '../src/models/game-v5.model'
+import { GameV5 } from '../src/models/v5/game-v5.model'
 
 export type TestCase_GetGame = {
 	description: string

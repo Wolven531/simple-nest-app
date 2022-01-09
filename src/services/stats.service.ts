@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { GameV5 } from '../models/game-v5.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 
 @Injectable()
 export class StatsService {
@@ -41,14 +41,8 @@ export class StatsService {
 		let totalWins = 0
 
 		games.forEach((g) => {
-			const identity = g.participants.find((i) => i.puuid === targetPuuid)
-
-			if (!identity) {
-				return
-			}
-
 			const participant = g.participants.find(
-				(p) => p.participantId === identity.participantId,
+				(p) => p.puuid === targetPuuid,
 			)
 
 			if (!participant) {

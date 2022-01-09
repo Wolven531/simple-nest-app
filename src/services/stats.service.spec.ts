@@ -6,7 +6,7 @@ import {
 	toggleMockedLogger,
 } from '../../test/utils'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { GameV5 } from '../models/game-v5.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { Game } from '../models/game.model'
 import { Participant } from '../models/participant.model'
 import { Stats } from '../models/stats.model'
