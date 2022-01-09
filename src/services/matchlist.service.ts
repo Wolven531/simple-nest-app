@@ -6,6 +6,7 @@ import {
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
 	REGION,
+	REGION_V5,
 } from '../constants'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
@@ -34,7 +35,7 @@ export class MatchlistService {
 
 		return firstValueFrom(
 			this.httpService.get(
-				`https://${REGION}.api.riotgames.com/lol/match/v5/matches/${gameId}`,
+				`https://${REGION_V5}.api.riotgames.com/lol/match/v5/matches/${gameId}`,
 				{
 					headers: {
 						'Accept-Charset':
@@ -101,7 +102,7 @@ export class MatchlistService {
 
 		return firstValueFrom(
 			this.httpService.get(
-				`https://${REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?count=${getLastX}${filterQueue}`,
+				`https://${REGION_V5}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?count=${getLastX}${filterQueue}`,
 				{
 					headers: {
 						'Accept-Charset':
@@ -128,7 +129,12 @@ export class MatchlistService {
 					' getMatchlist | match-svc ',
 				)
 
-				return Promise.all(allMatches.map(this.v5GetGame))
+				return Promise.all(
+					allMatches.map((matchId) => {
+						this.logger.log(`about to grab game - ${matchId}`)
+						return this.v5GetGame(matchId)
+					}),
+				)
 			})
 			.catch((err) => {
 				this.logger.error(
