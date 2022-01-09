@@ -39,15 +39,15 @@ export class MatchlistController {
 		private readonly logger: Logger,
 	) {}
 
-	@Get(':accountId')
+	@Get(':puuid')
 	@ApiOperation({
 		description:
-			'Get a list of matches from the Riot API (match v4 currently) for a given Summoner accountId',
+			'Get a list of games from the Riot API (match v5 currently) for a given Summoner puuid',
 		externalDocs: {
 			description: 'Riot API Get Matchlist Endpoint Docs',
-			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatchlist',
+			url: 'https://developer.riotgames.com/apis#match-v5/GET_getMatchIdsByPUUID',
 		},
-		summary: 'Get a list of matches for a given Summoner accountId',
+		summary: 'Get a list of games for a given Summoner puuid',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
@@ -83,26 +83,6 @@ export class MatchlistController {
 	@ApiQuery({
 		allowEmptyValue: false,
 		description:
-			'Whether to return game data alongside match data; false by default',
-		examples: {
-			'Default (not specified)': {
-				value: undefined,
-			},
-			'Request with game data (includeGameData=true)': {
-				value: true,
-			},
-			'Request without game data (includeGameData=false)': {
-				value: false,
-			},
-		},
-		name: 'includeGameData',
-		required: false,
-		style: 'simple',
-		type: 'boolean',
-	})
-	@ApiQuery({
-		allowEmptyValue: false,
-		description:
 			'Optional filter to return only matches w/ a certain queue',
 		enum: Object.keys(COMMON_QUEUE_TYPES),
 		examples: queueTypeExamples,
@@ -111,7 +91,7 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('match')
+	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getMatchlist(
@@ -119,7 +99,7 @@ export class MatchlistController {
 		@Query('getLastX') getLastX = 10,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Match[] | Game[]> {
+	): Promise<Game[]> {
 		this.logger.log(
 			`puuid="${puuid}" getLastX=${getLastX} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
@@ -134,7 +114,7 @@ export class MatchlistController {
 			'Get a Game from the Riot API (match v4 currently) using a given gameId',
 		externalDocs: {
 			description: 'Riot API Get Match Endpoint Docs',
-			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatch',
+			url: 'https://developer.riotgames.com/apis#match-v5/GET_getMatch',
 		},
 		summary: 'Get a Game using a given gameId',
 	})
