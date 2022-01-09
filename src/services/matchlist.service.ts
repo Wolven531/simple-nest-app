@@ -8,6 +8,7 @@ import {
 	REGION,
 	REGION_V5,
 } from '../constants'
+import { GameV5 } from '../models/game-v5.model'
 import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { Matchlist } from '../models/matchlist.model'
@@ -28,9 +29,9 @@ export class MatchlistService {
 	 * This method uses the Riot Match API v5 to retrieve a Game
 	 *
 	 * @param gameId string Identifier for game to retrieve
-	 * @returns Promise<Game> if successful; Promise<null> otherwise
+	 * @returns Promise<GameV5> if successful; Promise<null> otherwise
 	 */
-	async v5GetGame(gameId: string): Promise<Game | null> {
+	async v5GetGame(gameId: string): Promise<GameV5 | null> {
 		const apiKey = this.appService.getRiotToken()
 
 		return firstValueFrom(
@@ -46,8 +47,8 @@ export class MatchlistService {
 				},
 			),
 		)
-			.then<Game>((resp) => {
-				const game = resp.data as Game
+			.then<GameV5>((resp) => {
+				const game = resp.data as GameV5
 
 				this.logger.log(
 					`Game w/ ID "${game.gameId}" loaded`,
@@ -83,7 +84,7 @@ export class MatchlistService {
 		puuid: string,
 		getLastX = 10,
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Game[]> {
+	): Promise<GameV5[]> {
 		const apiKey = this.appService.getRiotToken()
 
 		// update value BEFORE hitting Riot API
@@ -123,7 +124,7 @@ export class MatchlistService {
 
 				return matchIds
 			})
-			.then<Game[]>((allMatches: string[]) => {
+			.then<GameV5[]>((allMatches: string[]) => {
 				this.logger.log(
 					`retrieving additional info for ${allMatches.length} indiviudal games...`,
 					' getMatchlist | match-svc ',
