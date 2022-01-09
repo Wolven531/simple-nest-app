@@ -120,6 +120,7 @@ async function bootstrap() {
 				),
 				totalMastery,
 				summoner.name,
+				summoner.puuid,
 				summoner.id,
 			)
 		}),
