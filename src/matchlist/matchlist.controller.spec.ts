@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { MatchlistController } from './matchlist.controller'
 
@@ -26,8 +25,10 @@ describe('MatchlistController', () => {
 					provide: MatchlistService,
 					useFactory: () =>
 						({
-							v4GetGame: mockGetGame,
-							v4GetMatchlist: mockGetMatchlist,
+							// v4GetGame: mockGetGame,
+							// v4GetMatchlist: mockGetMatchlist,
+							v5GetGame: mockGetGame,
+							v5GetMatchlist: mockGetMatchlist,
 						} as unknown as MatchlistService),
 				},
 				Logger,
@@ -51,15 +52,10 @@ describe('MatchlistController', () => {
 		})
 
 		describe('invoke getMatchlist()', () => {
-			let resp: Match[]
+			let resp: Game[]
 
 			beforeEach(async () => {
-				resp = (await controller.getMatchlist(
-					'some-account-id',
-					undefined,
-					undefined,
-					undefined,
-				)) as Match[]
+				resp = (await controller.getMatchlist('some-puuid')) as Game[]
 			})
 
 			it('returns empty array', () => {
@@ -72,7 +68,7 @@ describe('MatchlistController', () => {
 			let resp: Game
 
 			beforeEach(async () => {
-				resp = await controller.getGame(0)
+				resp = await controller.getGame('0')
 			})
 
 			it('returns empty array', () => {
