@@ -4,16 +4,16 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { COMMON_QUEUE_TYPES } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
+import { GameV5 } from '../models/game-v5.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
 
 describe('StatsController', () => {
 	// constants for testing
-	const fakeAccountId = 'someAccountId'
+	const fakePuuid = 'some-puuid'
 	// const fakeGame: Game = {} as Game
-	const fakeGames: Game[] = []
+	const fakeGames: GameV5[] = []
 	const fakeKDA = 3.14
 	const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
 
@@ -42,7 +42,8 @@ describe('StatsController', () => {
 					useFactory: () =>
 						({
 							// v4GetGame: mockGetGame,
-							v4GetMatchlist: mockGetMatchlist,
+							// v4GetMatchlist: mockGetMatchlist,
+							v5GetMatchlist: mockGetMatchlist,
 						} as unknown as MatchlistService),
 				},
 				{
@@ -96,7 +97,7 @@ describe('StatsController', () => {
 						headersRequired: [],
 						queryParamsRequired: [
 							{
-								name: 'accountId',
+								name: 'puuid',
 								type: 'string',
 							},
 						],
@@ -105,14 +106,14 @@ describe('StatsController', () => {
 			})
 		})
 
-		describe(`invoke getSummaryForAccountId("${fakeAccountId}", undefined, "${fakeQueueFilter}")`, () => {
+		describe(`invoke getSummaryForAccountId("${fakePuuid}", undefined, "${fakeQueueFilter}")`, () => {
 			let capturedError: Error
 			let resp: CalculatedStats
 
 			beforeEach(async () => {
 				try {
 					resp = await controller.getSummaryForAccountId(
-						fakeAccountId,
+						fakePuuid,
 						undefined,
 						fakeQueueFilter,
 					)
@@ -125,14 +126,13 @@ describe('StatsController', () => {
 				expect(capturedError).toBeUndefined()
 				expect(mockCalculateGeneralStats).toHaveBeenCalledTimes(1)
 				expect(mockCalculateGeneralStats).toHaveBeenLastCalledWith(
-					fakeAccountId,
+					fakePuuid,
 					fakeGames,
 				)
 				expect(mockGetMatchlist).toHaveBeenCalledTimes(1)
 				expect(mockGetMatchlist).toHaveBeenLastCalledWith(
-					fakeAccountId,
+					fakePuuid,
 					10, // from endpoint default
-					true,
 					fakeQueueFilter,
 				)
 				expect(resp).toMatchObject({ kDA: fakeKDA } as CalculatedStats)
