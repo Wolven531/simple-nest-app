@@ -1,390 +1,18 @@
 import { HttpModule, HttpService } from '@nestjs/axios'
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { from } from 'rxjs'
-import { toggleMockedLogger } from '../../test/utils'
 import {
-	COMMON_QUEUE_TYPES,
-	MAX_NUM_MATCHES,
-	MIN_NUM_MATCHES,
-} from '../constants'
-import { Game } from '../models/game.model'
-import { Match } from '../models/match.model'
-import { Matchlist } from '../models/matchlist.model'
+	testCases_getGame,
+	testCases_getMatchlist,
+} from '../../test/test-cases'
+import { toggleMockedLogger } from '../../test/utils'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { AppService } from './app.service'
 import { MatchlistService } from './matchlist.service'
-
-type TestCase_GetGame = {
-	description: string
-	expectedCountHttpGet: number
-	expectedResult: Game | null
-	mockHttpGet: jest.Mock
-	paramGameId: number
-}
-type TestCase_GetMatchlist = {
-	description: string
-	expectedCountHttpGet: number
-	expectedCountGetGame: number
-	expectedUrlParamCount: number
-	expectedUrlParamQueueFilter: string
-	expectedResult: Match[] | Game[]
-	mockGetGame: jest.Mock
-	mockHttpGet: jest.Mock
-	paramAccountId: string
-	paramGetLastX: number | undefined
-	paramIncludeGameData: boolean | undefined
-	paramQueueType: keyof typeof COMMON_QUEUE_TYPES | undefined
-}
 
 describe('Matchlist Service', () => {
 	const fakeAPIKey = 'some-api-key'
 
-	const testCases_getGame: TestCase_GetGame[] = [
-		{
-			description: 'Http error occurs',
-			expectedCountHttpGet: 1,
-			expectedResult: null,
-			mockHttpGet: jest.fn(() =>
-				from(Promise.reject(new Error('Fake ajw error'))),
-			),
-			paramGameId: 1,
-		},
-		{
-			description: 'Returned data is bad',
-			expectedCountHttpGet: 1,
-			expectedResult: null,
-			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			paramGameId: 2,
-		},
-		{
-			description: 'Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: { gameCreation: 333, gameDuration: 444 } as Game,
-					}),
-				),
-			),
-			paramGameId: 3,
-		},
-	]
-	const testCases_getMatchlist: TestCase_GetMatchlist[] = [
-		{
-			description: 'Http error occurs',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 0,
-			expectedUrlParamCount: 10,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() =>
-				from(Promise.reject(new Error('Fake ajw error'))),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: undefined,
-			paramIncludeGameData: undefined,
-			paramQueueType: undefined,
-		},
-		{
-			description: 'Returned data is bad',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 0,
-			expectedUrlParamCount: 10,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() => from(Promise.resolve({}))),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: undefined,
-			paramIncludeGameData: undefined,
-			paramQueueType: undefined,
-		},
-		{
-			description: 'No filters - Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 0,
-			expectedUrlParamCount: 10,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [
-				new Match(
-					222,
-					'NONE',
-					2020,
-					'NA1',
-					100,
-					COMMON_QUEUE_TYPES.aram.id,
-					'NONE',
-					new Date(2020, 1, 1).getTime(),
-				),
-			],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									COMMON_QUEUE_TYPES.aram.id,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: undefined,
-			paramIncludeGameData: undefined,
-			paramQueueType: undefined,
-		},
-		{
-			description:
-				'Get Last X is below MIN_NUM_MATCHES - Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 0,
-			expectedUrlParamCount: MIN_NUM_MATCHES,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [
-				new Match(
-					222,
-					'NONE',
-					2020,
-					'NA1',
-					100,
-					COMMON_QUEUE_TYPES.aram.id,
-					'NONE',
-					new Date(2020, 1, 1).getTime(),
-				),
-			],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									COMMON_QUEUE_TYPES.aram.id,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: MIN_NUM_MATCHES - 1,
-			paramIncludeGameData: undefined,
-			paramQueueType: undefined,
-		},
-		{
-			description:
-				'Get Last X is above MAX_NUM_MATCHES - Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 0,
-			expectedUrlParamCount: MAX_NUM_MATCHES,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [
-				new Match(
-					222,
-					'NONE',
-					2020,
-					'NA1',
-					100,
-					COMMON_QUEUE_TYPES.aram.id,
-					'NONE',
-					new Date(2020, 1, 1).getTime(),
-				),
-			],
-			mockGetGame: jest.fn(() => Promise.resolve()),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									COMMON_QUEUE_TYPES.aram.id,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: MAX_NUM_MATCHES + 1,
-			paramIncludeGameData: undefined,
-			paramQueueType: undefined,
-		},
-		{
-			description: 'Include game data - Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 1,
-			expectedUrlParamCount: 1,
-			expectedUrlParamQueueFilter: '',
-			expectedResult: [
-				new Game(
-					222,
-					333,
-					444,
-					'CLASSIC',
-					'MATCHED_GAME',
-					'v1',
-					1,
-					[],
-					[],
-					'p1',
-					COMMON_QUEUE_TYPES.aram.id,
-					2020,
-					[],
-				),
-			],
-			mockGetGame: jest.fn(() =>
-				Promise.resolve(
-					new Game(
-						222,
-						333,
-						444,
-						'CLASSIC',
-						'MATCHED_GAME',
-						'v1',
-						1,
-						[],
-						[],
-						'p1',
-						COMMON_QUEUE_TYPES.aram.id,
-						2020,
-						[],
-					),
-				),
-			),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									COMMON_QUEUE_TYPES.aram.id,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: 1,
-			paramIncludeGameData: true,
-			paramQueueType: undefined,
-		},
-		{
-			description: 'include queue filter - Returned data is good',
-			expectedCountHttpGet: 1,
-			expectedCountGetGame: 1,
-			expectedUrlParamCount: 1,
-			expectedUrlParamQueueFilter: `&queue=${COMMON_QUEUE_TYPES.aram.id}`,
-			expectedResult: [
-				new Game(
-					222,
-					333,
-					444,
-					'CLASSIC',
-					'MATCHED_GAME',
-					'v1',
-					1,
-					[],
-					[],
-					'p1',
-					COMMON_QUEUE_TYPES.aram.id,
-					2020,
-					[],
-				),
-			],
-			mockGetGame: jest.fn(() =>
-				Promise.resolve(
-					new Game(
-						222,
-						333,
-						444,
-						'CLASSIC',
-						'MATCHED_GAME',
-						'v1',
-						1,
-						[],
-						[],
-						'p1',
-						COMMON_QUEUE_TYPES.aram.id,
-						2020,
-						[],
-					),
-				),
-			),
-			mockHttpGet: jest.fn(() =>
-				from(
-					Promise.resolve({
-						data: {
-							endIndex: 1,
-							startIndex: 0,
-							matches: [
-								new Match(
-									222,
-									'NONE',
-									2020,
-									'NA1',
-									100,
-									COMMON_QUEUE_TYPES.aram.id,
-									'NONE',
-									new Date(2020, 1, 1).getTime(),
-								),
-							] as Match[],
-							totalGames: 1,
-						} as Matchlist,
-					}),
-				),
-			),
-			paramAccountId: 'some-account-id',
-			paramGetLastX: 1,
-			paramIncludeGameData: true,
-			paramQueueType: 'aram',
-		},
-	]
 	let service: MatchlistService
 	let testModule: TestingModule
 	let mockGetRiotToken: jest.Mock
@@ -440,10 +68,10 @@ describe('Matchlist Service', () => {
 					})
 
 					describe(`invoke getGame(${paramGameId})`, () => {
-						let actualResult: Game | null
+						let actualResult: GameV5 | null
 
 						beforeEach(async () => {
-							actualResult = await service.v4GetGame(paramGameId)
+							actualResult = await service.v5GetGame(paramGameId)
 						})
 
 						it('uses AppService for riotToken, invokes get() correctly and returns expected result', () => {
@@ -454,7 +82,7 @@ describe('Matchlist Service', () => {
 							)
 							if (expectedCountHttpGet > 0) {
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
-									`https://na1.api.riotgames.com/lol/match/v4/matches/${paramGameId}`,
+									`https://americas.api.riotgames.com/lol/match/v5/matches/${paramGameId}`,
 									{
 										headers: {
 											'Accept-Charset':
@@ -483,14 +111,13 @@ describe('Matchlist Service', () => {
 				expectedResult,
 				mockGetGame,
 				mockHttpGet,
-				paramAccountId,
+				paramPuuid,
 				paramGetLastX,
-				paramIncludeGameData,
 				paramQueueType,
 			}) => {
-				describe(`w/ mocked HttpGet and v4GetGame (${description})`, () => {
+				describe(`w/ mocked HttpGet and v5GetGame (${description})`, () => {
 					beforeEach(() => {
-						jest.spyOn(service, 'v4GetGame').mockImplementation(
+						jest.spyOn(service, 'v5GetGame').mockImplementation(
 							mockGetGame,
 						)
 						jest.spyOn(
@@ -499,16 +126,15 @@ describe('Matchlist Service', () => {
 						).mockImplementation(mockHttpGet)
 					})
 
-					describe(`invoke getMatchlist("${paramAccountId}", ${paramGetLastX}, ${paramIncludeGameData}, ${
+					describe(`invoke getMatchlist("${paramPuuid}", ${paramGetLastX}, ${
 						paramQueueType ? `"${paramQueueType}"` : paramQueueType
 					})`, () => {
-						let actualResult: Game[] | Match[]
+						let actualResult: GameV5[]
 
 						beforeEach(async () => {
-							actualResult = await service.v4GetMatchlist(
-								paramAccountId,
+							actualResult = await service.v5GetMatchlist(
+								paramPuuid,
 								paramGetLastX,
-								paramIncludeGameData,
 								paramQueueType,
 							)
 						})
@@ -520,17 +146,11 @@ describe('Matchlist Service', () => {
 								expectedCountHttpGet,
 							)
 							if (expectedCountHttpGet > 0) {
-								const expectedFullUrl =
-									'https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'
-										.concat(paramAccountId)
-										.concat(
-											`?endIndex=${expectedUrlParamCount}`,
-										)
-										.concat(
-											paramQueueType
-												? expectedUrlParamQueueFilter
-												: '',
-										)
+								const expectedFullUrl = `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${paramPuuid}/ids?count=${expectedUrlParamCount}${
+									paramQueueType
+										? expectedUrlParamQueueFilter
+										: ''
+								}`
 
 								expect(mockHttpGet).toHaveBeenLastCalledWith(
 									expectedFullUrl,
