@@ -49,6 +49,7 @@ describe('User Service', () => {
 				new Date(1990, 11, 15),
 				9,
 				'name 1',
+				'puuid-1',
 				'summ-id-1',
 			),
 			mockLoadedUsers: [
@@ -57,9 +58,17 @@ describe('User Service', () => {
 					new Date(1990, 11, 15),
 					9,
 					'name 1',
+					'puuid-1',
 					'summ-id-1',
 				),
-				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
+				new User(
+					'account-id-2',
+					new Date(),
+					12,
+					'name 2',
+					'puuid-2',
+					'summ-id-2',
+				),
 			],
 			name: 'multiple users, one name matches exactly',
 			param: 'name 1',
@@ -70,6 +79,7 @@ describe('User Service', () => {
 				new Date(1990, 11, 15),
 				9,
 				'name 1',
+				'puuid-1',
 				'summ-id-1',
 			),
 			mockLoadedUsers: [
@@ -78,9 +88,17 @@ describe('User Service', () => {
 					new Date(1990, 11, 15),
 					9,
 					'name 1',
+					'puuid-1',
 					'summ-id-1',
 				),
-				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
+				new User(
+					'account-id-2',
+					new Date(),
+					12,
+					'name 2',
+					'puuid-2',
+					'summ-id-2',
+				),
 			],
 			name: 'multiple users, one name matches w/ different casing',
 			param: 'nAmE 1',
@@ -88,8 +106,22 @@ describe('User Service', () => {
 		{
 			expectedResult: undefined,
 			mockLoadedUsers: [
-				new User('account-id-1', new Date(), 9, 'name 1', 'summ-id-1'),
-				new User('account-id-2', new Date(), 12, 'name 2', 'summ-id-2'),
+				new User(
+					'account-id-1',
+					new Date(),
+					9,
+					'name 1',
+					'puuid-1',
+					'summ-id-1',
+				),
+				new User(
+					'account-id-2',
+					new Date(),
+					12,
+					'name 2',
+					'puuid-2',
+					'summ-id-2',
+				),
 			],
 			name: 'multiple users, none match',
 			param: 'non-matching name',
@@ -111,6 +143,7 @@ describe('User Service', () => {
 	// 				new Date().getTime(),
 	// 				9,
 	// 				'name 1',
+	// 				'puuid-1',
 	// 				'summ-id-1',
 	// 			),
 	// 			new User(
@@ -118,6 +151,7 @@ describe('User Service', () => {
 	// 				new Date().getTime(),
 	// 				12,
 	// 				'name 2',
+	// 				'puuid-2',,
 	// 				'summ-id-2',
 	// 			),
 	// 		],
@@ -132,6 +166,7 @@ describe('User Service', () => {
 	// 				new Date().getTime(),
 	// 				9,
 	// 				'name 1',
+	// 				'puuid-1',
 	// 				'summ-id-1',
 	// 			),
 	// 			new User(
@@ -139,6 +174,7 @@ describe('User Service', () => {
 	// 				new Date(1990, 11, 15).getTime(),
 	// 				12,
 	// 				'name 2',
+	// 				'puuid-2',
 	// 				'summ-id-2',
 	// 			),
 	// 		],
@@ -157,12 +193,12 @@ describe('User Service', () => {
 	// {
 	// 	expectedCountError: 0,
 	// 	expectedResult: [
-	// 		new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
+	// 		new User('account-id-1', 1599444327317, 9, 'name 1', 'puuid-1', 'summ-id-1'),
 	// 	],
 	// 	// mockReadFileSync: jest.fn(() =>
 	// 	// 	Buffer.from(
 	// 	// 		JSON.stringify([
-	// 	// 			new User('account-id-1', 1599444327317, 9, 'name 1', 'summ-id-1'),
+	// 	// 			new User('account-id-1', 1599444327317, 9, 'name 1', 'puuid-1', 'summ-id-1'),
 	// 	// 		]),
 	// 	// 		ENCODING_UTF8,
 	// 	// 	),
@@ -212,6 +248,7 @@ describe('User Service', () => {
 		lastUpdated: new Date(2021, 7, 1),
 		masteryTotal: 1,
 		name: 'name 1',
+		puuid: 'puuid-1',
 		summonerId: 'summ-id',
 	}
 	const fakeSummoner: Summoner = {
