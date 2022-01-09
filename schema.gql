@@ -17,5 +17,6 @@ type User {
   lastUpdated: DateTime!
   masteryTotal: Int!
   name: String!
+  puuid: String!
   summonerId: String!
 }
