@@ -17,19 +17,18 @@ import {
 	ApiTags,
 } from '@nestjs/swagger'
 import {
-	accountIdExamples,
 	puuidExamples,
 	COMMON_QUEUE_TYPES,
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
 	queueTypeExamples,
 } from '../constants'
-import { Game } from '../models/game.model'
+import { GameV5 } from '../models/game-v5.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
 @ApiTags('matchlist')
-@ApiExtraModels(Game, Match)
+@ApiExtraModels(GameV5, Match)
 @Controller('matchlist')
 export class MatchlistController {
 	constructor(
@@ -99,7 +98,7 @@ export class MatchlistController {
 		@Query('getLastX') getLastX = 10,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Game[]> {
+	): Promise<GameV5[]> {
 		this.logger.log(
 			`puuid="${puuid}" getLastX=${getLastX} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
@@ -134,9 +133,9 @@ export class MatchlistController {
 	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	getGame(@Param('gameId') gameId: string): Promise<Game> {
+	getGame(@Param('gameId') gameId: string): Promise<GameV5> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
 
-		return this.matchlistService.v5GetGame(gameId) as Promise<Game>
+		return this.matchlistService.v5GetGame(gameId) as Promise<GameV5>
 	}
 }
