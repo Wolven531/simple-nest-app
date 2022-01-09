@@ -1,5 +1,7 @@
+import { deserializeArray } from 'class-transformer'
 import { ALL_QUEUES } from './data/queues'
 import * as usersJsonData from './data/users.json'
+import { User } from './models/user.model'
 
 // Environment constants
 export const ENV_API_KEY = 'RIOT_SECRET'
@@ -48,6 +50,9 @@ export const TIME_MILLIS_IN_DAY =
 const accountIdExamples: any = {}
 accountIdExamples['Custom Account ID'] = { value: '' }
 
+const puuidExamples: any = {}
+puuidExamples['Custom PUUID'] = { value: '' }
+
 const queueTypeExamples: any = {}
 queueTypeExamples['Default (not specified)'] = {
 	value: undefined,
@@ -71,9 +76,14 @@ Object.keys(COMMON_QUEUE_TYPES).forEach(
 	},
 )
 
-usersJsonData.forEach((user) => {
+const users: User[] = deserializeArray(User, JSON.stringify(usersJsonData))
+
+users.forEach((user) => {
 	accountIdExamples[`Account ID for ${user.name}`] = {
 		value: user.accountId,
+	}
+	puuidExamples[`PUUID for ${user.name}`] = {
+		value: user.puuid,
 	}
 	searchKeyExamples[`Search for ${user.name}`] = {
 		value: user.name,
@@ -85,6 +95,7 @@ usersJsonData.forEach((user) => {
 
 export {
 	accountIdExamples,
+	puuidExamples,
 	queueTypeExamples,
 	searchKeyExamples,
 	summonerIdExamples,
