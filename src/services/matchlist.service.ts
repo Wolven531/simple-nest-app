@@ -51,11 +51,6 @@ export class MatchlistService {
 			.then<GameV5>((resp) => {
 				const game = resp.data.info as GameV5
 
-				this.logger.log(
-					`Game loaded\n\n${JSON.stringify(game, null, 4)}\n\n`,
-					' getGame | match-svc ',
-				)
-
 				return game
 			})
 			.catch((err) => {
