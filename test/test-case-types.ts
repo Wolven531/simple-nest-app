@@ -1,5 +1,13 @@
 import { COMMON_QUEUE_TYPES } from '../src/constants'
+import { CalculatedStats } from '../src/models/calculated-stats.model'
 import { GameV5 } from '../src/models/v5/game-v5.model'
+
+export type TestCase_CalculateGeneralStats = {
+	expectedResult: CalculatedStats
+	testDescription: string
+	paramPuuid: string
+	paramGames: GameV5[]
+}
 
 export type TestCase_GetGame = {
 	description: string
