@@ -55,7 +55,7 @@ describe('Mastery Service', () => {
 		// 	expectedResult: -1, // comes from DEFAULT_TOTAL_MASTERY_SCORE
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
-		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
+		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'puuid-1', 'summ-1'),
 		// 	// ]),
 		// 	paramSummonerId: '',
 		// 	paramDefaultMasteryTotal: undefined,
@@ -66,7 +66,7 @@ describe('Mastery Service', () => {
 		// 	expectedResult: 75, // comes from fresh User
 		// 	mockHttpGet: jest.fn(() => Promise.resolve()),
 		// 	// mockLoadUsersFromFile: jest.fn(() => [
-		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'summ-1'),
+		// 	// 	new User('acct-1', new Date().getTime(), 75, 'name-1', 'puuid-1', 'summ-1'),
 		// 	// ]),
 		// 	paramSummonerId: 'summ-1',
 		// 	paramDefaultMasteryTotal: undefined,
@@ -89,6 +89,7 @@ describe('Mastery Service', () => {
 			// 		new Date(2020, 1, 1).getTime(),
 			// 		75,
 			// 		'name-1',
+			// 		'puuid-1',
 			// 		'summ-1',
 			// 	),
 			// ]),
@@ -111,6 +112,7 @@ describe('Mastery Service', () => {
 			// 		new Date(2020, 1, 1).getTime(),
 			// 		75,
 			// 		'name-1',
+			// 		'puuid-1',
 			// 		'summ-1',
 			// 	),
 			// ]),
@@ -155,6 +157,7 @@ describe('Mastery Service', () => {
 						new Date(2020, 1, 1).getTime(),
 						134,
 						'name-1',
+						'puuid-1',
 						'summ-1',
 					),
 				],
@@ -165,6 +168,7 @@ describe('Mastery Service', () => {
 						new Date(2020, 1, 1).getTime(),
 						123,
 						'name-1',
+						'puuid-1',
 						'summ-1',
 					),
 				]),
@@ -391,6 +395,7 @@ describe('Mastery Service', () => {
 									accountId: expectedUser.accountId,
 									masteryTotal: expectedUser.masteryTotal,
 									name: expectedUser.name,
+									puuid: expectedUser.puuid,
 									summonerId: expectedUser.summonerId,
 								} as User)
 							})

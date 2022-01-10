@@ -17,18 +17,18 @@ import {
 	ApiTags,
 } from '@nestjs/swagger'
 import {
-	accountIdExamples,
+	puuidExamples,
 	COMMON_QUEUE_TYPES,
 	MAX_NUM_MATCHES,
 	MIN_NUM_MATCHES,
 	queueTypeExamples,
 } from '../constants'
-import { Game } from '../models/game.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
 @ApiTags('matchlist')
-@ApiExtraModels(Game, Match)
+@ApiExtraModels(GameV5, Match)
 @Controller('matchlist')
 export class MatchlistController {
 	constructor(
@@ -38,21 +38,21 @@ export class MatchlistController {
 		private readonly logger: Logger,
 	) {}
 
-	@Get(':accountId')
+	@Get(':puuid')
 	@ApiOperation({
 		description:
-			'Get a list of matches from the Riot API (match v4 currently) for a given Summoner accountId',
+			'Get a list of games from the Riot API (match v5 currently) for a given Summoner puuid',
 		externalDocs: {
 			description: 'Riot API Get Matchlist Endpoint Docs',
-			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatchlist',
+			url: 'https://developer.riotgames.com/apis#match-v5/GET_getMatchIdsByPUUID',
 		},
-		summary: 'Get a list of matches for a given Summoner accountId',
+		summary: 'Get a list of games for a given Summoner puuid',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
-		description: 'accountId of a Summoner',
-		examples: accountIdExamples,
-		name: 'accountId',
+		description: 'puuid of a Summoner',
+		examples: puuidExamples,
+		name: 'puuid',
 		required: true,
 		style: 'simple',
 		type: 'string',
@@ -82,26 +82,6 @@ export class MatchlistController {
 	@ApiQuery({
 		allowEmptyValue: false,
 		description:
-			'Whether to return game data alongside match data; false by default',
-		examples: {
-			'Default (not specified)': {
-				value: undefined,
-			},
-			'Request with game data (includeGameData=true)': {
-				value: true,
-			},
-			'Request without game data (includeGameData=false)': {
-				value: false,
-			},
-		},
-		name: 'includeGameData',
-		required: false,
-		style: 'simple',
-		type: 'boolean',
-	})
-	@ApiQuery({
-		allowEmptyValue: false,
-		description:
 			'Optional filter to return only matches w/ a certain queue',
 		enum: Object.keys(COMMON_QUEUE_TYPES),
 		examples: queueTypeExamples,
@@ -110,27 +90,21 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('match')
+	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getMatchlist(
-		@Param('accountId') accountId: string,
+		@Param('puuid') puuid: string,
 		@Query('getLastX') getLastX = 10,
-		@Query('includeGameData') includeGameData = false,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Match[] | Game[]> {
+	): Promise<GameV5[]> {
 		this.logger.log(
-			`accountId="${accountId}" getLastX=${getLastX} includeGameData=${includeGameData} queueType="${queueType}"`,
+			`puuid="${puuid}" getLastX=${getLastX} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
 		)
 
-		return this.matchlistService.v4GetMatchlist(
-			accountId,
-			getLastX,
-			includeGameData,
-			queueType,
-		)
+		return this.matchlistService.v5GetMatchlist(puuid, getLastX, queueType)
 	}
 
 	@Get('game/:gameId')
@@ -139,7 +113,7 @@ export class MatchlistController {
 			'Get a Game from the Riot API (match v4 currently) using a given gameId',
 		externalDocs: {
 			description: 'Riot API Get Match Endpoint Docs',
-			url: 'https://developer.riotgames.com/apis#match-v4/GET_getMatch',
+			url: 'https://developer.riotgames.com/apis#match-v5/GET_getMatch',
 		},
 		summary: 'Get a Game using a given gameId',
 	})
@@ -154,14 +128,14 @@ export class MatchlistController {
 		name: 'gameId',
 		required: true,
 		style: 'simple',
-		type: 'number',
+		type: 'string',
 	})
 	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	getGame(@Param('gameId') gameId: number): Promise<Game> {
+	getGame(@Param('gameId') gameId: string): Promise<GameV5> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
 
-		return this.matchlistService.v4GetGame(gameId) as Promise<Game>
+		return this.matchlistService.v5GetGame(gameId) as Promise<GameV5>
 	}
 }

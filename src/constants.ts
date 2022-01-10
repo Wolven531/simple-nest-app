@@ -1,5 +1,7 @@
+import { deserializeArray } from 'class-transformer'
 import { ALL_QUEUES } from './data/queues'
 import * as usersJsonData from './data/users.json'
+import { User } from './models/user.model'
 
 // Environment constants
 export const ENV_API_KEY = 'RIOT_SECRET'
@@ -25,6 +27,7 @@ export const COMMON_QUEUE_TYPES = {
 export const MAX_NUM_MATCHES = 19 // need soft cap here until rate limit is in place
 export const MIN_NUM_MATCHES = 1
 export const REGION = 'na1'
+export const REGION_V5 = 'americas'
 
 // Time constants
 export const TIME_HOURS_IN_DAY = 24
@@ -47,6 +50,9 @@ export const TIME_MILLIS_IN_DAY =
 
 const accountIdExamples: any = {}
 accountIdExamples['Custom Account ID'] = { value: '' }
+
+const puuidExamples: any = {}
+puuidExamples['Custom PUUID'] = { value: '' }
 
 const queueTypeExamples: any = {}
 queueTypeExamples['Default (not specified)'] = {
@@ -71,9 +77,14 @@ Object.keys(COMMON_QUEUE_TYPES).forEach(
 	},
 )
 
-usersJsonData.forEach((user) => {
+const users: User[] = deserializeArray(User, JSON.stringify(usersJsonData))
+
+users.forEach((user) => {
 	accountIdExamples[`Account ID for ${user.name}`] = {
 		value: user.accountId,
+	}
+	puuidExamples[`PUUID for ${user.name}`] = {
+		value: user.puuid,
 	}
 	searchKeyExamples[`Search for ${user.name}`] = {
 		value: user.name,
@@ -85,6 +96,7 @@ usersJsonData.forEach((user) => {
 
 export {
 	accountIdExamples,
+	puuidExamples,
 	queueTypeExamples,
 	searchKeyExamples,
 	summonerIdExamples,

@@ -2,9 +2,7 @@ import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { UserMasteryService } from '../composite/user-mastery.service'
 import { User } from '../models/user.model'
-import { MasteryService } from '../services/mastery.service'
 import { UserResolver } from './user.resolver'
-import { UserService } from './user.service'
 
 describe('UserResolver', () => {
 	const fakeUpdated = new Date(2021, 7, 29)
@@ -15,6 +13,7 @@ describe('UserResolver', () => {
 			lastUpdated: fakeUpdated,
 			masteryTotal: 17,
 			name: 'some user',
+			puuid: 'puuid-1',
 			summonerId: 'some-summoner-id',
 		},
 	]

@@ -16,12 +16,12 @@ import {
 	ApiTags,
 } from '@nestjs/swagger'
 import {
-	accountIdExamples,
 	COMMON_QUEUE_TYPES,
+	puuidExamples,
 	queueTypeExamples,
 } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
+import { GameV5 } from '../models/v5/game-v5.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
@@ -40,14 +40,14 @@ export class StatsController {
 
 	@Get('summary')
 	@ApiOperation({
-		description: 'Get calculated stats using an account ID',
-		summary: 'Get calculated stats using an account ID',
+		description: 'Get calculated stats using an puuid',
+		summary: 'Get calculated stats using an puuid',
 	})
 	@ApiQuery({
 		allowEmptyValue: false,
-		description: 'accountId to search for when parsing game data',
-		examples: accountIdExamples,
-		name: 'accountId',
+		description: 'puuid to search for when parsing game data',
+		examples: puuidExamples,
+		name: 'puuid',
 		required: true,
 		style: 'simple',
 		type: 'string',
@@ -92,18 +92,18 @@ export class StatsController {
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	async getSummaryForAccountId(
-		@Query('accountId') accountId: string,
+		@Query('puuid') puuid: string,
 		@Query('getLastX') getLastX = 10,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
 	): Promise<CalculatedStats> {
-		if (accountId.length < 1) {
+		if (puuid.length < 1) {
 			throw new BadRequestException({
 				error: true,
 				headersRequired: [],
 				queryParamsRequired: [
 					{
-						name: 'accountId',
+						name: 'puuid',
 						type: 'string',
 					},
 				],
@@ -111,17 +111,16 @@ export class StatsController {
 		}
 
 		this.logger.log(
-			`accountId=${accountId} getLastX=${getLastX} queueType="${queueType}"`,
+			`puuid=${puuid} getLastX=${getLastX} queueType="${queueType}"`,
 			' getSummaryForAccountId | StatsCtrl ',
 		)
 
-		const games: Game[] = (await this.matchlistService.v4GetMatchlist(
-			accountId,
+		const games: GameV5[] = (await this.matchlistService.v5GetMatchlist(
+			puuid,
 			getLastX,
-			true,
 			queueType,
-		)) as Game[]
+		)) as GameV5[]
 
-		return this.statsService.calculateGeneralStats(accountId, games)
+		return this.statsService.calculateGeneralStats(puuid, games)
 	}
 }
