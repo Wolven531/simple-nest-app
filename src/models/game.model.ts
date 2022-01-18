@@ -1,10 +1,8 @@
-import { Participant } from './participant.model'
-import { ParticipantIdentity } from './participant-identity.model'
-import { Team } from './team.model'
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger'
+import { Participant } from './participant.model'
 
-@ApiExtraModels(Participant, ParticipantIdentity, Team)
-class Game {
+@ApiExtraModels(Participant)
+export class Game {
 	@ApiProperty()
 	gameCreation: number
 
@@ -12,10 +10,19 @@ class Game {
 	gameDuration: number
 
 	@ApiProperty()
+	gameEndTimestamp: number
+
+	@ApiProperty()
 	gameId: number
 
 	@ApiProperty()
 	gameMode: string
+
+	@ApiProperty()
+	gameName: string
+
+	@ApiProperty()
+	gameStartTimestamp: number
 
 	@ApiProperty()
 	gameType: string
@@ -25,11 +32,6 @@ class Game {
 
 	@ApiProperty()
 	mapId: number
-
-	@ApiProperty({
-		type: [ParticipantIdentity],
-	})
-	participantIdentities: ParticipantIdentity[]
 
 	@ApiProperty({
 		type: [Participant],
@@ -43,57 +45,61 @@ class Game {
 	queueId: number
 
 	@ApiProperty()
-	seasonId: number
+	teams: any[]
 
-	@ApiProperty({
-		type: [Team],
-	})
-	teams: Team[]
+	@ApiProperty()
+	tournamentCode: string
 
 	/**
-	 * @param gameCreation - Timestamp of when game was created
-	 * @param gameDuration - Length of game in seconds
-	 * @param gameId - Unique identifier for game
-	 * @param gameMode - Mode of game (e.g. 'CLASSIC')
-	 * @param gameType - Type of game (e.g. 'MATCHED_GAME')
-	 * @param gameVersion - Patch version used for game
-	 * @param mapId - Refers to which map game was played on
-	 * @param participantIdentities - Array of info related to League about participants
-	 * @param participants - Array of info related to specific game about participants
-	 * @param platformId - Which platform game was played on (e.g. 'NA1')
-	 * @param queueId - Which queue generated game
-	 * @param seasonId - Which season game was played in
-	 * @param teams - Array describing the factions in game
+	 * @param gameCreation number
+	 * @param gameDuration number
+	 * @param gameEndTimestamp number
+	 * @param gameId number
+	 * @param gameMode string
+	 * @param gameName string
+	 * @param gameStartTimestamp number
+	 * @param gameType string
+	 * @param gameVersion string
+	 * @param mapId number
+	 * @param participants Participant[]
+	 * @param platformId string
+	 * @param queueId number
+	 * @param teams any[]
+	 * @param tournamentCode string
 	 */
 	constructor(
 		gameCreation: number,
 		gameDuration: number,
+		gameEndTimestamp: number,
 		gameId: number,
 		gameMode: string,
+		gameName: string,
+		gameStartTimestamp: number,
 		gameType: string,
 		gameVersion: string,
 		mapId: number,
-		participantIdentities: ParticipantIdentity[],
+		// participants:	List[ParticipantDto]
 		participants: Participant[],
 		platformId: string,
 		queueId: number,
-		seasonId: number,
-		teams: Team[],
+		// teams:	List[TeamDto]
+		teams: any[],
+		tournamentCode: string,
 	) {
 		this.gameCreation = gameCreation
 		this.gameDuration = gameDuration
+		this.gameEndTimestamp = gameEndTimestamp
 		this.gameId = gameId
 		this.gameMode = gameMode
+		this.gameName = gameName
+		this.gameStartTimestamp = gameStartTimestamp
 		this.gameType = gameType
 		this.gameVersion = gameVersion
 		this.mapId = mapId
-		this.participantIdentities = participantIdentities
 		this.participants = participants
 		this.platformId = platformId
 		this.queueId = queueId
-		this.seasonId = seasonId
 		this.teams = teams
+		this.tournamentCode = tournamentCode
 	}
 }
-
-export { Game }
