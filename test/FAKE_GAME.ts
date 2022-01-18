@@ -1,6 +1,6 @@
-import { GameV5 } from '../src/models/v5/game-v5.model'
+import { Game } from '../src/models/game.model'
 
-export const FAKE_GAME: GameV5 = {
+export const FAKE_GAME: Game = {
 	gameCreation: 1641637443000,
 	gameDuration: 1352,
 	gameEndTimestamp: 1641638851492,

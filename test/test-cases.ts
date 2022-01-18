@@ -7,7 +7,7 @@ import {
 	MIN_NUM_MATCHES,
 } from '../src/constants'
 import { CalculatedStats } from '../src/models/calculated-stats.model'
-import { GameV5 } from '../src/models/v5/game-v5.model'
+import { Game } from '../src/models/game.model'
 import {
 	TestCase_CalculateGeneralStats,
 	TestCase_GetGame,
@@ -17,7 +17,7 @@ import { FAKE_GAME } from './FAKE_GAME'
 // import FakeGame from './fakeGame1.json'
 // import { deserialize } from 'class-transformer'
 
-// const DeserializedFakeGame = deserialize(GameV5, JSON.stringify(FakeGame))
+// const DeserializedFakeGame = deserialize(Game, JSON.stringify(FakeGame))
 
 export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 	[
@@ -143,7 +143,7 @@ export const testCases_getGame: TestCase_GetGame[] = [
 	{
 		description: 'Returned data is good',
 		expectedCountHttpGet: 1,
-		expectedResult: { gameCreation: 333, gameDuration: 444 } as GameV5,
+		expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
 		mockHttpGet: jest.fn(() =>
 			from(
 				Promise.resolve({
@@ -151,7 +151,7 @@ export const testCases_getGame: TestCase_GetGame[] = [
 						info: {
 							gameCreation: 333,
 							gameDuration: 444,
-						} as GameV5,
+						} as Game,
 					},
 				}),
 			),
@@ -195,9 +195,9 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 10,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as GameV5],
+		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as GameV5),
+			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -218,9 +218,9 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: MIN_NUM_MATCHES,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as GameV5],
+		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as GameV5),
+			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -241,9 +241,9 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: MAX_NUM_MATCHES,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as GameV5],
+		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as GameV5),
+			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -263,24 +263,9 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 1,
 		expectedUrlParamQueueFilter: '',
-		// new GameV5(
-		// 	222,
-		// 	333,
-		// 	444,
-		// 	'CLASSIC',
-		// 	'MATCHED_GAME',
-		// 	'v1',
-		// 	1,
-		// 	[],
-		// 	[],
-		// 	'p1',
-		// 	COMMON_QUEUE_TYPES.aram.id,
-		// 	2020,
-		// 	[],
-		// ),
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as GameV5],
+		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as GameV5),
+			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -300,24 +285,9 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 1,
 		expectedUrlParamQueueFilter: `&queue=${COMMON_QUEUE_TYPES.aram.id}`,
-		// new Game(
-		// 	222,
-		// 	333,
-		// 	444,
-		// 	'CLASSIC',
-		// 	'MATCHED_GAME',
-		// 	'v1',
-		// 	1,
-		// 	[],
-		// 	[],
-		// 	'p1',
-		// 	COMMON_QUEUE_TYPES.aram.id,
-		// 	2020,
-		// 	[],
-		// ),
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as GameV5],
+		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as GameV5),
+			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(

@@ -2,12 +2,12 @@ import { HttpModule } from '@nestjs/axios'
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
-import { GameV5 } from '../models/v5/game-v5.model'
+import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { MatchlistController } from './matchlist.controller'
 
 describe('MatchlistController', () => {
-	const fakeGame: GameV5 = {} as GameV5
+	const fakeGame: Game = {} as Game
 	let controller: MatchlistController
 	let testModule: TestingModule
 	let mockGetGame: jest.Mock
@@ -50,10 +50,10 @@ describe('MatchlistController', () => {
 		})
 
 		describe('invoke getMatchlist()', () => {
-			let resp: GameV5[]
+			let resp: Game[]
 
 			beforeEach(async () => {
-				resp = (await controller.getMatchlist('some-puuid')) as GameV5[]
+				resp = (await controller.getMatchlist('some-puuid')) as Game[]
 			})
 
 			it('returns empty array', () => {
@@ -63,7 +63,7 @@ describe('MatchlistController', () => {
 		})
 
 		describe('invoke getGame()', () => {
-			let resp: GameV5
+			let resp: Game
 
 			beforeEach(async () => {
 				resp = await controller.getGame('0')

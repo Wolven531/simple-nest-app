@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { GameV5 } from '../models/v5/game-v5.model'
+import { Game } from '../models/game.model'
 
 @Injectable()
 export class StatsService {
@@ -17,10 +17,7 @@ export class StatsService {
 	 *
 	 * @returns A CalculatedStats object built using the parameters
 	 */
-	calculateGeneralStats(
-		targetPuuid: string,
-		games: GameV5[],
-	): CalculatedStats {
+	calculateGeneralStats(targetPuuid: string, games: Game[]): CalculatedStats {
 		const ctx = ' calculateGeneralStats | StatsSvc '
 
 		this.logger.log(

@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { COMMON_QUEUE_TYPES } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { GameV5 } from '../models/v5/game-v5.model'
+import { Game } from '../models/game.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
@@ -12,8 +12,7 @@ import { StatsController } from './stats.controller'
 describe('StatsController', () => {
 	// constants for testing
 	const fakePuuid = 'some-puuid'
-	// const fakeGame: Game = {} as Game
-	const fakeGames: GameV5[] = []
+	const fakeGames: Game[] = []
 	const fakeKDA = 3.14
 	const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
 

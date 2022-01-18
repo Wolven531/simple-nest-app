@@ -6,7 +6,7 @@ import {
 	testCases_getMatchlist,
 } from '../../test/test-cases'
 import { toggleMockedLogger } from '../../test/utils'
-import { GameV5 } from '../models/v5/game-v5.model'
+import { Game } from '../models/game.model'
 import { AppService } from './app.service'
 import { MatchlistService } from './matchlist.service'
 
@@ -68,7 +68,7 @@ describe('Matchlist Service', () => {
 					})
 
 					describe(`invoke getGame(${paramGameId})`, () => {
-						let actualResult: GameV5 | null
+						let actualResult: Game | null
 
 						beforeEach(async () => {
 							actualResult = await service.v5GetGame(paramGameId)
@@ -129,7 +129,7 @@ describe('Matchlist Service', () => {
 					describe(`invoke getMatchlist("${paramPuuid}", ${paramGetLastX}, ${
 						paramQueueType ? `"${paramQueueType}"` : paramQueueType
 					})`, () => {
-						let actualResult: GameV5[]
+						let actualResult: Game[]
 
 						beforeEach(async () => {
 							actualResult = await service.v5GetMatchlist(

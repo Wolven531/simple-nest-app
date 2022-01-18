@@ -23,12 +23,12 @@ import {
 	MIN_NUM_MATCHES,
 	queueTypeExamples,
 } from '../constants'
-import { GameV5 } from '../models/v5/game-v5.model'
+import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
 @ApiTags('matchlist')
-@ApiExtraModels(GameV5, Match)
+@ApiExtraModels(Game, Match)
 @Controller('matchlist')
 export class MatchlistController {
 	constructor(
@@ -98,7 +98,7 @@ export class MatchlistController {
 		@Query('getLastX') getLastX = 10,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<GameV5[]> {
+	): Promise<Game[]> {
 		this.logger.log(
 			`puuid="${puuid}" getLastX=${getLastX} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
@@ -133,9 +133,9 @@ export class MatchlistController {
 	@ApiTags('game')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	getGame(@Param('gameId') gameId: string): Promise<GameV5> {
+	getGame(@Param('gameId') gameId: string): Promise<Game> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
 
-		return this.matchlistService.v5GetGame(gameId) as Promise<GameV5>
+		return this.matchlistService.v5GetGame(gameId) as Promise<Game>
 	}
 }
