@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { firstValueFrom } from 'rxjs'
 import {
 	COMMON_QUEUE_TYPES,
@@ -49,6 +49,10 @@ export class MatchlistService {
 			),
 		)
 			.then<Match>((resp) => {
+				if (!resp.data || resp.status !== HttpStatus.OK) {
+					throw new Error('Response data was bad')
+				}
+
 				const match = resp.data as Match
 				// const match = resp.data.info as Match
 
