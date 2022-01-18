@@ -1,10 +1,6 @@
 import { Logger } from '@nestjs/common'
 import { TestingModule } from '@nestjs/testing'
-import { ParticipantIdentity } from '../src/models/participant-identity.model'
 import { Player } from '../src/models/player.model'
-
-const generateParticipantIdentity = (id: number): ParticipantIdentity =>
-	new ParticipantIdentity(id, generatePlayer(id))
 
 const generatePlayer = (id: number): Player =>
 	new Player('p', `a${id}`, `sn${id}`, `s${id}`, 'p', `a${id}`, 'm', 0)
@@ -49,4 +45,4 @@ const toggleMockedLogger = (
 	}
 }
 
-export { generateParticipantIdentity, generatePlayer, toggleMockedLogger }
+export { generatePlayer, toggleMockedLogger }
