@@ -7,7 +7,7 @@ import {
 	MIN_NUM_MATCHES,
 	REGION_V5,
 } from '../constants'
-import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
 import { AppService } from './app.service'
 
 @Injectable()
@@ -22,16 +22,16 @@ export class MatchlistService {
 	) {}
 
 	/**
-	 * This method uses the Riot Match API v5 to retrieve a Game
+	 * This method uses the Riot Match API v5 to retrieve a Match
 	 *
-	 * @param gameId string Identifier for game to retrieve
-	 * @returns Promise<Game> if successful; Promise<null> otherwise
+	 * @param gameId string Identifier for match to retrieve
+	 * @returns Promise<Match> if successful; Promise<null> otherwise
 	 */
-	async v5GetGame(gameId: string): Promise<Game | null> {
+	async v5GetGame(gameId: string): Promise<Match | null> {
 		const apiKey = this.appService.getRiotToken()
 
 		this.logger.log(
-			`About to fetch game (id = ${gameId})`,
+			`About to fetch match (id = ${gameId})`,
 			' getGame | match-svc ',
 		)
 
@@ -48,14 +48,15 @@ export class MatchlistService {
 				},
 			),
 		)
-			.then<Game>((resp) => {
-				const game = resp.data.info as Game
+			.then<Match>((resp) => {
+				const match = resp.data as Match
+				// const match = resp.data.info as Match
 
-				return game
+				return match
 			})
 			.catch((err) => {
 				this.logger.error(
-					`Error while fetching game!\n\n${JSON.stringify(
+					`Error while fetching match!\n\n${JSON.stringify(
 						err,
 						null,
 						4,
@@ -74,13 +75,13 @@ export class MatchlistService {
 	 * @param getLastX number Defaults to 10; number of matches to retrieve
 	 * @param queueType string Defaults to undefined; can be specified as a key from COMMON_QUEUE_TYPES
 	 *     to filter which matches to request
-	 * @returns A collection of Game objects
+	 * @returns A collection of Match objects
 	 */
 	async v5GetMatchlist(
 		puuid: string,
 		getLastX = 10,
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Game[]> {
+	): Promise<Match[]> {
 		const apiKey = this.appService.getRiotToken()
 
 		// update value BEFORE hitting Riot API
@@ -98,7 +99,7 @@ export class MatchlistService {
 				: `&queue=${COMMON_QUEUE_TYPES[queueType].id}`
 
 		this.logger.log(
-			`About to use HTTP to grab list of game IDs for puuid="${puuid}"`,
+			`About to use HTTP to grab list of match IDs for puuid="${puuid}"`,
 			' getMatchlist | match-svc ',
 		)
 
@@ -125,7 +126,7 @@ export class MatchlistService {
 
 				return matchIds
 			})
-			.then<Game[]>((allMatches: string[]) => {
+			.then<Match[]>((allMatches: string[]) => {
 				this.logger.log(
 					`retrieving additional info for ${allMatches.length} indiviudal games...`,
 					' getMatchlist | match-svc ',
@@ -133,7 +134,7 @@ export class MatchlistService {
 
 				return Promise.all(
 					allMatches.map((matchId) => {
-						this.logger.log(`about to grab game - ${matchId}`)
+						this.logger.log(`about to grab match - ${matchId}`)
 						return this.v5GetGame(matchId)
 					}),
 				)

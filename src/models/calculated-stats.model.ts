@@ -54,21 +54,21 @@ class CalculatedStats {
 
 	/**
 	 * @param gamesCount - number of games used to calculate the stats in this instance
-	 * @param goldEarnedAvg - average amount of gold earned per game
+	 * @param goldEarnedAvg - average amount of gold earned per match
 	 * @param goldEarnedTotal - total amount of gold earned across all games
 	 * @param kDA - calculated by adding kills and assists and dividing by assists across all games
-	 * @param timePlayedAvg - average amount of seconds per game
+	 * @param timePlayedAvg - average amount of seconds per match
 	 * @param timePlayedTotal - total amount of seconds across all games
-	 * @param assistsAvg - average amount of assists earned per game
+	 * @param assistsAvg - average amount of assists earned per match
 	 * @param assistsTotal - total amount of assists earned across all games
-	 * @param deathsAvg - average amount of deaths earned per game
+	 * @param deathsAvg - average amount of deaths earned per match
 	 * @param deathsTotal - total amount of deaths earned across all games
-	 * @param killsAvg - average amount of kills earned per game
+	 * @param killsAvg - average amount of kills earned per match
 	 * @param killsTotal - total amount of kills earned across all games
 	 * @param totalLosses - total number of losses across all games
 	 * @param totalWins - total number of wins across all games
 	 * @param winPercentage - ratio of wins to total number games
-	 * @param visionScoreAvg - average vision score per game
+	 * @param visionScoreAvg - average vision score per match
 	 * @param visionScoreTotal - total vision score across all games
 	 */
 	constructor(

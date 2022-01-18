@@ -50,22 +50,22 @@ class Team {
 	bans: any[]
 
 	/**
-	 * @param teamId - Team number used in game (i.e. 100, 200)
+	 * @param teamId - Team number used in match (i.e. 100, 200)
 	 * @param win - Whether the team achieved a victory (e.g. 'Win')
-	 * @param firstBlood - True if this team scored the first kill in the game, false otherwise
-	 * @param firstTower - True if this team destroyed the first tower in the game, false otherwise
-	 * @param firstInhibitor - True if this team destroyed the first inhibitor in the game, false otherwise
-	 * @param firstBaron - True if this team scored the first baron monster kill in the game, false otherwise
-	 * @param firstDragon - True if this team scored the first dragon monster kill in the game, false otherwise
-	 * @param firstRiftHerald - True if this team scored the first rift herald monster kill in the game, false otherwise
-	 * @param towerKills - Number of towers this team destroyed in the game
-	 * @param inhibitorKills - Number of inhibitors this team destroyed in the game
-	 * @param baronKills - Number of baron monster kills this team scored in the game
-	 * @param dragonKills - Number of dragon monster kills this team scored in the game
-	 * @param vilemawKills - Number of vile maw monster kills this team scored in the game
-	 * @param riftHeraldKills - Number of rift herald monster kills this team scored in the game
-	 * @param dominionVictoryScore - Score achieved if the game was dominion
-	 * @param bans - array of champions banned from the game in pre-game setup
+	 * @param firstBlood - True if this team scored the first kill in the match, false otherwise
+	 * @param firstTower - True if this team destroyed the first tower in the match, false otherwise
+	 * @param firstInhibitor - True if this team destroyed the first inhibitor in the match, false otherwise
+	 * @param firstBaron - True if this team scored the first baron monster kill in the match, false otherwise
+	 * @param firstDragon - True if this team scored the first dragon monster kill in the match, false otherwise
+	 * @param firstRiftHerald - True if this team scored the first rift herald monster kill in the match, false otherwise
+	 * @param towerKills - Number of towers this team destroyed in the match
+	 * @param inhibitorKills - Number of inhibitors this team destroyed in the match
+	 * @param baronKills - Number of baron monster kills this team scored in the match
+	 * @param dragonKills - Number of dragon monster kills this team scored in the match
+	 * @param vilemawKills - Number of vile maw monster kills this team scored in the match
+	 * @param riftHeraldKills - Number of rift herald monster kills this team scored in the match
+	 * @param dominionVictoryScore - Score achieved if the match was dominion
+	 * @param bans - array of champions banned from the match in pre-match setup
 	 */
 	constructor(
 		teamId: number,

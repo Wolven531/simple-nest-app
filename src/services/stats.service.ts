@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
 
 @Injectable()
 export class StatsService {
@@ -10,25 +10,28 @@ export class StatsService {
 	) {}
 
 	/**
-	 * This method iterates a collection of Game objects and calculates general stats
+	 * This method iterates a collection of Match objects and calculates general stats
 	 *
 	 * @param targetPuuid String puuid representing for which User to calculate stats
-	 * @param games Array of Game objects to use when calculating stats
+	 * @param matches Array of Match objects to use when calculating stats
 	 *
 	 * @returns A CalculatedStats object built using the parameters
 	 */
-	calculateGeneralStats(targetPuuid: string, games: Game[]): CalculatedStats {
+	calculateGeneralStats(
+		targetPuuid: string,
+		matches: Match[],
+	): CalculatedStats {
 		const ctx = ' calculateGeneralStats | StatsSvc '
 
 		this.logger.log(
-			`About to calc stats for ${games.length} games w/ puuid = ${targetPuuid}...`,
+			`About to calc stats for ${matches.length} matches w/ puuid = ${targetPuuid}...`,
 			ctx,
 		)
 
-		const timePlayedTotal = games
-			.map((g) => g.gameDuration)
+		const timePlayedTotal = matches
+			.map((g) => g.info.gameDuration)
 			.reduce((acc, curr) => acc + curr, 0)
-		const timePlayedAvg = timePlayedTotal / games.length || 0
+		const timePlayedAvg = timePlayedTotal / matches.length || 0
 
 		let assistsTotal = 0
 		let deathsTotal = 0
@@ -37,8 +40,8 @@ export class StatsService {
 		let visionScoreTotal = 0
 		let totalWins = 0
 
-		games.forEach((g) => {
-			const participant = g.participants.find(
+		matches.forEach((m) => {
+			const participant = m.info.participants.find(
 				(p) => p.puuid === targetPuuid,
 			)
 
@@ -54,17 +57,17 @@ export class StatsService {
 			totalWins += participant.win ? 1 : 0
 		})
 
-		const goldEarnedAvg = goldEarnedTotal / games.length || 0
-		const assistsAvg = assistsTotal / games.length || 0
-		const deathsAvg = deathsTotal / games.length || 0
-		const killsAvg = killsTotal / games.length || 0
+		const goldEarnedAvg = goldEarnedTotal / matches.length || 0
+		const assistsAvg = assistsTotal / matches.length || 0
+		const deathsAvg = deathsTotal / matches.length || 0
+		const killsAvg = killsTotal / matches.length || 0
 		const kDA = (killsTotal + assistsTotal) / deathsTotal || 0
-		const totalLosses = games.length - totalWins
-		const visionScoreAvg = visionScoreTotal / games.length || 0
-		const winPercentage = (totalWins / games.length || 0) * 100
+		const totalLosses = matches.length - totalWins
+		const visionScoreAvg = visionScoreTotal / matches.length || 0
+		const winPercentage = (totalWins / matches.length || 0) * 100
 
 		return new CalculatedStats(
-			games.length,
+			matches.length,
 			goldEarnedAvg,
 			goldEarnedTotal,
 			kDA,

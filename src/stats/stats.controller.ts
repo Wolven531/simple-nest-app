@@ -21,7 +21,7 @@ import {
 	queueTypeExamples,
 } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 
@@ -45,7 +45,7 @@ export class StatsController {
 	})
 	@ApiQuery({
 		allowEmptyValue: false,
-		description: 'puuid to search for when parsing game data',
+		description: 'puuid to search for when parsing match data',
 		examples: puuidExamples,
 		name: 'puuid',
 		required: true,
@@ -56,19 +56,19 @@ export class StatsController {
 		allowEmptyValue: false,
 		description: 'Number of games to retrieve for parsing; 10 by default',
 		examples: {
-			'Default - Ten (10) Games': {
+			'Default - Ten (10) Matches': {
 				value: 10,
 			},
-			'Custom Number of Games': {
+			'Custom Number of Matches': {
 				value: '',
 			},
-			'One (1) Game': {
+			'One (1) Match': {
 				value: 1,
 			},
-			'Three (3) Games': {
+			'Three (3) Matches': {
 				value: 3,
 			},
-			'Five (5) Games': {
+			'Five (5) Matches': {
 				value: 5,
 			},
 		},
@@ -115,11 +115,11 @@ export class StatsController {
 			' getSummaryForAccountId | StatsCtrl ',
 		)
 
-		const games: Game[] = (await this.matchlistService.v5GetMatchlist(
+		const games: Match[] = (await this.matchlistService.v5GetMatchlist(
 			puuid,
 			getLastX,
 			queueType,
-		)) as Game[]
+		)) as Match[]
 
 		return this.statsService.calculateGeneralStats(puuid, games)
 	}

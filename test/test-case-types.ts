@@ -1,18 +1,18 @@
 import { COMMON_QUEUE_TYPES } from '../src/constants'
 import { CalculatedStats } from '../src/models/calculated-stats.model'
-import { Game } from '../src/models/game.model'
+import { Match } from '../src/models/match.model'
 
 export type TestCase_CalculateGeneralStats = {
 	expectedResult: CalculatedStats
 	testDescription: string
 	paramPuuid: string
-	paramGames: Game[]
+	paramGames: Match[]
 }
 
 export type TestCase_GetGame = {
 	description: string
 	expectedCountHttpGet: number
-	expectedResult: Game | null
+	expectedResult: Match | null
 	mockHttpGet: jest.Mock
 	paramGameId: string
 }
@@ -23,7 +23,7 @@ export type TestCase_GetMatchlist = {
 	expectedCountGetGame: number
 	expectedUrlParamCount: number
 	expectedUrlParamQueueFilter: string
-	expectedResult: Game[]
+	expectedResult: Match[]
 	mockGetGame: jest.Mock
 	mockHttpGet: jest.Mock
 	paramPuuid: string

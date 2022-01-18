@@ -28,7 +28,7 @@ class Player {
 	/**
 	 * @param platformId - Original region player exists in (e.g. 'NA')
 	 * @param accountId - Original encrypted account ID for player
-	 * @param summonerName - Name displayed for player in game
+	 * @param summonerName - Name displayed for player in match
 	 * @param summonerId - Simple unique summoner ID for player
 	 * @param currentPlatformId - Current region player exists in (equal to `platformId` in most cases)
 	 * @param currentAccountId - Current encrypted account ID for player (equal to `accountId` in most cases)
