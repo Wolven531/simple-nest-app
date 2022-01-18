@@ -2,7 +2,7 @@ import { HttpModule } from '@nestjs/axios'
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
-import { Match } from '../models/Match.model'
+import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { MatchlistController } from './matchlist.controller'
 
