@@ -1,7 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger'
 import { Participant } from './participant.model'
+import { Team } from './team.model'
 
-@ApiExtraModels(Participant)
+@ApiExtraModels(Participant, Team)
 export class MatchInfo {
 	@ApiProperty()
 	gameCreation: number
@@ -44,8 +45,10 @@ export class MatchInfo {
 	@ApiProperty()
 	queueId: number
 
-	@ApiProperty()
-	teams: any[]
+	@ApiProperty({
+		type: [Team],
+	})
+	teams: Team[]
 
 	@ApiProperty()
 	tournamentCode: string
@@ -71,7 +74,7 @@ export class MatchInfo {
 		participants: Participant[],
 		platformId: string,
 		queueId: number,
-		teams: any[],
+		teams: Team[],
 		tournamentCode: string,
 	) {
 		this.gameCreation = gameCreation
