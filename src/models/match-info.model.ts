@@ -1,8 +1,9 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger'
 import { Participant } from './participant.model'
+import { Team } from './team.model'
 
-@ApiExtraModels(Participant)
-export class Game {
+@ApiExtraModels(Participant, Team)
+export class MatchInfo {
 	@ApiProperty()
 	gameCreation: number
 
@@ -44,28 +45,20 @@ export class Game {
 	@ApiProperty()
 	queueId: number
 
-	@ApiProperty()
-	teams: any[]
+	@ApiProperty({
+		type: [Team],
+	})
+	teams: Team[]
 
 	@ApiProperty()
 	tournamentCode: string
 
 	/**
-	 * @param gameCreation number
-	 * @param gameDuration number
-	 * @param gameEndTimestamp number
-	 * @param gameId number
-	 * @param gameMode string
-	 * @param gameName string
-	 * @param gameStartTimestamp number
-	 * @param gameType string
-	 * @param gameVersion string
-	 * @param mapId number
-	 * @param participants Participant[]
-	 * @param platformId string
-	 * @param queueId number
-	 * @param teams any[]
-	 * @param tournamentCode string
+	 * For more specific information on constants and values, please
+	 * visit https://developer.riotgames.com/docs/lol#general_game-constants
+	 *
+	 * @param info - match info
+	 * @param metadata - match metadata
 	 */
 	constructor(
 		gameCreation: number,
@@ -78,12 +71,10 @@ export class Game {
 		gameType: string,
 		gameVersion: string,
 		mapId: number,
-		// participants:	List[ParticipantDto]
 		participants: Participant[],
 		platformId: string,
 		queueId: number,
-		// teams:	List[TeamDto]
-		teams: any[],
+		teams: Team[],
 		tournamentCode: string,
 	) {
 		this.gameCreation = gameCreation

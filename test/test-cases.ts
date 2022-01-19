@@ -7,17 +7,16 @@ import {
 	MIN_NUM_MATCHES,
 } from '../src/constants'
 import { CalculatedStats } from '../src/models/calculated-stats.model'
-import { Game } from '../src/models/game.model'
+import { Match } from '../src/models/match.model'
 import {
 	TestCase_CalculateGeneralStats,
 	TestCase_GetGame,
 	TestCase_GetMatchlist,
 } from './test-case-types'
-import { FAKE_GAME } from './FAKE_GAME'
-// import FakeGame from './fakeGame1.json'
+import { FAKE_MATCH } from './fakes'
 // import { deserialize } from 'class-transformer'
 
-// const DeserializedFakeGame = deserialize(Game, JSON.stringify(FakeGame))
+// const DeserializedFakeMatch = deserialize(Match, JSON.stringify(FakeMatch))
 
 export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 	[
@@ -65,12 +64,12 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 				0,
 				0,
 			),
-			testDescription: 'a single Game (w/ a win that matches)',
+			testDescription: 'a single Match (w/ a win that matches)',
 			paramPuuid:
 				'iI1Bb6J3FprYZ7De0Yi3MMHql2mhHQ4cfusM0z0hW71Noow7fnkJqb_LZYw4kA3F9i0FaWZ7tkn1cw',
-			// paramGames: [FakeGame],
-			// paramGames: [DeserializedFakeGame],
-			paramGames: [FAKE_GAME],
+			// paramGames: [FakeMatch],
+			// paramGames: [DeserializedFakeMatch],
+			paramGames: [FAKE_MATCH],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -92,10 +91,10 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 				0,
 				0,
 			),
-			testDescription: 'a single Game (w/ a loss that matches)',
+			testDescription: 'a single Match (w/ a loss that matches)',
 			paramPuuid:
 				'-ezYn-k39TSn42zD7a2NcewPStW18C9sOQSEhU8wtYR3_L47fZOViqCnOxCO8QN3ogdT03JDeO8aQA',
-			paramGames: [FAKE_GAME],
+			paramGames: [FAKE_MATCH],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -117,9 +116,9 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 				0,
 				0,
 			),
-			testDescription: 'a single Game (w/ no identity matches)',
+			testDescription: 'a single Match (w/ no identity matches)',
 			paramPuuid: 'a3',
-			paramGames: [FAKE_GAME],
+			paramGames: [FAKE_MATCH],
 		},
 	]
 
@@ -143,7 +142,9 @@ export const testCases_getGame: TestCase_GetGame[] = [
 	{
 		description: 'Returned data is good',
 		expectedCountHttpGet: 1,
-		expectedResult: { gameCreation: 333, gameDuration: 444 } as Game,
+		expectedResult: {
+			info: { gameCreation: 333, gameDuration: 444 },
+		} as Match,
 		mockHttpGet: jest.fn(() =>
 			from(
 				Promise.resolve({
@@ -151,9 +152,10 @@ export const testCases_getGame: TestCase_GetGame[] = [
 						info: {
 							gameCreation: 333,
 							gameDuration: 444,
-						} as Game,
-					},
-				}),
+						},
+					} as Match,
+					status: HttpStatus.OK,
+				} as AxiosResponse),
 			),
 		),
 		paramGameId: '3',
@@ -195,9 +197,13 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 10,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
+		expectedResult: [
+			{ info: { gameId: 'match-id-1' } } as unknown as Match,
+		],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
+			Promise.resolve({
+				info: { gameId: 'match-id-1' },
+			} as unknown as Match),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -218,9 +224,13 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: MIN_NUM_MATCHES,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
+		expectedResult: [
+			{ info: { gameId: 'match-id-1' } } as unknown as Match,
+		],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
+			Promise.resolve({
+				info: { gameId: 'match-id-1' },
+			} as unknown as Match),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -241,9 +251,13 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: MAX_NUM_MATCHES,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
+		expectedResult: [
+			{ info: { gameId: 'match-id-1' } } as unknown as Match,
+		],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
+			Promise.resolve({
+				info: { gameId: 'match-id-1' },
+			} as unknown as Match),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -258,14 +272,18 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		paramQueueType: undefined,
 	},
 	{
-		description: 'Include game data - Returned data is good',
+		description: 'Include match data - Returned data is good',
 		expectedCountHttpGet: 1,
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 1,
 		expectedUrlParamQueueFilter: '',
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
+		expectedResult: [
+			{ info: { gameId: 'match-id-1' } } as unknown as Match,
+		],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
+			Promise.resolve({
+				info: { gameId: 'match-id-1' },
+			} as unknown as Match),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(
@@ -285,9 +303,13 @@ export const testCases_getMatchlist: TestCase_GetMatchlist[] = [
 		expectedCountGetGame: 1,
 		expectedUrlParamCount: 1,
 		expectedUrlParamQueueFilter: `&queue=${COMMON_QUEUE_TYPES.aram.id}`,
-		expectedResult: [{ gameId: 'match-id-1' } as unknown as Game],
+		expectedResult: [
+			{ info: { gameId: 'match-id-1' } } as unknown as Match,
+		],
 		mockGetGame: jest.fn(() =>
-			Promise.resolve({ gameId: 'match-id-1' } as unknown as Game),
+			Promise.resolve({
+				info: { gameId: 'match-id-1' },
+			} as unknown as Match),
 		),
 		mockHttpGet: jest.fn(() =>
 			from(

@@ -32,7 +32,7 @@ class Timeline {
 	xpPerMinDeltas: any
 
 	/**
-	 * @param participantId - In-game identifier of the player to which this timeline pertains
+	 * @param participantId - In-match identifier of the player to which this timeline pertains
 	 * @param creepsPerMinDeltas - ???
 	 * @param xpPerMinDeltas - ???
 	 * @param goldPerMinDeltas - ???
@@ -40,8 +40,8 @@ class Timeline {
 	 * @param xpDiffPerMinDeltas - ???
 	 * @param damageTakenPerMinDeltas - ???
 	 * @param damageTakenDiffPerMinDeltas - ???
-	 * @param role - Calculated role for the player in-game
-	 * @param lane - Calculated lane for the player in-game
+	 * @param role - Calculated role for the player in-match
+	 * @param lane - Calculated lane for the player in-match
 	 */
 	constructor(
 		participantId: number,

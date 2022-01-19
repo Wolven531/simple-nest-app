@@ -2,19 +2,19 @@ import { HttpModule } from '@nestjs/axios'
 import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
-import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { MatchlistController } from './matchlist.controller'
 
 describe('MatchlistController', () => {
-	const fakeGame: Game = {} as Game
+	const fakeMatch: Match = {} as Match
 	let controller: MatchlistController
 	let testModule: TestingModule
 	let mockGetGame: jest.Mock
 	let mockGetMatchlist: jest.Mock
 
 	beforeEach(async () => {
-		mockGetGame = jest.fn().mockResolvedValue(fakeGame)
+		mockGetGame = jest.fn().mockResolvedValue(fakeMatch)
 		mockGetMatchlist = jest.fn().mockResolvedValue([])
 
 		testModule = await Test.createTestingModule({
@@ -50,10 +50,10 @@ describe('MatchlistController', () => {
 		})
 
 		describe('invoke getMatchlist()', () => {
-			let resp: Game[]
+			let resp: Match[]
 
 			beforeEach(async () => {
-				resp = (await controller.getMatchlist('some-puuid')) as Game[]
+				resp = (await controller.getMatchlist('some-puuid')) as Match[]
 			})
 
 			it('returns empty array', () => {
@@ -63,7 +63,7 @@ describe('MatchlistController', () => {
 		})
 
 		describe('invoke getGame()', () => {
-			let resp: Game
+			let resp: Match
 
 			beforeEach(async () => {
 				resp = await controller.getGame('0')
@@ -71,7 +71,7 @@ describe('MatchlistController', () => {
 
 			it('returns empty array', () => {
 				expect(mockGetGame).toHaveBeenCalledTimes(1)
-				expect(resp).toEqual(fakeGame)
+				expect(resp).toEqual(fakeMatch)
 			})
 		})
 	})

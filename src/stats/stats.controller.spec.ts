@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { toggleMockedLogger } from '../../test/utils'
 import { COMMON_QUEUE_TYPES } from '../constants'
 import { CalculatedStats } from '../models/calculated-stats.model'
-import { Game } from '../models/game.model'
+import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 import { StatsService } from '../services/stats.service'
 import { StatsController } from './stats.controller'
@@ -12,7 +12,7 @@ import { StatsController } from './stats.controller'
 describe('StatsController', () => {
 	// constants for testing
 	const fakePuuid = 'some-puuid'
-	const fakeGames: Game[] = []
+	const fakeMatches: Match[] = []
 	const fakeKDA = 3.14
 	const fakeQueueFilter: keyof typeof COMMON_QUEUE_TYPES = 'aram'
 
@@ -29,8 +29,8 @@ describe('StatsController', () => {
 		mockCalculateGeneralStats = jest
 			.fn()
 			.mockReturnValue({ kDA: fakeKDA } as CalculatedStats)
-		// mockGetGame = jest.fn().mockResolvedValue(fakeGame)
-		mockGetMatchlist = jest.fn().mockResolvedValue(fakeGames)
+		// mockGetGame = jest.fn().mockResolvedValue(fakeMatch)
+		mockGetMatchlist = jest.fn().mockResolvedValue(fakeMatches)
 
 		testModule = await Test.createTestingModule({
 			controllers: [StatsController],
@@ -124,7 +124,7 @@ describe('StatsController', () => {
 				expect(mockCalculateGeneralStats).toHaveBeenCalledTimes(1)
 				expect(mockCalculateGeneralStats).toHaveBeenLastCalledWith(
 					fakePuuid,
-					fakeGames,
+					fakeMatches,
 				)
 				expect(mockGetMatchlist).toHaveBeenCalledTimes(1)
 				expect(mockGetMatchlist).toHaveBeenLastCalledWith(

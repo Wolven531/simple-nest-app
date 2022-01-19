@@ -23,12 +23,11 @@ import {
 	MIN_NUM_MATCHES,
 	queueTypeExamples,
 } from '../constants'
-import { Game } from '../models/game.model'
 import { Match } from '../models/match.model'
 import { MatchlistService } from '../services/matchlist.service'
 
 @ApiTags('matchlist')
-@ApiExtraModels(Game, Match)
+@ApiExtraModels(Match)
 @Controller('matchlist')
 export class MatchlistController {
 	constructor(
@@ -90,7 +89,7 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('game')
+	@ApiTags('match')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
 	getMatchlist(
@@ -98,7 +97,7 @@ export class MatchlistController {
 		@Query('getLastX') getLastX = 10,
 		@Query('queueType')
 		queueType: keyof typeof COMMON_QUEUE_TYPES = undefined,
-	): Promise<Game[]> {
+	): Promise<Match[]> {
 		this.logger.log(
 			`puuid="${puuid}" getLastX=${getLastX} queueType="${queueType}"`,
 			' getMatchlist | MatchlistCtrl ',
@@ -110,18 +109,18 @@ export class MatchlistController {
 	@Get('game/:gameId')
 	@ApiOperation({
 		description:
-			'Get a Game from the Riot API (match v4 currently) using a given gameId',
+			'Get a Match from the Riot API (match v4 currently) using a given gameId',
 		externalDocs: {
 			description: 'Riot API Get Match Endpoint Docs',
 			url: 'https://developer.riotgames.com/apis#match-v5/GET_getMatch',
 		},
-		summary: 'Get a Game using a given gameId',
+		summary: 'Get a Match using a given gameId',
 	})
 	@ApiParam({
 		allowEmptyValue: false,
-		description: 'gameId of a Game',
+		description: 'gameId of a Match',
 		examples: {
-			'Custom Game ID': {
+			'Custom Match ID': {
 				value: '',
 			},
 		},
@@ -130,12 +129,12 @@ export class MatchlistController {
 		style: 'simple',
 		type: 'string',
 	})
-	@ApiTags('game')
+	@ApiTags('match')
 	@HttpCode(HttpStatus.OK)
 	@Header('Cache-Control', 'none')
-	getGame(@Param('gameId') gameId: string): Promise<Game> {
+	getGame(@Param('gameId') gameId: string): Promise<Match> {
 		this.logger.log(`gameId=${gameId}`, ' getGame | MatchlistCtrl ')
 
-		return this.matchlistService.v5GetGame(gameId) as Promise<Game>
+		return this.matchlistService.v5GetGame(gameId) as Promise<Match>
 	}
 }
