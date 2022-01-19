@@ -13,11 +13,10 @@ import {
 	TestCase_GetGame,
 	TestCase_GetMatchlist,
 } from './test-case-types'
-import { FAKE_GAME } from './FAKE_GAME'
-// import FakeGame from './fakeGame1.json'
+import { FAKE_MATCH } from './fakes'
 // import { deserialize } from 'class-transformer'
 
-// const DeserializedFakeGame = deserialize(Match, JSON.stringify(FakeGame))
+// const DeserializedFakeMatch = deserialize(Match, JSON.stringify(FakeMatch))
 
 export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 	[
@@ -68,9 +67,9 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 			testDescription: 'a single Match (w/ a win that matches)',
 			paramPuuid:
 				'iI1Bb6J3FprYZ7De0Yi3MMHql2mhHQ4cfusM0z0hW71Noow7fnkJqb_LZYw4kA3F9i0FaWZ7tkn1cw',
-			// paramGames: [FakeGame],
-			// paramGames: [DeserializedFakeGame],
-			paramGames: [FAKE_GAME],
+			// paramGames: [FakeMatch],
+			// paramGames: [DeserializedFakeMatch],
+			paramGames: [FAKE_MATCH],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -95,7 +94,7 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 			testDescription: 'a single Match (w/ a loss that matches)',
 			paramPuuid:
 				'-ezYn-k39TSn42zD7a2NcewPStW18C9sOQSEhU8wtYR3_L47fZOViqCnOxCO8QN3ogdT03JDeO8aQA',
-			paramGames: [FAKE_GAME],
+			paramGames: [FAKE_MATCH],
 		},
 		{
 			expectedResult: new CalculatedStats(
@@ -119,7 +118,7 @@ export const testCases_CalculateGeneralStats: TestCase_CalculateGeneralStats[] =
 			),
 			testDescription: 'a single Match (w/ no identity matches)',
 			paramPuuid: 'a3',
-			paramGames: [FAKE_GAME],
+			paramGames: [FAKE_MATCH],
 		},
 	]
 

@@ -1,6 +1,6 @@
-import { Match } from '../src/models/match.model'
+import { Match } from '../../src/models/match.model'
 
-export const FAKE_GAME: Match = {
+export const FAKE_MATCH: Match = {
 	info: {
 		gameCreation: 1641637443000,
 		gameDuration: 1352,

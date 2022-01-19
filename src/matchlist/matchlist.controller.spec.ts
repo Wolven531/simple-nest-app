@@ -7,14 +7,14 @@ import { MatchlistService } from '../services/matchlist.service'
 import { MatchlistController } from './matchlist.controller'
 
 describe('MatchlistController', () => {
-	const fakeGame: Match = {} as Match
+	const fakeMatch: Match = {} as Match
 	let controller: MatchlistController
 	let testModule: TestingModule
 	let mockGetGame: jest.Mock
 	let mockGetMatchlist: jest.Mock
 
 	beforeEach(async () => {
-		mockGetGame = jest.fn().mockResolvedValue(fakeGame)
+		mockGetGame = jest.fn().mockResolvedValue(fakeMatch)
 		mockGetMatchlist = jest.fn().mockResolvedValue([])
 
 		testModule = await Test.createTestingModule({
@@ -71,7 +71,7 @@ describe('MatchlistController', () => {
 
 			it('returns empty array', () => {
 				expect(mockGetGame).toHaveBeenCalledTimes(1)
-				expect(resp).toEqual(fakeGame)
+				expect(resp).toEqual(fakeMatch)
 			})
 		})
 	})
